@@ -37,13 +37,10 @@ autodoc_default_options = {
     'undoc-members': True,
     'inherited-members': True,
     'show-inheritance': True,
-    'imported-members': True,
 }
-
 
 # -- Options for autosummary ------------------------------------------------
 autosummary_generate = True
-autosummary_imported_members = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

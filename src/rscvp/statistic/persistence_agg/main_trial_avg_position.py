@@ -17,7 +17,7 @@ from stimpyp import Session
 __all__ = ['PositionBinPersistenceAgg']
 
 
-@publish_annotation('main', project='rscvp', figure='fig.2B', as_doc=True)
+@publish_annotation('main', project='rscvp', figure=['fig.2B', 'fig.S2E'], as_doc=True)
 class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, TreadmillOptions, SelectionOptions):
     DESCRIPTION = 'Plot the sorted position-binned trial averaged activity heatmap for batch dataset'
 

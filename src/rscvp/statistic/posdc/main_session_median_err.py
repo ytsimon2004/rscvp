@@ -1,16 +1,17 @@
 import pingouin as pg
 import polars as pl
 import seaborn as sns
-from rscvp.statistic.core import print_var
-from rscvp.util.cli import CommonOptions
 
 from argclz import AbstractParser, argument
 from neuralib.plot import plot_figure
-from neuralib.util.verbose import print_load, printdf
+from neuralib.util.verbose import print_load, printdf, publish_annotation
+from rscvp.statistic.core import print_var
+from rscvp.util.cli import CommonOptions
 
 __all__ = ['SessionMedianErr']
 
 
+@publish_annotation('sup', project='rscvp', figure='fig.S2B', as_doc=True)
 class SessionMedianErr(AbstractParser, CommonOptions):
     DESCRIPTION = 'Plot median decoding error in different behavioral sessions from batch CV dataset'
 

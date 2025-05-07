@@ -46,4 +46,4 @@ core API
 
 source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-- `rscvp.statistic.main_2p_fov <https://github.com/ytsimon2004/rscvp/blob/main/src/rscvp/statistic/main_2p_fov.py>`_
+- `batch processing source code <https://github.com/ytsimon2004/rscvp/blob/main/src/rscvp/statistic/main_2p_fov.py>`_

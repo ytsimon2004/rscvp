@@ -11,6 +11,7 @@ Figure Instruction
    fig4
    fig5
    fig6
+   fig7
 
 .. toctree::
    :maxdepth: 2
@@ -25,4 +26,5 @@ Figure Instruction
 .. toctree::
    :maxdepth: 2
    :caption: Appendix Figures
+
 

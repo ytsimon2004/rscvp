@@ -1,13 +1,14 @@
-from rscvp.retinotopic.cache_retinotopic import RetinotopicCacheBuilder
-from rscvp.util.cli.cli_wfield import WFieldOptions
-
 from argclz import AbstractParser
 from neuralib.imaging.widefield.plot import plot_retinotopic_maps
 from neuralib.persistence.cli_persistence import get_options_and_cache
+from neuralib.util.verbose import publish_annotation
+from rscvp.retinotopic.cache_retinotopic import RetinotopicCacheBuilder
+from rscvp.util.cli.cli_wfield import WFieldOptions
 
 __all__ = ['RetinotopicMapOptions']
 
 
+@publish_annotation('main', project='rscvp', figure='fig.S3', as_doc=True)
 class RetinotopicMapOptions(AbstractParser, WFieldOptions):
     DESCRIPTION = 'Plot the retinotopic map based on the persistence cached data'
 

@@ -13,7 +13,7 @@ from rscvp.visual.main_polar import BaseVisPolarOptions
 __all__ = ['TopoMetricOptions']
 
 
-@publish_annotation('main', project='rscvp', figure='fig.2C & fig.4D left & fig.5K', as_doc=True)
+@publish_annotation('main', project='rscvp', figure=['fig.2C', 'fig.4D left', 'fig.5K', 'fig.S2F'], as_doc=True)
 class TopoMetricOptions(StatPipeline, BaseVisPolarOptions):
     DESCRIPTION = 'topological value average for the batch dataset'
 

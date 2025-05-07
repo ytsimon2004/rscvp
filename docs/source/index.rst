@@ -33,7 +33,7 @@ Figure Instruction
 
 .. toctree::
    :maxdepth: 3
-   :caption: Examples
+   :caption: Reference Code
 
    fig_instruction/index
 
@@ -45,5 +45,14 @@ API Reference
 
 .. toctree::
    :maxdepth: 1
+   :caption: Modules
 
-   api/rscvp.rst
+   api/rscvp.atlas
+   api/rscvp.model
+   api/rscvp.retinotopic
+   api/rscvp.selection
+   api/rscvp.spatial
+   api/rscvp.statistic
+   api/rscvp.topology
+   api/rscvp.visual
+   api/rscvp.util

@@ -15,7 +15,7 @@ from rscvp.util.util_stat import DataSetType, CollectDataSet
 __all__ = ['ValStatGSP']
 
 
-@publish_annotation('main', project='rscvp', figure='fig.2D-2F', as_doc=True)
+@publish_annotation('main', project='rscvp', figure=['fig.2D-2F', 'fig.S3D'], as_doc=True)
 class ValStatGSP(StatPipeline, Dispatch):
     DESCRIPTION = 'see the values from individual neurons across animal'
 

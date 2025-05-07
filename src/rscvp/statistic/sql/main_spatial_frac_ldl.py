@@ -13,7 +13,7 @@ from rscvp.util.cli import CommonOptions
 __all__ = ['SpatialFracLDLStat']
 
 
-@publish_annotation('sup', figure='xxx')
+@publish_annotation('sup', project='rscvp', figure='fig.S2C', as_doc=True)
 class SpatialFracLDLStat(StatPipeline):
     DESCRIPTION = 'Compare fraction of spatial cells across behavioral sessions from multiple animals'
 

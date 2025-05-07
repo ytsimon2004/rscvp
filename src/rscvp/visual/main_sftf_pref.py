@@ -2,10 +2,6 @@ from typing import Literal
 
 import numpy as np
 import polars as pl
-from rscvp.util.cli import DataOutput, SelectionOptions, SQLDatabaseOptions
-from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
-from rscvp.util.database import VisualSFTFDirDB
-from rscvp.visual.util import SFTF_ARRANGEMENT, SFTFDirCollections
 from tqdm import tqdm
 
 from argclz import AbstractParser, argument
@@ -14,12 +10,16 @@ from neuralib.io import csv_header
 from neuralib.plot import dotplot
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import fprint, publish_annotation
+from rscvp.util.cli import DataOutput, SelectionOptions, SQLDatabaseOptions
+from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
+from rscvp.util.database import VisualSFTFDirDB
+from rscvp.visual.util import SFTF_ARRANGEMENT, SFTFDirCollections
 from stimpyp import GratingPattern
 
 __all__ = ['VisualSFTFPrefOptions']
 
 
-@publish_annotation('main', project='rscvp', figure='fig.5C', caption='db usage', as_doc=True)
+@publish_annotation('main', project='rscvp', figure='fig.5C left', caption='db usage', as_doc=True)
 class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions):
     DESCRIPTION = """
     Plot the visual sftf preference in dot plot (either fraction of cell, or activity amplitude).
