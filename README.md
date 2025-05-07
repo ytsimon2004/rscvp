@@ -1,10 +1,6 @@
-from neuralib.util.verbose import publish_annotation
+# rscvp
 
-# rscvp2
-
-by Yu-Ting Wei (ytsimon2004@gmail.com)
-
-- Pipeline for RSC visuo-spatial project analysis
+- Pipeline for RSC visuo-spatial project (rscvp) analysis
 - Data are acquired using internal customized package [Stimpy](https://bitbucket.org/activision/stimpy/src/master)
 - Core analysis largely depending on the customized
   package [neuralib](https://neuralib.readthedocs.io/en/latest/index.html) and cli
@@ -12,18 +8,18 @@ by Yu-Ting Wei (ytsimon2004@gmail.com)
 
 ------------------------------
 
-# How to set up in a local machine?
+## How to set up in a local machine?
 
-## 1. Clone or download the project locally
+### 1. Clone or download the project locally
 
-## 2. Create conda environment
+### 2. Create conda environment
 
 ```bash
 conda create -n rscvp python~=3.10.0 -y
 conda activate rscvp
 ```
 
-## 3. Install required packages
+### 3. Install required packages
 
 - First `cd` to the directory with [pyproject.toml](pyproject.toml)
 
@@ -65,9 +61,7 @@ class FigureClass:
 
 -----------------------------
 
-## Data Folder structure
-
-## DATA STRUCTURE (See also in [io.py](./src/rscvp/util/io.py))
+## Data Folder structure (See also in [io.py](./src/rscvp/util/io.py))
 
 ### Physiological dataset (per recording date/mouse id, i.e., 2P data)
 
@@ -94,3 +88,9 @@ class FigureClass:
         └── summary/
 
 - Detail can be found in [histology readme](src/rscvp/atlas/README.md)
+
+---------------------------
+
+## Contact
+
+Yu-Ting Wei (ytsimon2004@gmail.com)
