@@ -1,0 +1,51 @@
+{
+  "userPrefix": "AA",
+  "expname": "default",
+  "defaultExperimentType": "test",
+  "logFolder": "C:\\Users\\User\\my_stimpy\\users\\default\\logs",
+  "tmpFolder": "C:\\Users\\User\\my_stimpy\\users\\default\\tmp",
+  "protocolsFolder": "C:\\Users\\User\\my_stimpy\\users\\default\\protocols",
+  "stimsFolder": "C:\\Users\\User\\my_stimpy\\res\\stims",
+  "vrFolder": "C:\\Users\\User\\my_stimpy\\res\\vr_envs\\example",
+  "monitor": [
+    {
+      "name": "test",
+      "rate": 60.0,
+      "distance": 18,
+      "sizePix": [
+        1000,
+        1000
+      ],
+      "gamma": 1.0,
+      "width": 25,
+      "fullScreen": false,
+      "screen": 1,
+      "pos": [
+        0,
+        0
+      ]
+    }
+  ],
+  "flashIndicator": true,
+  "flashIndicatorMode": 0,
+  "flashIndicatorParameters": {
+    "size": 100,
+    "units": "pix",
+    "pos": [
+      -300,
+      300
+    ]
+  },
+  "warp": {
+    "warp": "spherical",
+    "warpfile": "",
+    "warpGridsize": 300,
+    "eyepoint": [
+      0.5,
+      0.5
+    ],
+    "flipHorizontal": false,
+    "flipVertical": false
+  },
+  "default_imaging_mode": "no_cam"
+}

@@ -1,0 +1,37 @@
+[project]
+name = "rscvp"
+version = "0.0.0"
+requires-python = ">=3.10"
+description = "Analysis for retrosplenial cortex project"
+authors = [
+    { name = "Yu-Ting Wei", email = "ytsimon2004@gmail.com" }
+]
+readme = "README.md"
+keywords = ["Neuroscience", "visual neuroscience", "brain mapping", "spatial navigation"]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    'Intended Audience :: Science/Research',
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "neura-library[all]",
+    "stimpyp",
+    "scikit-learn",
+    "iblatlas"
+]
+
+
+[project.optional-dependencies]
+
+doc = [
+    "sphinx",
+    "pydata-sphinx-theme",
+    "sphinx-toolbox",
+    "sphinx-rtd-theme",
+    "sphinx-prompt",
+    "sphinx_copybutton"
+]

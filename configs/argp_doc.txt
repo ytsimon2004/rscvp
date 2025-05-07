@@ -1,0 +1,47 @@
+validator, validator_on_set, action
+-------------------------------------
+list, true, append
+path, false, extend
+
+
+work - path, false, append
+
+
+APPEND
+-------
+EXAMPLE: --file FILE1 --file FILE2
+
+I. parse:
+
+1. string value from cli
+2 _type_caster (string to path)
+3. validator on path
+4. set path value on list by append in argparse.Namedspace
+
+
+II. set:
+
+1. list(path) from argparse.Namedspace/user assign
+2. validator on list(path)
+3. set list(path) to RoiRenderCLI
+
+
+
+EXTEND
+-------
+
+EXAMPLE: --file FILE1,FILE2,...
+
+I. parse:
+
+1. string value from cli
+2 _type_caster (string to list(path))
+3. validator on list(path)
+4. set list(path) value on list by extend in argparse.Namedspace
+
+
+II. set:
+
+1. list(path) from argparse.Namedspace/user assign
+2. validator on list(path)
+3. set list(path) to RoiRenderCLI

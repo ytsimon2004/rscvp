@@ -1,0 +1,56 @@
+{
+  "default_imaging_mode": "2P",
+  "flashIndicator": true,
+  "flashIndicatorParameters": {
+    "size": 65,
+    "units": "pix",
+    "pos": [
+      730,
+      -410
+    ]
+  },
+  "logFolder": "E:\\data\\presentation",
+  "monitor": [
+    {
+      "distance": 18,
+      "fullScreen": true,
+      "gamma": 1.8,
+      "name": "asus-pg279",
+      "rate": 60.0,
+      "screen": 0,
+      "sizePix": [
+        2560,
+        1440
+      ],
+      "width": 60.0
+    }
+  ],
+  "protocolsFolder": "C:\\Users\\mouselab\\my_stimpy\\users\\simon\\protocols",
+  "stimsFolder": "E:\\data\\stims",
+  "userPrefix": "YW",
+  "warp": {
+    "eyepoint": [
+      0.5,
+      0.5
+    ],
+    "flipHorizontal": false,
+    "flipVertical": false,
+    "warp": "spherical",
+    "warpGridsize": 300,
+    "warpfile": ""
+  },
+  "rig": {
+    "port": "COM24"
+  },
+  "scanbox": {
+    "ip": "10.86.1.60",
+    "port": 7000,
+    "dataFolder": "E:\\data\\2p\\raw\\",
+    "trigger": true
+  },
+  "labcams": {
+    "ip": "10.86.1.69",
+    "port": 100000,
+    "trigger": true
+  }
+}

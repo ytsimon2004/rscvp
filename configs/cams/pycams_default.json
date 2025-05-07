@@ -1,0 +1,60 @@
+{
+  "back-up": [
+    {
+      "description": "calib",
+      "type": "avt",
+      "name": "Mako G-030B",
+      "params": {
+        "settings_file": "mako_settings.xml",
+        "exposure": 15000,
+        "gain": 0,
+        "trigger_mode": "Off",
+        "trigger_activation": "LevelHigh",
+        "trigger_source": "Line1"
+      },
+      "recorder_params": {
+        "recorder": "opencv",
+        "folder": "test"
+      }
+    },
+    {
+      "description": "dalsa",
+      "type": "genicam",
+      "name": "Nano-M1930(00:01:0d:c4:a0:98)",
+      "params": {
+        "exposure": 15000,
+        "gain": 8,
+        "trigger_mode": "Off"
+      },
+      "recorder_params": {
+        "recorder": "opencv",
+        "folder": "test"
+      }
+    },
+    {
+      "description": "webcam",
+      "name": "webcam",
+      "type": "opencv"
+    }
+  ],
+  "cams": [
+    {
+      "description": "webcam",
+      "name": "webcam",
+      "type": "opencv"
+    }
+  ],
+  "recorder_params": {
+    "data_folder": "C:\\Users\\adminphilip45\\data",
+    "experiment_folder": "pano_calib",
+    "recorder_frames_per_file": 0,
+    "compress": 0,
+    "recorder_sleep_time": 0.05
+  },
+  "server_params": {
+    "server": "udp",
+    "server_ip": "127.0.0.1",
+    "server_port": 5004,
+    "server_refresh_time": 30
+  }
+}
