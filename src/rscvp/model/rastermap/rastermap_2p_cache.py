@@ -15,6 +15,11 @@ from rscvp.util.util_camera import truncate_video_to_pulse
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
 
+__all__ = [
+    'RasterInput2P',
+    'RasterMap2PCacheBuilder'
+]
+
 
 @attrs.frozen
 class RasterInput2P:

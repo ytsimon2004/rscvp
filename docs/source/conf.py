@@ -1,10 +1,15 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath('../../src'))
+
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
 
 project = 'rscvp'
 copyright = '2025, yu-ting wei'
@@ -32,6 +37,10 @@ autodoc_default_options = {
     'inherited-members': True,
     'show-inheritance': True,
 }
+
+autodoc_mock_imports = [
+    "rscvp.util.cli"
+]
 
 # -- Options for autosummary ------------------------------------------------
 autosummary_generate = True

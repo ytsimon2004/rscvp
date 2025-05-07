@@ -6,13 +6,13 @@ import pingouin as pg
 import seaborn as sns
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
-from rscvp.util.cli.cli_celltype import SessionDataFrame, CellTypeSelectionOptions
-from rscvp.util.cli.cli_output import DataOutput
 
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli.cli_celltype import SessionDataFrame, CellTypeSelectionOptions
+from rscvp.util.cli.cli_output import DataOutput
 
 __all__ = ['SpatialSessionStat']
 
@@ -112,7 +112,7 @@ class SpatialSessionStat(AbstractParser, CellTypeSelectionOptions, Dispatch):
     # Dot Plot #
     # ======== #
 
-    @DispatchOption.dispatch('dot')
+    @dispatch('dot')
     def plot_session_dot(self, ssdf: SessionDataFrame,
                          output: DataOutput):
         for var in ssdf.variables:
@@ -122,7 +122,7 @@ class SpatialSessionStat(AbstractParser, CellTypeSelectionOptions, Dispatch):
             with plot_figure(self.fig_output(output, var), figsize=(6, 10)) as ax:
                 plot_ses_dot(ax, df, ylabel=var)
 
-    @DispatchOption.dispatch('scatter')
+    @dispatch('scatter')
     def plot_pair_scatter(self, ssdf: SessionDataFrame,
                           output: DataOutput,
                           **kwargs):

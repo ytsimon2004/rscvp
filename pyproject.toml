@@ -1,6 +1,6 @@
 [project]
 name = "rscvp"
-version = "0.0.0"
+version = "0.0.1"
 requires-python = ">=3.10"
 description = "Analysis for retrosplenial cortex project"
 authors = [
@@ -27,6 +27,8 @@ dependencies = [
 
 [project.optional-dependencies]
 
+opt = ["memory_profiler", "pingouin"]
+
 doc = [
     "sphinx",
     "pydata-sphinx-theme",
@@ -35,3 +37,21 @@ doc = [
     "sphinx-prompt",
     "sphinx_copybutton"
 ]
+
+all = ["rscvp[opt]", "rscvp[doc]"]
+
+
+[project.urls]
+Homepage = "https://github.com/ytsimon2004/rscvp"
+Documentation = "https://neuralib.readthedocs.io/en/latest/index.html"
+Repository = "https://github.com/ytsimon2004/rscvp"
+Issues = "https://github.com/ytsimon2004/rscvp/issues"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.0"]

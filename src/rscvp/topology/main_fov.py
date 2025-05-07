@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from rscvp.util.cli.cli_suite2p import Suite2pOptions
 
 from argclz import AbstractParser, as_argument, argument
 from neuralib.imaging.suite2p import Suite2PResult
@@ -9,11 +8,12 @@ from neuralib.imaging.suite2p.plot import get_soma_pixel
 from neuralib.imglib.color import grey2rgb
 from neuralib.imglib.transform import affine_transform
 from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli.cli_suite2p import Suite2pOptions
 
 __all__ = ['FOVOptions']
 
 
-@publish_annotation('main', project='rscvp')
+@publish_annotation('main', project='rscvp', figure='fig.1C', as_doc=True)
 class FOVOptions(AbstractParser, Suite2pOptions):
     DESCRIPTION = 'Plot the recording FOV in both PMT channels and suite2p registered somata'
 
