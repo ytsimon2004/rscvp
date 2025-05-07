@@ -8,9 +8,6 @@ rscvp.atlas
     :maxdepth: 1
     :caption: Modules:
 
-    rscvp.atlas._ccf
-    rscvp.atlas._cellpose
-    rscvp.atlas.core
     rscvp.atlas.dir
     rscvp.atlas.main_expr_level
     rscvp.atlas.main_expr_range

@@ -3,7 +3,13 @@ from typing import Literal, get_args
 import numpy as np
 import polars as pl
 from matplotlib_venn import venn2
-from rscvp.atlas.core import RSCRoiClassifierDataFrame
+
+from argclz import AbstractParser, as_argument, argument
+from argclz.dispatch import Dispatch, dispatch
+from neuralib.atlas.ccf.dataframe import ROIS_NORM_TYPE
+from neuralib.plot import plot_figure
+from neuralib.plot.colormap import DiscreteColorMapper, get_customized_cmap
+from neuralib.plot.tools import insert_latex_equation
 from rscvp.atlas.dir import AbstractCCFDir
 from rscvp.atlas.util_plot import (
     plot_foreach_channel_pie,
@@ -12,14 +18,8 @@ from rscvp.atlas.util_plot import (
     prepare_venn_data
 )
 from rscvp.util.cli import HistOptions, ROIOptions
+from rscvp.util.cli.cli_roi import RSCRoiClassifierDataFrame
 from rscvp.util.util_plot import REGION_COLORS_HIST
-
-from argclz import AbstractParser, as_argument, argument
-from argclz.dispatch import Dispatch, dispatch
-from neuralib.atlas.ccf.dataframe import ROIS_NORM_TYPE
-from neuralib.plot import plot_figure
-from neuralib.plot.colormap import DiscreteColorMapper, get_customized_cmap
-from neuralib.plot.tools import insert_latex_equation
 
 __all__ = ['RoiQuantOptions']
 

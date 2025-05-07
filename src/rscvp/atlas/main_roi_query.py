@@ -2,11 +2,6 @@ from pathlib import Path
 from typing import Literal, ClassVar
 
 import numpy as np
-from rscvp.atlas.core import RSCRoiClassifierDataFrame
-from rscvp.atlas.util_plot import plot_rois_bar
-from rscvp.util.cli.cli_hist import HistOptions
-from rscvp.util.cli.cli_roi import ROIOptions
-from rscvp.util.util_plot import REGION_COLORS_HIST
 
 from argclz import AbstractParser, as_argument, argument
 from argclz.dispatch import Dispatch, dispatch
@@ -15,6 +10,10 @@ from neuralib.atlas.typing import Area
 from neuralib.plot import dotplot
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
+from rscvp.atlas.util_plot import plot_rois_bar
+from rscvp.util.cli.cli_hist import HistOptions
+from rscvp.util.cli.cli_roi import ROIOptions, RSCRoiClassifierDataFrame
+from rscvp.util.util_plot import REGION_COLORS_HIST
 
 __all__ = ['RoiQueryOptions']
 

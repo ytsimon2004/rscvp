@@ -47,21 +47,23 @@ sys.path.insert(0, str(SRC.parent))
 
 
 def get_module_all(module_path: Path) -> list:
-    """Dynamically import a module and extract __all__, if available."""
     try:
         rel_path = module_path.relative_to(SRC.parent)
         modname = '.'.join(rel_path.with_suffix('').parts)
         mod = importlib.import_module(modname)
         return getattr(mod, '__all__', [])
     except Exception as e:
-        print(f"[Warning] Could not extract __all__ from {module_path.name}: {e}")
-        return []
+        print(f"[Warning] Failed to import {module_path.name} ({modname}): {e}")
+        return None  # return None to differentiate from empty __all__
 
 
 def write_module_file(module: str, output_path: Path, all_list: list):
     """Write an .rst file for a module using only autosummary."""
+    if all_list is None:
+        print(f"[Skipped] Could not import {module}")
+        return
     if not all_list:
-        print(f"[Skipped] {module} has no __all__")
+        print(f"[Empty] {module} has no __all__")
         return
 
     autosummary_list = textwrap.indent('\n'.join(all_list), '   ')

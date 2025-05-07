@@ -6,13 +6,13 @@ import numpy as np
 import polars as pl
 import seaborn as sns
 from matplotlib.axes import Axes
-from rscvp.util.cli.cli_roi import ROIOptions
-from rscvp.util.util_plot import ROIS_COLORS
 
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure
 from neuralib.util.utils import joinn
+from rscvp.util.cli import ROIOptions
+from rscvp.util.util_plot import ROIS_COLORS
 
 __all__ = ['RoiExpressionOptions']
 

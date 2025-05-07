@@ -38,10 +38,6 @@ autodoc_default_options = {
     'show-inheritance': True,
 }
 
-autodoc_mock_imports = [
-    "rscvp.util.cli"
-]
-
 # -- Options for autosummary ------------------------------------------------
 autosummary_generate = True
 

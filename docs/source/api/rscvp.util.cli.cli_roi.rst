@@ -8,3 +8,4 @@ rscvp.util.cli.cli_roi
    :nosignatures:
 
    ROIOptions
+   RSCRoiClassifierDataFrame
