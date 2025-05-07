@@ -21,7 +21,8 @@ author = 'yu-ting wei'
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx_prompt',
-              'sphinx_copybutton']
+              'sphinx_copybutton',
+              "sphinx.ext.viewcode"]
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -36,10 +37,13 @@ autodoc_default_options = {
     'undoc-members': True,
     'inherited-members': True,
     'show-inheritance': True,
+    'imported-members': True,
 }
+
 
 # -- Options for autosummary ------------------------------------------------
 autosummary_generate = True
+autosummary_imported_members = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

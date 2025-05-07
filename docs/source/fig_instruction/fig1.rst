@@ -13,7 +13,7 @@ core API
 
 source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-`neuralib source code <https://github.com/ytsimon2004/neuralib/blob/main/src/neuralib/atlas/brainrender/core.py>`_
+- `neuralib source code <https://github.com/ytsimon2004/neuralib/blob/main/src/neuralib/atlas/brainrender/core.py>`_
 
 
 .. raw:: html
@@ -42,8 +42,8 @@ figure 1C
 
 core API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-:class:`rscvp.statistic.main_2p_fov.FieldOfViewOptions`
+- :class:`rscvp.statistic.main_2p_fov.FieldOfViewOptions`
 
 source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-`rscvp.statistic.main_2p_fov <https://github.com/ytsimon2004/rscvp/blob/main/src/rscvp/statistic/main_2p_fov.py>`_
+- `rscvp.statistic.main_2p_fov <https://github.com/ytsimon2004/rscvp/blob/main/src/rscvp/statistic/main_2p_fov.py>`_

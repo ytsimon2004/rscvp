@@ -15,7 +15,9 @@ core API
 
 source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-`neuralib source code <https://github.com/ytsimon2004/neuralib/blob/main/src/neuralib/atlas/brainrender/core.py>`_
+- Left: `rscvp source code <https://github.com/ytsimon2004/rscvp/blob/main/src/rscvp/spatial/main_position_map.py>`_
+- Right: `rscvp source code <https://github.com/ytsimon2004/rscvp/blob/main/src/rscvp/statistic/sql/main_vp_fraction.py>`_
+
 
 
 .. raw:: html
