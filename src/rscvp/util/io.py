@@ -25,7 +25,7 @@ CONFIG_FOLDER = RSCVP_CACHE_DIRECTORY / 'config'
 HISTOLOGY_HOME_ROOT = RSCVP_CACHE_DIRECTORY / 'histology'
 
 #
-DISK_TYPE = Literal['local', 'WD-2T', 'BigDATA', 'bkrunch', 'bkrunch2', 'bkrunch-linux']
+DISK_TYPE = Literal['local', 'WD-2T', 'BigDATA', 'bkrunch', 'bkrunch2', 'bkrunch-linux', 'default']
 DATA_SRC_TYPE = Literal['stimpy', 'suite2p', 'behavior', 'histology', 'track', 'cache']
 
 
@@ -147,6 +147,12 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
         stimpy='/Volumes/BigDATA/data/user/yu-ting/presentation',
         physiology='/Volumes/BigDATA/data/user/yu-ting/analysis/phys',
         histology='/Volumes/BigDATA/data/user/yu-ting/analysis/hist'
+    )),
+
+    'default': IOConfig(source_root=dict(
+        stimpy=RSCVP_CACHE_DIRECTORY / 'presentation',
+        physiology=RSCVP_CACHE_DIRECTORY / 'analysis' / 'phys',
+        histology=RSCVP_CACHE_DIRECTORY / 'analysis' / 'hist'
     ))
 
 }
@@ -183,7 +189,7 @@ def get_io_config(config: dict[str, IOConfig] | None = None,
         case ('bkrunch-linux', None):
             return config['bkrunch-linux']
         case _:
-            raise NotImplementedError('')
+            return config['default']
 
 
 def islocal() -> bool:
