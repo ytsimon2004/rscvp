@@ -1,17 +1,16 @@
 import numpy as np
-from rscvp.spatial.main_cache_sortidx import ApplySortIdxOptions
-from rscvp.util.cli import Suite2pOptions
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.position import load_interpolated_position
-from rscvp.util.typing import SIGNAL_TYPE
-from rscvp.util.util_cascade import get_neuron_cascade_spks
-from rscvp.util.util_trials import TrialSelection
 from scipy.ndimage import gaussian_filter1d
 
 from argclz import AbstractParser, argument, as_argument
 from neuralib.imaging.suite2p import normalize_signal, get_neuron_signal, sync_s2p_rigevent
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
+from rscvp.spatial.main_cache_sortidx import ApplySortIdxOptions
+from rscvp.util.cli import Suite2pOptions
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.position import load_interpolated_position
+from rscvp.util.typing import SIGNAL_TYPE
+from rscvp.util.util_trials import TrialSelection
 
 __all__ = ['CPBeltSortTrialOptions']
 
@@ -70,6 +69,7 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
         if self.signal_type in ('df_f', 'spks'):
             signal = get_neuron_signal(s2p, neuron_list)[0]  # (N, it:image_time)
         elif self.signal_type == 'cascade_spks':
+            from rscvp.util.util_cascade import get_neuron_cascade_spks
             signal = get_neuron_cascade_spks(s2p, neuron_list)
         else:
             raise ValueError(f'unknown signal type: {self.signal_type}')
