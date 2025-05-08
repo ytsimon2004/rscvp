@@ -1,5 +1,7 @@
 # rscvp
 
+[![Documentation Status](https://readthedocs.org/projects/rscvp/badge/?version=latest)](https://rscvp.readthedocs.io/en/latest/)
+
 - Pipeline for RSC visuo-spatial project (rscvp) analysis
 - Data are acquired using internal customized package [Stimpy](https://bitbucket.org/activision/stimpy/src/master)
 - Core analysis largely depending on the customized
