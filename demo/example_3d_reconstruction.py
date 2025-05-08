@@ -1,3 +1,4 @@
+from demo.util import mkdir_test_dataset
 from neuralib.atlas.brainrender.roi import RoiRenderCLI
 from neuralib.util.utils import ensure_dir
 from rscvp.atlas.dir import AbstractCCFDir
@@ -22,7 +23,9 @@ class ExampleRun(RoiRenderCLI):
 
 
 def main():
+    mkdir_test_dataset()
     ExampleRun().main()
+    # clean_cache_dataset()
 
 
 if __name__ == '__main__':

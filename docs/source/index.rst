@@ -32,11 +32,18 @@ Figure Instruction
 -------------------------
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Reference Code
+   :maxdepth: 2
 
    fig_instruction/index
 
+
+Demo Run
+-------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   demo/index
 
 
 

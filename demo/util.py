@@ -10,25 +10,25 @@ __all__ = ['mkdir_test_dataset',
 
 TOKEN = ...  # contact author since paper is not published yet
 
+CACHED_DATASET = ensure_dir(RSCVP_CACHE_DIRECTORY) / 'rscvp_dataset'
 
-def mkdir_test_dataset() -> Path:
-    output_dir = ensure_dir(RSCVP_CACHE_DIRECTORY) / 'rscvp_dataset'
 
-    if output_dir.exists():
-        return output_dir
+def mkdir_test_dataset(force_download: bool = False) -> Path:
+    if CACHED_DATASET.exists() and not force_download:
+        return CACHED_DATASET
     else:
         data_url = 'https://zenodo.org/records/15363378/files/rscvp_dataset.zip?token='
         data_url += TOKEN
 
         zip_stream = download_with_tqdm(data_url)
         with zipfile.ZipFile(zip_stream) as zip_file:
-            zip_file.extractall(output_dir)
+            zip_file.extractall(RSCVP_CACHE_DIRECTORY)
 
-    return output_dir
+    return CACHED_DATASET
 
 
 def clean_cache_dataset():
-    output_dir = ensure_dir(RSCVP_CACHE_DIRECTORY) / 'rscvp_dataset'
+    output_dir = RSCVP_CACHE_DIRECTORY
     if output_dir.exists():
         import shutil
         shutil.rmtree(output_dir)
