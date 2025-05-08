@@ -150,9 +150,9 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
     )),
 
     'default': IOConfig(source_root=dict(
-        stimpy=RSCVP_CACHE_DIRECTORY / 'presentation',
-        physiology=RSCVP_CACHE_DIRECTORY / 'analysis' / 'phys',
-        histology=RSCVP_CACHE_DIRECTORY / 'analysis' / 'hist'
+        stimpy=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'presentation',
+        physiology=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'analysis' / 'phys',
+        histology=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'analysis' / 'hist'
     ))
 
 }
@@ -160,12 +160,35 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
 
 def get_io_config(config: dict[str, IOConfig] | None = None,
                   remote_disk: str | None = None,
-                  mnt_prefix: Literal['/mnt', '/Volumes'] = '/Volumes') -> IOConfig:
+                  mnt_prefix: Literal['/mnt', '/Volumes'] = '/Volumes',
+                  force_use_default: bool = False) -> IOConfig:
+    """
+    Determines and retrieves the appropriate IO configuration for the current node and remote disk
+    setup. This function evaluates the current machine's hostname and optionally, a specified remote
+    disk to decide the corresponding `IOConfig` from the given or default configuration dictionary.
+
+    :param config: A dictionary mapping from strings (node/disk identifiers) to `IOConfig` objects.
+        If not provided, a predefined `DEFAULT_IO_CONFIG` dictionary is used.
+        Defaults to None.
+    :param remote_disk: The identifier of a remote disk to be checked. When provided, the function
+        verifies that this disk is mounted under the specified `mnt_prefix` path. If absent or not
+        specified, the function determines the configuration based only on the node. Defaults to None.
+    :param mnt_prefix: A prefix path where a remote disk should be mounted. The allowed values are
+        either '/mnt' or '/Volumes'. Defaults to '/Volumes'.
+    :param force_use_default: A boolean flag to enforce the use of the default configuration, ignoring
+        other criteria like node or remote disk. Defaults to False.
+    :return: The `IOConfig` object corresponding to the current environment (node/disk combination).
+    :raises RuntimeError: If `remote_disk` is specified but is not detected at the specified mount
+        location under `mnt_prefix`.
+    """
     if config is None:
         config = DEFAULT_IO_CONFIG
 
     if isinstance(remote_disk, str) and not (Path(mnt_prefix) / remote_disk).exists():
         raise RuntimeError(f'check remote disk connection: {remote_disk}')
+
+    if force_use_default:
+        return config['default']
 
     node = platform.node()
     match node, remote_disk:

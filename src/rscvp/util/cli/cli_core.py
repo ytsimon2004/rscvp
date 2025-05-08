@@ -2,12 +2,12 @@ import logging
 from pathlib import Path
 from typing import Literal, Iterable, ClassVar, TypeVar, Any
 
-from rscvp.util.io import IOConfig, get_io_config, DATA_SRC_TYPE
 from typing_extensions import Self
 
 from argclz import argument
 from neuralib.io import mkdir_version
 from neuralib.util.utils import uglob, joinn
+from rscvp.util.io import IOConfig, get_io_config, DATA_SRC_TYPE
 from .cli_io import CELLULAR_IO, WFIELD_IO, BEH_IO, CodeAlias
 from .cli_output import DataOutput, TempDirWrapper
 
@@ -97,6 +97,12 @@ class CommonOptions:
              'latest version directory, otherwise create a new version suffix'
     )
 
+    use_default: bool = argument(
+        '--use-default',
+        group=GROUP_IO,
+        help='use default io config'
+    )
+
     debug_mode: bool = argument(
         '--debug',
         group=GROUP_IO,
@@ -110,7 +116,7 @@ class CommonOptions:
     config: IOConfig | None = None
 
     def get_io_config(self):
-        self.config = get_io_config(remote_disk=self.remote_disk)
+        self.config = get_io_config(remote_disk=self.remote_disk, force_use_default=self.use_default)
 
     @property
     def filename(self) -> str:

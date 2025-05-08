@@ -83,6 +83,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
         # plot/csv
         with csv_header(output.csv_output, header) as csv:
             for i in tqdm(neuron_list, desc='preferred_sftf', unit='neuron', ncols=80):
+                i = 0 if sig.shape[0] == 1 else i  # index correction
                 data = (
                     SFTFDirCollections(para, sig[i], image_time, norm=True)
                     .get_meshgrid_data(do_dir_avg=~self.max_dir)

@@ -3,7 +3,7 @@ import warnings
 from unittest.mock import patch
 
 from argclz import AbstractParser
-from rscvp.atlas._ccf.main_slice_transform import plot_slice_view_transform
+# from rscvp.atlas._ccf.main_slice_transform import plot_slice_view_transform
 from rscvp.atlas.main_expr_range import RoiExprRangeBatchOptions
 from rscvp.atlas.main_roi_atlas import RoiAtlasOptions
 from rscvp.atlas.main_roi_quant import RoiQuantOptions

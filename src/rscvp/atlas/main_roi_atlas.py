@@ -5,9 +5,6 @@ from typing import Optional, Iterable, final
 import attrs
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.atlas.dir import AbstractCCFDir
-from rscvp.util.cli import HistOptions
-from rscvp.util.util_plot import ROIS_COLORS
 from tqdm import tqdm
 
 from argclz import AbstractParser, argument
@@ -16,6 +13,9 @@ from neuralib.imglib.array import ImageArrayWrapper
 from neuralib.plot import plot_figure
 from neuralib.util.utils import uglob
 from neuralib.util.verbose import publish_annotation
+from rscvp.atlas.dir import AbstractCCFDir
+from rscvp.util.cli import HistOptions
+from rscvp.util.util_plot import ROIS_COLORS
 
 __all__ = ['RoiAtlasOptions']
 
@@ -36,7 +36,7 @@ class RoiAtlasOptions(AbstractParser, HistOptions):
 
         foreach_atlas = tqdm(self.roi_atlas_iter(ccf_dir), total=n_images, unit='images', desc='plot roi atlas')
         for ratlas in foreach_atlas:
-            output_file = out / f'{ratlas.name}.pdf'
+            output_file = None if self.debug_mode else out / f'{ratlas.name}.pdf'
             with plot_figure(output_file, figsize=(8, 8)) as ax:
                 ratlas.plot(ax, affine_transform=self.affine_transform)
 

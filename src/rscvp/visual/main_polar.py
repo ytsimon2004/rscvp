@@ -4,12 +4,6 @@ import numpy as np
 import polars as pl
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
-from rscvp.util.cli import DataOutput, SQLDatabaseOptions, SelectionOptions
-from rscvp.util.cli.cli_io import CELLULAR_IO
-from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
-from rscvp.util.database import VisualSFTFDirDB
-from rscvp.visual.util import PrefSFTFParas, SFTFDirCollections, SFTF_IDX, SFTF_LIT
-from rscvp.visual.util_plot import selective_pie, dir_hist
 
 from argclz import argument, AbstractParser
 from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
@@ -19,6 +13,12 @@ from neuralib.plot.colormap import get_customized_cmap
 from neuralib.typing import AxesArray, PathLike
 from neuralib.util.utils import keys_with_value
 from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli import DataOutput, SQLDatabaseOptions, SelectionOptions
+from rscvp.util.cli.cli_io import CELLULAR_IO
+from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
+from rscvp.util.database import VisualSFTFDirDB
+from rscvp.visual.util import PrefSFTFParas, SFTFDirCollections, SFTF_IDX, SFTF_LIT
+from rscvp.visual.util_plot import selective_pie, dir_hist
 from stimpyp import GratingPattern, Direction
 
 __all__ = [
@@ -258,8 +258,8 @@ def plot_sftf_dir_polar(coll: SFTFDirCollections,
 def _plot_sftf_dir_polar(ax: AxesArray,
                          coll: SFTFDirCollections,
                          polar_style: POLAR_STYLE = 'color_angle',
-                         with_grid: bool = False,
-                         with_sem: bool = False):
+                         with_grid: bool = True,
+                         with_sem: bool = True):
     sf_x = coll.grating.sf_i()
     tf_y = coll.grating.tf_i()
 
