@@ -31,9 +31,7 @@ opt = [
     "memory_profiler", # more memory heavily data io
     "pingouin",
     "gspread",
-    "rastermap",
-    "dotenv",
-    "slackclient"
+    "rastermap"
 ]
 
 doc = [
@@ -43,7 +41,9 @@ doc = [
     "sphinx-rtd-theme",
     "sphinx-prompt",
     "sphinx_copybutton",
-    "rscvp[opt]"
+    #
+    "rscvp[opt]",
+    "neura-library[all]",
 ]
 
 all = ["rscvp[opt]"]
