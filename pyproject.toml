@@ -31,7 +31,9 @@ opt = [
     "memory_profiler", # more memory heavily data io
     "pingouin",
     "gspread",
-    "rastermap"
+    "rastermap",
+    "dotenv",
+    "slackclient"
 ]
 
 doc = [
