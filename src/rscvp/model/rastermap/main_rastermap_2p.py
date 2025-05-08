@@ -4,11 +4,8 @@ from typing import Literal, TYPE_CHECKING
 import attrs
 import numpy as np
 import rastermap.utils
-import torch
 from matplotlib.axes import Axes
 from rastermap import Rastermap
-from rscvp.model.rastermap.rastermap_2p_cache import RasterMap2PCacheBuilder, RasterInput2P
-from rscvp.util.cli import CameraOptions, DataOutput, RasterMapOptions, SBXOptions, SelectionOptions, TreadmillOptions
 from scipy.interpolate import interp1d
 
 from argclz import AbstractParser, argument
@@ -18,9 +15,12 @@ from neuralib.plot import plot_figure, ax_merge
 from neuralib.util.gpu import check_mps_available
 from neuralib.util.unstable import unstable
 from neuralib.util.verbose import fprint
+from rscvp.model.rastermap.rastermap_2p_cache import RasterMap2PCacheBuilder, RasterInput2P
+from rscvp.util.cli import CameraOptions, DataOutput, RasterMapOptions, SBXOptions, SelectionOptions, TreadmillOptions
 
 if TYPE_CHECKING:
     from neuropop.nn_prediction import PredictionNetwork
+    import torch
 
 __all__ = ['RunRasterMap2POptions']
 
@@ -244,7 +244,9 @@ class RunRasterMap2POptions(AbstractParser,
     # ======================================== #
 
     @cached_property
-    def device(self) -> torch.device:
+    def device(self) -> 'torch.device':
+        import torch
+
         if torch.cuda.is_available():
             fprint('Process using cuda GPU')
             return torch.device('cuda')
