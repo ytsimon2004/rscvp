@@ -3,9 +3,8 @@ name = "rscvp"
 version = "0.0.1"
 requires-python = ">=3.10"
 description = "Analysis for retrosplenial cortex project"
-authors = [
-    { name = "Yu-Ting Wei", email = "ytsimon2004@gmail.com" }
-]
+authors = [{ name = "Yu-Ting Wei", email = "ytsimon2004@gmail.com" }]
+license = { file = "LICENSE" }
 readme = "README.md"
 keywords = ["Neuroscience", "visual neuroscience", "brain mapping", "spatial navigation"]
 classifiers = [
@@ -18,7 +17,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "neura-library[all]",
+    "neura-library[atlas]",
+    "neura-library[imaging]",
     "stimpyp",
     "scikit-learn",
     "iblatlas"
@@ -27,7 +27,11 @@ dependencies = [
 
 [project.optional-dependencies]
 
-opt = ["memory_profiler", "pingouin"]
+opt = [
+    "memory_profiler", # more memory heavily data io
+    "pingouin", # statistic
+    "gspread", # statistic
+]
 
 doc = [
     "sphinx",
@@ -35,10 +39,11 @@ doc = [
     "sphinx-toolbox",
     "sphinx-rtd-theme",
     "sphinx-prompt",
-    "sphinx_copybutton"
+    "sphinx_copybutton",
+    "rscvp[opt]"
 ]
 
-all = ["rscvp[opt]", "rscvp[doc]"]
+all = ["rscvp[opt]"]
 
 
 [project.urls]
