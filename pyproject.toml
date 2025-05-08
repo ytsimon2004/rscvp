@@ -29,8 +29,9 @@ dependencies = [
 
 opt = [
     "memory_profiler", # more memory heavily data io
-    "pingouin", # statistic
-    "gspread", # statistic
+    "pingouin",
+    "gspread",
+    "rastermap"
 ]
 
 doc = [
