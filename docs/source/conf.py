@@ -20,7 +20,6 @@ author = 'yu-ting wei'
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
-              'sphinx_prompt',
               'sphinx_copybutton',
               "sphinx.ext.viewcode"]
 
@@ -77,6 +76,6 @@ html_theme_options = {
 }
 
 # -- Copy Button --------------------------------
-copybutton_prompt_text = r'^(>>> |\.\.\. |\$ )'
+copybutton_prompt_text = r'^\$ '
 copybutton_prompt_is_regexp = True
 copybutton_remove_prompts = True

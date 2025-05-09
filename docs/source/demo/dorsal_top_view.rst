@@ -31,3 +31,9 @@ ROI Dorsal Cortex View
 
     - `demo script link <https://github.com/ytsimon2004/rscvp/blob/main/demo/example_dorsal_roi.py>`_
 
+**Run with**
+
+.. code-block:: bash
+
+    $ python -m demo.example_decoding
+

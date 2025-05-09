@@ -32,3 +32,9 @@ Visual Reliability
 
     - `demo script link <https://github.com/ytsimon2004/rscvp/blob/main/demo/example_visual_reliability.py>`_
 
+
+**Run with**
+
+.. code-block:: bash
+
+    $ python -m demo.example_visual_reliability

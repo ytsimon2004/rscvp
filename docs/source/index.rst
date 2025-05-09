@@ -5,27 +5,27 @@ Welcome to rscvp's documentation!
 Installation
 -------------------------
 
-- Clone the repo in from `rscvp <https://github.com/ytsimon2004/rscvp>`_
+- Clone the repo from `rscvp <https://github.com/ytsimon2004/rscvp>`_
 
 - Create conda env
 
-.. prompt:: bash $
+.. code-block:: bash
 
-    conda create -n rscvp python=3.10 -y
+    $ conda create -n rscvp python=3.10 -y
 
 
 - Create conda env
 
-.. prompt:: bash $
+.. code-block:: bash
 
-    conda activate rscvp
+    $ conda activate rscvp
 
 
 - Installation of package
 
 .. code-block:: bash
 
-    pip install .[all]
+    $ pip install .[all]
 
 
 Figure Instruction

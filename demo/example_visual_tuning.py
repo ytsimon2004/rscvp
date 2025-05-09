@@ -16,7 +16,7 @@ class ExampleRun(VisualTuningOptions):
 def main():
     mkdir_test_dataset()
     ExampleRun().main()
-    # clean_cache_dataset() clean all if needed
+    # clean_cache_dataset()  # clean all if needed
 
 
 if __name__ == '__main__':

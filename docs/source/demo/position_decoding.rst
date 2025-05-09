@@ -75,3 +75,9 @@ Position Decoding
 
     - `demo script link <https://github.com/ytsimon2004/rscvp/blob/main/demo/example_decoding.py>`_
 
+**Run with**
+
+.. code-block:: bash
+
+    $ python -m demo.example_decoding
+

@@ -33,3 +33,9 @@ Visual SFTF preference
 
     - `demo script link <https://github.com/ytsimon2004/rscvp/blob/main/demo/example_visual_sftf_dot.py>`_
 
+
+**Run with**
+
+.. code-block:: bash
+
+    $ python -m demo.example_visual_sftf_dot

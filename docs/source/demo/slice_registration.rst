@@ -30,3 +30,9 @@ Slice Registration
 
     - `demo script link <https://github.com/ytsimon2004/rscvp/blob/main/demo/example_registered_slice.py>`_
 
+
+**Run with**
+
+.. code-block:: bash
+
+    $ python -m demo.example_registered_slice

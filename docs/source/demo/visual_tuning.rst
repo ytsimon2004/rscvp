@@ -33,3 +33,9 @@ Visual Response Tuning
 
     - `demo script link <https://github.com/ytsimon2004/rscvp/blob/main/demo/example_visual_tuning.py>`_
 
+
+**Run with**
+
+.. code-block:: bash
+
+    $ python -m demo.example_visual_tuning
