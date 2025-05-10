@@ -43,9 +43,7 @@ class WFieldOptions(CameraOptions):
 
     @property
     def phys_dir(self) -> Path:
-        if self.config is None:
-            self.get_io_config()
-        return self.config.phy_animal_dir
+        return self.get_io_config().phy_animal_dir
 
     @property
     def processed_dir(self) -> Path:

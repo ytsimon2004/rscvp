@@ -18,7 +18,7 @@ from rscvp.statistic.parq.main_pf_gsp import PFStatGSP
 from rscvp.statistic.sql.main_cell_type import CellTypeStat
 from rscvp.statistic.sql.main_decode_err import MedianDecodeErrorStat
 from rscvp.statistic.sql.main_vp_fraction import VisSpaFracStat
-from ._util import check_attr
+from .util import check_attr
 
 
 # ============================== #

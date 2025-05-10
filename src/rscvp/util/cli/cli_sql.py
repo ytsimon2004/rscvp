@@ -28,11 +28,12 @@ class SQLDatabaseOptions(CommonOptions, Generic[T], metaclass=abc.ABCMeta):
 
     @property
     def cur_time(self) -> str:
+        """current time, used for database populate/update"""
         return datetime_to_str(datetime.datetime.now().replace(microsecond=0))
 
     def get_primary_key_field(self, field: str, auto_cast: bool = True, page: WorkPageName = 'apcls_tac') -> Any:
         """
-        Specify a `field name` and get a cell from the primary key
+        Specify a ``field name`` and get a cell from the primary key
 
         :param field: field(header) in the gspread worksheet
         :param auto_cast: auto cast numerical
@@ -56,11 +57,11 @@ class SQLDatabaseOptions(CommonOptions, Generic[T], metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def populate_database(self, *args, **kwargs) -> None:
+        """populate analyzed results into SQL database"""
         pass
 
     def add_data(self, db: T):
-        """
-        Add data to the database
+        """add data to the database
 
         :param db: Type of the database
         """
@@ -72,6 +73,10 @@ class SQLDatabaseOptions(CommonOptions, Generic[T], metaclass=abc.ABCMeta):
         database.add_data(db)
 
     def update_data(self, db: T, *arg):
+        """update data in the database
+
+        :param db: Type of the database
+        """
         database = RSCDatabase()
         if self.db_debug_mode:
             database._debug_mode = True

@@ -67,7 +67,7 @@ class SessionBinnedErr(AbstractParser, CommonOptions, TreadmillOptions):
             # avg cross plane
             dat = {s: np.mean(vals, axis=0) for s, vals in _ret.items()}
 
-            ret[self.filename] = dat
+            ret[self.stimpy_filename] = dat
 
         return ret
 

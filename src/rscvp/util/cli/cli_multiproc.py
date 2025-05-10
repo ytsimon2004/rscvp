@@ -3,7 +3,7 @@ from typing import ClassVar
 import joblib
 import polars as pl
 
-from argclz import argument
+from argclz import argument, validator
 from neuralib.util.verbose import fprint
 from .cli_output import DataOutput
 
@@ -11,15 +11,16 @@ __all__ = ['MultiProcOptions']
 
 
 class MultiProcOptions:
-    GROUP_MP: ClassVar[str] = 'Multiprocessing CPU Option'
+    """Multiprocessing CPU options for parallel computation"""
 
-    CPU_COUNT: ClassVar[int] = joblib.cpu_count()
+    GROUP_MP: ClassVar[str] = 'Multiprocessing CPU Option'
+    """Multiprocessing CPU Option"""
 
     f_jobs: float = argument(
         '-J', '--job',
+        validator.float.in_range(0, 1),
         type=float,
         default=0.5,
-        validator=lambda it: 0 < it < 1,
         group=GROUP_MP,
         help='fraction of CPU for parallel computations'
     )
@@ -32,7 +33,7 @@ class MultiProcOptions:
             if not 0 < self.f_jobs <= 1:
                 raise ValueError('')
             else:
-                n_jobs = int(self.CPU_COUNT * self.f_jobs)
+                n_jobs = int(joblib.cpu_count() * self.f_jobs)
         fprint(f'MultiProcess on {n_jobs} CPUs!', vtype='io', flush=True)
 
         return n_jobs

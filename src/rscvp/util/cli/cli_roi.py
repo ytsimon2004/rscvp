@@ -17,6 +17,8 @@ __all__ = ['ROIOptions',
 
 
 class ROIOptions(HistOptions):
+    """ROI options for anatomical tracing"""
+
     GROUP_ROI: ClassVar[str] = 'ROI Options'
     """group roi options"""
 

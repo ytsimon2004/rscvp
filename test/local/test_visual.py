@@ -9,7 +9,7 @@ from rscvp.visual.main_reliability import VisualReliabilityOptions
 from rscvp.visual.main_sftf_map import VisualSFTFMapOptions
 from rscvp.visual.main_sftf_pref import VisualSFTFPrefOptions
 from rscvp.visual.main_tuning import VisualTuningOptions
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestVisualModule(unittest.TestCase):

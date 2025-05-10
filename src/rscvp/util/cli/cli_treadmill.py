@@ -6,8 +6,10 @@ __all__ = ['TreadmillOptions']
 
 
 class TreadmillOptions:
-    """cli options for linear treadmill information"""
+    """Options for linear treadmill task"""
+
     GROUP_TREADMILL: ClassVar = 'Belt Options'
+    """group treadmill options"""
 
     # ----- Position ----- #
 

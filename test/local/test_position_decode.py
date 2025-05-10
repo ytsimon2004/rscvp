@@ -5,7 +5,7 @@ from unittest.mock import patch
 from rscvp.model.bayes_decoding.cache_bayes import BayesDecodeCacheBuilder
 from rscvp.model.bayes_decoding.main_decode_analysis import DecodeAnalysisOptions
 from rscvp.statistic.persistence_agg.main_decode_err import BayesDecodePersistenceAgg
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestPositionDecodeModule(unittest.TestCase):

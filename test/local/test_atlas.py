@@ -14,7 +14,7 @@ from rscvp.atlas.main_roi_top_view import RoiTopViewOptions
 from rscvp.atlas.main_roi_view import RoisViewOptions
 from rscvp.atlas.main_ternary import TernaryPercOptions
 from rscvp.util.cli import HistOptions
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestAtlasModule(unittest.TestCase):
@@ -333,6 +333,7 @@ class TestAtlasModule(unittest.TestCase):
         check_attr(Opt, RoiAtlasOptions)
         Opt().main([])
 
+    @unittest.skip('function archived')
     @patch('matplotlib.pyplot.show')
     def test_slice_transform(self, *args):
         class Test(AbstractParser, HistOptions):

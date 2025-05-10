@@ -13,8 +13,13 @@ __all__ = ['SBXOptions']
 
 
 class SBXOptions(CommonOptions):
+    """Scanbox options for calcium imaging DAQ system"""
+
     GROUP_SBX: ClassVar = 'Scanbox Options'
+    """group scanbox options"""
+
     GROUP_MAPPING: ClassVar = 'Brain Mapping Options'
+    """group brain mapping options"""
 
     # -----SBX----- #
     lines: int = argument('--lines', group=GROUP_SBX, default=528, help='number of lines for the scanning fov')
@@ -26,7 +31,7 @@ class SBXOptions(CommonOptions):
     brain_mapping: bool = argument('--brain-mapping', group=GROUP_MAPPING, help='Do brain mapping scaling')
 
     def load_sbx(self) -> SBXInfo:
-        f = uglob(self.config.phy_animal_dir, '*.mat')
+        f = uglob(self.get_io_config().phy_animal_dir, '*.mat')
         return SBXInfo.load(f)
 
     @property

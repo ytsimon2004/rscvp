@@ -1,6 +1,6 @@
 import platform
 from pathlib import Path
-from typing import TypedDict, ClassVar, Literal
+from typing import TypedDict, ClassVar, Literal, cast
 
 from neuralib.typing import PathLike
 from neuralib.util.utils import ensure_dir
@@ -47,20 +47,22 @@ class IOConfig:
     def __init__(self,
                  source_root: DataSourceRoot,
                  gspread_auth: Path | None = None):
-        self.source_root = source_root
-        self._converter()
+        self.source_root = cast(
+            DataSourceRoot,
+            {src: Path(p) for src, p in source_root.items()}
+        )
 
-        #
         self._gspread_auth = gspread_auth or self.DEFAULT_GSPREAD_AUTH
         self._phy_animal_dir = self.source_root['physiology'] / '%'
 
-    def _converter(self):
-        for src, p in self.source_root.items():
-            self.source_root[src] = Path(p)
+    @property
+    def phy_base_dir(self) -> Path:
+        """base physiology directory"""
+        return self.source_root['physiology']
 
     @property
     def phy_animal_dir(self) -> Path:
-        """Daily usage"""
+        """physiology animal directory"""
         return self._phy_animal_dir
 
     @phy_animal_dir.setter
@@ -69,35 +71,33 @@ class IOConfig:
 
     @property
     def stimpy(self) -> Path:
+        """stimpy presentation directory"""
         return self.source_root['stimpy']
 
     @property
-    def histology(self) -> Path:
-        return self.source_root['histology']
-
-    @property
     def suite2p(self) -> Path:
+        """suite2p analysis directory under physiology animal directory"""
         return ensure_dir(self.phy_animal_dir / 'suite2p')
 
     @property
     def cache(self) -> Path:
+        """cached data directory under physiology animal directory"""
         return ensure_dir(self.phy_animal_dir / 'cache')
 
     @property
     def track(self) -> Path:
+        """camera tracking data under physiology animal directory"""
         return ensure_dir(self.phy_animal_dir / 'track')
 
     @property
     def behavior(self) -> Path:
+        """behavioral data under physiology animal directory"""
         return ensure_dir(self.phy_animal_dir / 'behavior')
 
     @property
-    def output_dir(self) -> Path:
-        return self.source_root['physiology']
-
-    @property
     def statistic_dir(self) -> Path:
-        return ensure_dir(self.output_dir / 'statistics')
+        """statistics directory under base physiology directory"""
+        return ensure_dir(self.phy_base_dir / 'statistics')
 
 
 DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
@@ -216,4 +216,5 @@ def get_io_config(config: dict[str, IOConfig] | None = None,
 
 
 def islocal() -> bool:
+    """if running on current local machine"""
     return platform.node() == 'Yu-Tings-MacBook-Pro.local'

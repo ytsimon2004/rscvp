@@ -100,7 +100,7 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
             animal=self.animal_id,
             plane_index=self.plane_index,
             signal_type=self.signal_type,
-            selection=self.selection_filename(),
+            selection=self.selection_prefix(),
             session_type=self.session,
             act_normalized=self.act_normalized
         )

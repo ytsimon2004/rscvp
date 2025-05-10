@@ -13,7 +13,7 @@ from rscvp.track.main_licking_prob import LickProbOptions
 from rscvp.track.main_pupil_track import PupilTrackOptions
 from rscvp.util.cli import StimpyOptions
 from stimpyp import RiglogData
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestBehaviorTrackModule(unittest.TestCase):

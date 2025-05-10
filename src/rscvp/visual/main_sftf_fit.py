@@ -265,7 +265,7 @@ class SFTFModelCacheBuilder(AbstractParser, SelectionOptions, PersistenceRSPOpti
                               plane_index=self.plane_index)
 
     def compute_cache(self, cache: SFTFModelCache) -> SFTFModelCache:
-        neuron_idx = np.array(self.get_neuron_list())
+        neuron_idx = np.array(self.get_all_neurons())
         cache.neuron_idx = neuron_idx
         cache.src_neuron_idx = self.get_neuron_plane_idx(len(neuron_idx), self.plane_index)
         cache.sf_set = self.stim_para.sf_set

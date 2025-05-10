@@ -13,7 +13,7 @@ from rscvp.spatial.main_sparsity import SparsityOptions
 from rscvp.spatial.main_trial_corr import TrialCorrOptions
 from rscvp.statistic.persistence_agg.main_si_sorted_occ import SISortAlignPersistenceAgg
 from rscvp.statistic.persistence_agg.main_trial_avg_position import PositionBinPersistenceAgg
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestSpatialModule(unittest.TestCase):

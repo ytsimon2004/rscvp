@@ -29,8 +29,11 @@ Region = str
 class CommonOptions:
     """Common options for physiological data path"""
 
-    GROUP_PRIMARY: ClassVar[str] = 'Data primary key'
-    GROUP_IO: ClassVar[str] = 'Data input/output'
+    GROUP_PRIMARY: ClassVar[str] = 'Data Primary Key Options'
+    """group data primary key options"""
+
+    GROUP_IO: ClassVar[str] = 'Data Input/Output Options'
+    """group data input/output options"""
 
     # ----- PRIMARY KEY ----- #
 
@@ -109,45 +112,47 @@ class CommonOptions:
         help='preview qt without save and generate files'
     )
 
-    # logging
-    logger: logging.Logger | None = None
-
     # after extend
-    config: IOConfig | None = None
+    __config: IOConfig | None = None
 
-    def get_io_config(self):
-        self.config = get_io_config(remote_disk=self.remote_disk, force_use_default=self.use_default)
+    def get_io_config(self) -> IOConfig:
+        """get io config based on the running machine"""
+        if self.__config is None:
+            self.__config = get_io_config(
+                remote_disk=self.remote_disk,
+                force_use_default=self.use_default
+            )
+        return self.__config
 
     @property
-    def filename(self) -> str:
+    def stimpy_filename(self) -> str:
+        """stimpy filename with given primary key options"""
         return f'{self.exp_date}_{self.animal_id}__{self.daq_type}_{self.username}'
 
     @property
-    def _legacy_filename(self) -> str:
-        """pyvstim legacy filename"""
+    def pyvstim_filename(self) -> str:
+        """pyvstim legacy filename with given primary key options"""
         return f'{self.exp_date}_{self.animal_id}_{self.daq_type}_{self.username}'
 
     @property
     def cache_directory(self) -> Path:
-        if self.config is None:
-            self.get_io_config()
-        return self.config.cache
+        """cached directory for physiological data processing"""
+        return self.get_io_config().cache
 
     @property
     def statistic_dir(self) -> Path | TempDirWrapper:
-        if self.config is None:
-            self.get_io_config()
-        return self.config.statistic_dir
+        """statistics directory under base physiology directory"""
+        return self.get_io_config().statistic_dir
 
     @property
-    def data_output(self) -> Path:
-        if self.config is None:
-            self.get_io_config()
-        return self.config.output_dir
+    def phy_base_dir(self) -> Path:
+        """base physiology directory"""
+        return self.get_io_config().phy_base_dir
 
     @property
     def concat_csv_path(self) -> Path:
-        p = self.data_output / self.filename
+        """get concat csv from multiple ETL optic plans"""
+        p = self.phy_base_dir / self.stimpy_filename
         p = uglob(uglob(p, 'concat_plane_v*', is_dir=True), 'concat_csv_v*', is_dir=True)
 
         if not p.exists():
@@ -178,19 +183,19 @@ class CommonOptions:
         if any([len(it) == 0 for it in item]):
             raise ValueError('')
 
-        if self.config is None:
-            self.get_io_config()
+        config = self.get_io_config()
 
         # not assign or foreach usage
-        if ('%' in self.config.phy_animal_dir.parts) or (self.filename not in self.config.phy_animal_dir.parts):
-            d = self.config.source_root['physiology']
+        if ('%' in config.phy_animal_dir.parts) or (self.stimpy_filename not in config.phy_animal_dir.parts):
+            d = config.source_root['physiology']
             g = '*' + '*'.join(item) + '*'  # i.e., '*210302*YW008*1P*YW*'
             if self.run_number is not None:
                 g += f'/run{self.run_number}_*'
 
             f = uglob(d, g, is_dir=True)
-            self.config.phy_animal_dir = f
-            assert f.name == self.filename, 'f.name != self.filename'
+            assert f.name in (self.stimpy_filename, self.pyvstim_filename), 'f.name != self.filename'
+
+            self.__config.phy_animal_dir = f
 
     def foreach_dataset(self, **field) -> Iterable[Self]:
         """Foreach different animal and experimental date.
@@ -218,10 +223,8 @@ class CommonOptions:
 
         :param field: foreach options, beside animal and exp date.
         """
-        if self.config is None:
-            self.get_io_config()
 
-        root = self.config.source_root.copy()
+        root = self.get_io_config().source_root.copy()
 
         # store value from cli
         old_animal = self.animal_id
@@ -262,7 +265,7 @@ class CommonOptions:
             for i in range(len(animal_list)):
                 self.animal_id = animal_list[i]
                 self.exp_date = date_list[i]
-                self.config.source_root = root.copy()
+                self.__config.source_root = root.copy()
                 for f, v in field_list.items():
                     setattr(self, f, v[i])
 
@@ -272,7 +275,7 @@ class CommonOptions:
             # restore to cli given value
             self.animal_id = old_animal
             self.exp_date = old_date
-            self.config.source_root = root.copy()
+            self.__config.source_root = root.copy()
             for f, v in old_fields.items():
                 setattr(self, f, v)
 
@@ -283,9 +286,7 @@ class CommonOptions:
         :param src: ``DATA_SRC_TYPE``
         :return: path
         """
-        if self.config is None:
-            self.get_io_config()
-        return getattr(self.config, src)
+        return getattr(self.get_io_config(), src)
 
     def get_data_output(self, code: CodeAlias,
                         *prefix: str,
@@ -302,7 +303,7 @@ class CommonOptions:
         :param output_type Output data type
         :return: ``DataOutput``
         """
-        output_directory = self.data_output / self.filename
+        output_directory = self.phy_base_dir / self.stimpy_filename
 
         match output_type:
             case 'cellular':
@@ -343,7 +344,11 @@ class CommonOptions:
         else:
             return DataOutput.of_tmp_output(code, output_directory, filename, summary_filename)
 
+    # logging
+    logger: logging.Logger | None = None
+
     def setup_logger(self, caller_name: str | None = None):
+        """setup logging for current class"""
         from neuralib.util.logging import setup_clogger
         self.logger = setup_clogger(level=logging.DEBUG, caller_name=caller_name)
 

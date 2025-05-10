@@ -9,7 +9,7 @@ from rscvp.util.cli.cli_dbview import DatabaseViewOptions
 from rscvp.util.io import get_io_config
 from rscvp.visual.main_polar import VisualPolarOptions
 from rscvp.visual.main_sftf_pref import VisualSFTFPrefOptions
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestSQLDatabaseInit(unittest.TestCase):
@@ -23,7 +23,7 @@ class TestSQLDatabaseInit(unittest.TestCase):
         class Opt(DatabaseViewOptions):
             _debug_mode = True
             action = 'import'
-            args = [str(get_io_config().output_dir)]
+            args = [str(get_io_config().source_root['physiology'])]
 
         Opt().main([])
 
@@ -101,7 +101,7 @@ class TestSQLPopulate(unittest.TestCase):
             used_session = 'light'
             db_debug_mode = True
             db_commit = True
-            plot_summary = 'fraction'
+            batch_type = 'fraction'
 
         check_attr(Opt, VisualSFTFPrefOptions)
         Opt().main([])
@@ -115,7 +115,7 @@ class TestSQLPopulate(unittest.TestCase):
             used_session = 'light'
             db_debug_mode = True
             db_commit = True
-            plot_summary = 'dff'
+            batch_type = 'dff'
 
         check_attr(Opt, VisualSFTFPrefOptions)
         Opt().main([])

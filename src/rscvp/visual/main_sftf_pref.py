@@ -49,6 +49,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
 
     def run(self):
         self.post_parsing()
+
         riglog = self.load_riglog_data()
         pattern = GratingPattern.of(riglog)
         output_info = self.get_data_output('st')
@@ -115,10 +116,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
 
         # for median dff value
         dy = dict(index='dff')
-        dy.update({
-            sftf: [ret[i]]
-            for i, sftf in enumerate(SFTF_ARRANGEMENT)
-        })
+        dy.update({sftf: [ret[i]] for i, sftf in enumerate(SFTF_ARRANGEMENT)})
         tmp = pl.DataFrame(dy)
         tmp.write_csv(output.mk_subdir('tmp', 'preferred_sftf_dff', '.csv'))
         self.populate_database(tmp)
@@ -196,25 +194,19 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
     # Database #
     # ======== #
 
-    def populate_database(self, df: pl.DataFrame):
+    def populate_database(self, df: pl.DataFrame) -> None:
         region = self.get_primary_key_field('region') if self.rec_region is None else self.rec_region
 
-        sftf = list(df.row(by_predicate=pl.col('index') == self.plot_summary)[1:])
+        sftf = list(df.row(by_predicate=pl.col('index') == self.batch_type)[1:])
 
         update_fields = dict(update_time=self.cur_time)
 
-        if self.plot_summary == 'fraction':
-            kwargs = {
-                f'sftf_frac_group{i + 1}': sftf[i]
-                for i in range(len(sftf))
-            }
-        elif self.plot_summary == 'dff':
-            kwargs = {
-                f'sftf_amp_group{i + 1}': sftf[i]
-                for i in range(len(sftf))
-            }
+        if self.batch_type == 'fraction':
+            kwargs = {f'sftf_frac_group{i + 1}': sftf[i] for i in range(len(sftf))}
+        elif self.batch_type == 'dff':
+            kwargs = {f'sftf_amp_group{i + 1}': sftf[i] for i in range(len(sftf))}
         else:
-            raise ValueError('')
+            raise ValueError(f'{self.batch_type}')
 
         update_fields = {**update_fields, **kwargs}
 

@@ -44,7 +44,7 @@ class PositionMapOptions(AbstractParser, ApplyPosBinActOptions):
 
         rig = self.load_riglog_data()
         signal_all = self.apply_binned_act_cache().occ_activity
-        protocol = self.get_protocol_name()
+        protocol = self.get_protocol_alias()
 
         for neuron_id in tqdm(neuron_list, desc='plot_calactivity_belt', unit='neurons', ncols=80):
             signal = signal_all[neuron_id]

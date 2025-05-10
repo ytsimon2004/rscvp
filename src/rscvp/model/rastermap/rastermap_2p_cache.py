@@ -208,7 +208,7 @@ class RasterMap2PCacheBuilder(AbstractParser,
             plane_index=self.plane_index,
             signal_type=self.signal_type,
             session=self.session,
-            selection=self.selection_filename(),
+            selection=self.selection_prefix(),
         )
 
     # ============= #

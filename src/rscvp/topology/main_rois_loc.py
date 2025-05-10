@@ -23,7 +23,7 @@ class RoiLocOptions(AbstractParser, Suite2pOptions, StimpyOptions, SBXOptions):
 
         fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, page=self.gspread_reference)
         s2p = self.load_suite_2p()
-        neuron_list = self.get_neuron_list()
+        neuron_list = self.get_all_neurons()
 
         def get_roi(neuron, plane, factor) -> CellularCoordinates:
             return get_s2p_coords(s2p, neuron, plane, factor).relative_origin(fov)

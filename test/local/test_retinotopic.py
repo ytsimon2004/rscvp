@@ -2,10 +2,10 @@ import unittest
 import warnings
 from unittest.mock import patch
 
-from _local._util import check_attr
 from neuralib.imglib.io import tif_to_gif, gif_show
 from rscvp.retinotopic.cache_retinotopic import RetinotopicCacheBuilder
 from rscvp.retinotopic.main_retinotopic_map import RetinotopicMapOptions
+from .util import check_attr
 
 
 class TestRetinotopicModule(unittest.TestCase):

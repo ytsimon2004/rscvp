@@ -51,7 +51,7 @@ Folder Details
   - `ops.npy` (Suite2p operations/parameters)
 
 
-.. code-block:: note
+.. note::
 
     - The naming convention for each dataset under `phys/` follows:
       `[EXP_DATE]_[ANIMAL_ID]__[EXP_TYPE]_[USER]`

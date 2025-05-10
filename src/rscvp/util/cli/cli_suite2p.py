@@ -19,7 +19,10 @@ NeuronID = int | list[int] | slice | np.ndarray | None
 
 
 class Suite2pOptions(CommonOptions):
+    """Suite2P options for calcium imaging data"""
+
     GROUP_SUITE2P: ClassVar[str] = 'Suite2P Options'
+    """group suite2p options"""
 
     plane_index: int | None = argument(
         '-P', '--plane',
@@ -68,12 +71,14 @@ class Suite2pOptions(CommonOptions):
 
     @property
     def suite2p_directory(self) -> Path:
+        """suite2p result directory with given plane index"""
         if self.plane_index is None:
             raise ValueError('')
         return self.get_src_path('suite2p') / f'plane{self.plane_index}'
 
     @property
     def has_chan2(self) -> bool:
+        """if suite2p result has chan2 data"""
         if self._has_chan2 is None:
             s2p = self.load_suite_2p()
             self._has_chan2 = s2p.has_chan2
@@ -95,7 +100,7 @@ class Suite2pOptions(CommonOptions):
         :param cell_prob: cell probability
         :param channel: which PMT channel
         :param force_load_plane: for load the setting usage (i.e., prevent empty `combined` folder)
-        :return: ``Suite2PResult``
+        :return: :class:`~neuralib.imaging.suite2p.core.Suite2PResult`
         """
         if force_load_plane is not None:
             self.plane_index = force_load_plane
@@ -107,7 +112,8 @@ class Suite2pOptions(CommonOptions):
 
         return ret
 
-    def get_neuron_list(self) -> list[int]:
+    def get_all_neurons(self) -> list[int]:
+        """get list of all neuron indices"""
         if self.plane_index is None:
             raise ValueError('get neurons list should be a specific optical plane')
 
@@ -115,17 +121,26 @@ class Suite2pOptions(CommonOptions):
         return list(range(n))
 
     def launch_gui(self):
+        """launch suite2p gui"""
         from suite2p.gui import gui2p
         gui2p.run(str(self.suite2p_directory / 'stat.npy'))
 
 
 def get_neuron_list(opt: Suite2pOptions | Suite2PResult,
                     neuron_ids: NeuronID | None = None) -> list[int]:
+    """
+    Get a list of neuron IDs based on provided options and identifiers.
+
+    :param opt: :class:`Suite2pOptions` or :class:`~neuralib.imaging.suite2p.core.Suite2PResult`.
+    :param neuron_ids: Optional parameter identifying neurons to retrieve.
+        It can be a single neuron ID, a list of neuron IDs, or ``None``. If ``None`` then all neurons are returned.
+    :return: A list of integers representing the neuron IDs.
+    """
     match opt, neuron_ids:
         case Suite2PResult(), None:
             return list(range(opt.n_neurons))
         case Suite2pOptions(), None:
-            return opt.get_neuron_list()
+            return opt.get_all_neurons()
         case _, int():
             return [neuron_ids]
         case _:

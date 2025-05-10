@@ -13,6 +13,8 @@ FIG_MODE = Literal['simplified', 'presentation']
 
 
 class PlotOptions:
+    """Plot options (i.e., figure style, dark theme, ...)"""
+
     GROUP_PLOT: ClassVar = 'Plot Options'
     """group plot options"""
 
@@ -29,10 +31,10 @@ class PlotOptions:
         help='whether plot some figure detail for batch analysis',
     )
 
-    black_bg: bool = argument(
+    dark_theme: bool = argument(
         '--black',
         group=GROUP_PLOT,
-        help='plt black background'
+        help='make plot as dark theme for presentation'
     )
 
     line_color: str = 'k'
@@ -43,7 +45,7 @@ class PlotOptions:
 
     def set_background(self, style='dark_background'):
         """set plotting background style"""
-        if self.black_bg:
+        if self.dark_theme:
             plt.style.use(style)
             self._set_black_default_color()
 

@@ -3,7 +3,7 @@ import warnings
 from unittest.mock import patch
 
 from rscvp.model.glm.main_eval import BehavioralGLMOptions
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestGLMModule(unittest.TestCase):

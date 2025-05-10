@@ -20,6 +20,7 @@ __all__ = ['CameraOptions']
 
 class CameraOptions(StimpyOptions):
     GROUP_CAM: ClassVar = 'Camera options'
+    """group camera options"""
 
     LABCAM_OFFSET_ISSUE_DATE: Final[datetime] = datetime.strptime('210925', "%y%m%d").date()
     """labcam offset issue"""
@@ -97,13 +98,15 @@ class CameraOptions(StimpyOptions):
 
     @property
     def camera_time(self) -> np.ndarray:
+        """get camera time from riglog data"""
         rig = self.load_riglog_data()
-        if self.track_type in ('keypoints', 'lick'):
-            cam = 'facecam'
-        elif self.track_type == 'pupil':
-            cam = 'eyecam'
-        else:
-            raise ValueError('')
+        match self.track_type:
+            case 'pupil':
+                cam = 'eyecam'
+            case 'keypoints' | 'lick':
+                cam = 'facecam'
+            case _:
+                raise ValueError(f'unknown track type: {self.track_type}')
         # noinspection PyTypeChecker
         return rig.camera_event[cam].time
 
@@ -113,9 +116,9 @@ class CameraOptions(StimpyOptions):
 
     @property
     def pixviz_directory(self) -> Path:
+        """"""
         ret = self.get_src_path('track') / 'pixviz'
-        ensure_dir(ret)
-        return ret
+        return ensure_dir(ret)
 
     def load_pixviz_result(self) -> PixVizResult:
         file = uglob(self.pixviz_directory, '*.npy')

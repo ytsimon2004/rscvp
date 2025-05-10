@@ -165,6 +165,6 @@ class CSVCollector:
             msg = f'{opt.exp_date}_{opt.animal_id} >> exc col:{drop_col} not fully found, df columns: {list(df.columns)}'
             fprint(msg, vtype='warning')
         else:
-            fprint(f'Drop! {drop_col} in {opt.filename}')
+            fprint(f'Drop! {drop_col} in {opt.stimpy_filename}')
 
         return df

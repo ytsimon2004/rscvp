@@ -25,11 +25,19 @@ PC_CLASSIFIER = Literal['si', 'slb', 'intersec']
 
 
 class SelectionOptions(Suite2pOptions, StimpyOptions):
+    """Neuronal selection and masking options"""
+    
     GROUP_SELECTION: ClassVar[str] = 'selection of neuron options'
+    """selection of neuron options"""
 
     DEFAULT_NEUROPIL_THRES: ClassVar[float] = -5
+    """default neuropiil error threshold for preselection"""
+
     DEFAULT_TRIAL_THRES: ClassVar[float] = 0.25
+    """default trial (lap) reliability threshold for preselection"""
+
     DEFAULT_VISUAL_THRES: ClassVar[float] = 0.2
+    """default visual reliability threshold for preselection"""
 
     pre_selection: bool = argument(
         '--pre',
@@ -83,18 +91,21 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
 
     @property
     def root(self) -> Path:
-        return self.config.phy_animal_dir
+        return self.get_io_config().phy_animal_dir
 
     @property
     def n_total_neurons(self) -> int:
+        """number of total neurons"""
         return len(self.get_selected_neurons())
 
     @property
     def n_selected_neurons(self) -> int:
+        """number of selected neurons"""
         return np.count_nonzero(self.get_selected_neurons())
 
     @property
     def selected_neurons(self) -> np.ndarray:
+        """selected neurons indices"""
         return np.nonzero(self.get_selected_neurons())[0]
 
     def get_csv_data(self, cols: str | list[str], *,
@@ -198,7 +209,7 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
 
     @property
     def pf_limit(self) -> bool:
-        """with place field limit as selection criteria"""
+        """if place field limit as selection criteria"""
         return not self.no_pf_limit
 
     def pre_select(self) -> np.ndarray:
@@ -330,7 +341,7 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
 
     def get_selection_mask(self, with_preselection: bool = True) -> SelectionMask:
         """get selection mask for all neurons"""
-        ps = self.pre_select() if with_preselection else np.full(self.get_neuron_list(), 0, dtype=bool)
+        ps = self.pre_select() if with_preselection else np.full(self.get_all_neurons(), 0, dtype=bool)
         n_neurons = np.count_nonzero(ps)
 
         if self.vc_selection is None:
@@ -380,6 +391,7 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
     # ===================== #
 
     def selection_info(self, sep: str = '\n') -> str:
+        """selection information"""
         pre = f'preselection: True use session {self.used_session}' if self.pre_selection else 'preselection: False'
         vis = f'visual: {self.vc_selection}' if self.vc_selection is not None else 'visual: False'
         place = f'place: {self.pc_selection}' if self.pc_selection is not None else 'place: False'
@@ -390,7 +402,8 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
 
         return sep.join((pre, vis, place, _random))
 
-    def selection_filename(self, sep: str = '-') -> str:
+    def selection_prefix(self, sep: str = '-') -> str:
+        """selection prefix for filename"""
         place = self.pc_selection or None
 
         ret = ''

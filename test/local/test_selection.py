@@ -5,7 +5,7 @@ from unittest.mock import patch
 from rscvp.selection.main_motion_drift import MotionDriftOptions
 from rscvp.selection.main_neuropil_error import NeuropilErrOptions
 from rscvp.selection.main_trial_reliability import TrialReliabilityOptions
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestSelectionModule(unittest.TestCase):

@@ -1,16 +1,13 @@
-from pathlib import Path
 from typing import ClassVar
 
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
-
 from argclz import argument
-from neuralib.util.verbose import fprint
+from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from stimpyp import (
     STIMPY_SOURCE_VERSION,
     Session,
     PyVlog,
     RiglogData,
-    get_protocol_name
+    get_protocol_name, ProtocolAlias
 )
 from .cli_core import CommonOptions
 
@@ -18,7 +15,10 @@ __all__ = ['StimpyOptions']
 
 
 class StimpyOptions(CommonOptions):
+    """Stimpy options"""
+
     GROUP_STIMPY: ClassVar[str] = 'Stimpy Options'
+    """group stimpy options"""
 
     session: Session | None = argument(
         '-s', '--session',
@@ -41,26 +41,24 @@ class StimpyOptions(CommonOptions):
     )
 
     @property
-    def stimpy_directory(self) -> Path:
-        d = self.get_src_path('stimpy')
-        ret = d / self.filename
-        if not ret.exists():
-            ret = d / f'{self._legacy_filename}'
-            if ret.exists():
-                fprint(f'legacy filename found: {ret}', vtype='warning')
-            else:
-                raise FileNotFoundError(f'cannot find {ret}')
-        return ret
-
-    @property
     def with_diode_offset(self) -> bool:
+        """if do the diode offset synchronization"""
         return not self.no_diode_offset
 
     def load_riglog_data(self, **kwargs) -> RiglogData | PyVlog:
-        if self.source_version == 'pyvstim':
-            return PyVlog(self.stimpy_directory, **kwargs)
-        else:
-            return RiglogData(self.stimpy_directory, diode_offset=self.with_diode_offset, **kwargs)
+        """Load :class:`~stimpyp.stimpy_core.RiglogData` or :class:`~stimpyp.pyvstim.PyVlog`
+         object based on the source version"""
+        log_directory = self.get_src_path('stimpy')
+
+        match self.source_version:
+            case 'pyvstim':
+                log_directory = log_directory / self.pyvstim_filename
+                return PyVlog(log_directory, **kwargs)
+            case 'stimpy-bit' | 'stimpy-git':
+                log_directory = log_directory / self.stimpy_filename
+                return RiglogData(log_directory, diode_offset=self.with_diode_offset, **kwargs)
+            case _:
+                raise ValueError('')
 
     # ================== #
     # Protocol Dependent #
@@ -68,6 +66,7 @@ class StimpyOptions(CommonOptions):
 
     @property
     def session_list(self) -> list[Session]:
+        """list of sessions based on the protocol type"""
         if self.is_vop_protocol():
             return ['light', 'visual', 'dark']
         elif self.is_ldl_protocol():
@@ -77,6 +76,7 @@ class StimpyOptions(CommonOptions):
 
     @property
     def gspread_reference(self) -> GSPREAD_SHEET_PAGE:
+        """get statistic google spreadsheet reference from the protocol type"""
         if self.is_vop_protocol():
             return 'apcls_tac'
         elif self.is_ldl_protocol():
@@ -84,11 +84,14 @@ class StimpyOptions(CommonOptions):
         else:
             raise ValueError('unsupported protocol')
 
-    def get_protocol_name(self) -> str:
-        return get_protocol_name(self.load_riglog_data().stimlog_file)
+    def get_protocol_alias(self) -> ProtocolAlias:
+        """get the protocol type from the filename"""
+        return get_protocol_name(self.load_riglog_data().riglog_file)
 
     def is_ldl_protocol(self) -> bool:
-        return self.get_protocol_name() == 'light_dark_light'
+        """if is light dark light protocol"""
+        return self.get_protocol_alias() == 'light_dark_light'
 
     def is_vop_protocol(self) -> bool:
-        return self.get_protocol_name() == 'visual_open_loop'
+        """if is visual open loop protocol"""
+        return self.get_protocol_alias() == 'visual_open_loop'

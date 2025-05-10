@@ -26,6 +26,7 @@ extensions = ['sphinx.ext.autodoc',
 
 intersphinx_mapping = {
     'neuralib': ('https://neuralib.readthedocs.io/en/latest/', None),
+    'stimpyp': ('https://stimpyp.readthedocs.io/en/latest/', None)
 }
 
 templates_path = ['_templates']

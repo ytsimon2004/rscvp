@@ -123,7 +123,7 @@ class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
             animal=self.animal_id,
             plane_index=self.plane_index if self.plane_index is not None else '_concat',
             signal_type=self.signal_type,
-            selection=(self.selection_filename()),
+            selection=(self.selection_prefix()),
             sortby=use_strategy
         )
 

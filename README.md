@@ -29,13 +29,12 @@ conda activate rscvp
 pip install -e .[all]
 ```
 
-------------------------------
 
-## See the detail information in [documentation](https://rscvp.readthedocs.io/en/latest/)
 
-## See the example demo and data structure in [Demo Run](https://rscvp.readthedocs.io/en/latest/index.html#demo-run)
+## See the detail information and Demo in [documentation](https://rscvp.readthedocs.io/en/latest/)
 
----------------------------
+
+
 
 ## Annotation for published figures in the source code
 

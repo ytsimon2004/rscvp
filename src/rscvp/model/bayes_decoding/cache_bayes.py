@@ -398,7 +398,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
             cv_info=self.cv_info,
             window=self.window,
             signal_type=self.signal_type,
-            selection=self.selection_filename(),
+            selection=self.selection_prefix(),
             run_epoch=self.running_epoch,
             random=self.n_selected_neurons if self.random else 'None',
             version=self.cache_version

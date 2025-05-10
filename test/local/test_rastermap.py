@@ -6,7 +6,7 @@ from rscvp.model.rastermap.main_rastermap_2p import RunRasterMap2POptions
 from rscvp.model.rastermap.main_rastermap_wfield import RunRasterMapWfieldOptions
 from rscvp.model.rastermap.rastermap_2p_cache import RasterMap2PCacheBuilder
 from rscvp.model.rastermap.rastermap_wfield_cache import RasterMapWfieldCacheBuilder
-from ._util import check_attr
+from .util import check_attr
 
 
 class TestRastermapModule(unittest.TestCase):
