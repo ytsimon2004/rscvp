@@ -25,6 +25,8 @@ CCF_GLOB_TYPE = Literal[
 ]
 
 
+# TODO from here
+
 class AbstractCCFDir(metaclass=abc.ABCMeta):
     """
     ::
@@ -497,7 +499,7 @@ def _concat_channel(ccf_dir: AbstractCCFDir, plane: PLANE_TYPE):
     If sagittal slice, auto move ipsi/contra hemispheres dataset (`resize_ipsi`, `resize_contra`)
     to new `resize` directory
 
-    :param ccf_dir: :class:`~neuralib.atlas.ccf.core.AbstractCCFDir()`
+    :param ccf_dir: :class:`AbstractCCFDir`
     :param plane: ``PLANE_TYPE`` {'coronal', 'sagittal', 'transverse'}
     :return:
     """

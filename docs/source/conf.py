@@ -21,7 +21,12 @@ author = 'yu-ting wei'
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx_copybutton',
-              "sphinx.ext.viewcode"]
+              "sphinx.ext.viewcode",
+              'sphinx.ext.intersphinx']
+
+intersphinx_mapping = {
+    'neuralib': ('https://neuralib.readthedocs.io/en/latest/', None),
+}
 
 templates_path = ['_templates']
 exclude_patterns = []

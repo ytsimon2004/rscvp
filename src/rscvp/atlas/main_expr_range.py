@@ -3,11 +3,11 @@ from typing import ClassVar
 import polars as pl
 import seaborn as sns
 from matplotlib.axes import Axes
-from rscvp.util.cli.cli_hist import HistOptions
-from rscvp.util.util_plot import REGION_COLORS_HIST
 
 from argclz import AbstractParser, as_argument, str_tuple_type
 from neuralib.plot import plot_figure
+from rscvp.util.cli.cli_hist import HistOptions
+from rscvp.util.util_plot import REGION_COLORS_HIST
 
 __all__ = ['RoiExprRangeBatchOptions']
 
@@ -29,7 +29,7 @@ class RoiExprRangeBatchOptions(AbstractParser, HistOptions):
 
     def collect_range_data(self) -> pl.DataFrame:
         ret = []
-        for ccf_dir in self.foreach_ccf_dir(self.animal):
+        for ccf_dir in self.foreach_ccf_dir():
             df = pl.read_csv(ccf_dir.parse_csv)
             concat = (
                 df.filter(pl.col('source').is_in(['aRSC', 'pRSC']))

@@ -8,8 +8,6 @@ import numpy as np
 import polars as pl
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
-from rscvp.util.cli import HistOptions, ROIOptions
-from rscvp.util.util_ibl import IBLAtlasPlotWrapper
 
 from argclz import AbstractParser, str_tuple_type, as_argument, argument
 from neuralib.atlas.map import ALLEN_FAMILY_TYPE
@@ -20,13 +18,17 @@ from neuralib.plot.colormap import insert_colorbar
 from neuralib.typing import AxesArray
 from neuralib.util.logging import LOGGING_IO_LEVEL
 from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli import HistOptions, ROIOptions
+from rscvp.util.util_ibl import IBLAtlasPlotWrapper
 
 __all__ = ['RoiTopViewOptions']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.6G', as_doc=True)
 class RoiTopViewOptions(AbstractParser, ROIOptions):
-    DESCRIPTION = 'Plot all the ROIs (given animals, fluorescence channel, allen family) on the top view'
+    """Plot ROIs on the top dorsal cortex view"""
+
+    DESCRIPTION = 'Plot ROIs on the top dorsal cortex view'
 
     animal = as_argument(HistOptions.animal).with_options(
         type=str_tuple_type,
@@ -44,7 +46,7 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
 
     area_family: ALLEN_FAMILY_TYPE | None = argument(
         '--family',
-        default=None,
+        default='ISOCORTEX',
         help='only plot rois in allen family'
     )
 
@@ -55,7 +57,7 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
 
     def run(self):
         self.setup_logger(Path(__file__).name)
-        df = self.get_atlas_data()
+        df = self.get_roi_dataframe()
 
         if self.as_histogram:
             self.plot_top_view_histogram(df)
@@ -65,10 +67,12 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
 
     @property
     def area_color_lut(self) -> Path:
+        """cached file for **area:color** lookup table (reproducing figures)"""
         file = 'area_color_lut.json'
         return self.histology_cache_directory / file
 
-    def get_atlas_data(self) -> pl.DataFrame:
+    def get_roi_dataframe(self) -> pl.DataFrame:
+        """get roi dataframe for plotting"""
         if len(self.animal) == 1:
             self.animal = self.animal[0]
             ccf_dir = self.get_ccf_dir()
@@ -76,7 +80,7 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
             self.logger.info(f'reconstruct single animal {self.animal}')
         else:
             df_list = []
-            for ccf_dir in self.foreach_ccf_dir(self.animal):
+            for ccf_dir in self.foreach_ccf_dir():
                 df = self.load_roi_dataframe(ccf_dir).dataframe()
                 df_list.append(df)
 
@@ -104,10 +108,10 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
 
     def plot_top_view_histogram(self, df: pl.DataFrame, bin_size: int = 200):
         """
+        Plot the top view roi 2D histogram for each source, with the colormap lookup table for each area.
 
-        :param df:
+        :param df: ROI dataframe
         :param bin_size: bin_size in um
-        :return:
         """
         ibl = IBLAtlasPlotWrapper()
         source = df['source'].unique().to_list()
@@ -215,6 +219,14 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
                               colormap_lut: dict[Area, str],
                               with_legend: bool = True,
                               legend_number_limit: int | None = None):
+        """
+        Plot the top view roi scatter plot for each source, with the colormap lookup table for each area.
+
+        :param df: ROI dataframe
+        :param colormap_lut: brain area:color dict
+        :param with_legend: with legend or not, default True
+        :param legend_number_limit: number of roi should larger than how many, then show in legend. If None then show all.
+        """
 
         ibl = IBLAtlasPlotWrapper()
         source = df['source'].unique().to_list()
@@ -225,7 +237,6 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
                 ax = ax_merge(_ax)[:2, i]
                 self.plot_ibl_view(ax, ibl)
 
-                #
                 df_src = df.filter(pl.col('source') == src)
                 n_rois = df_src.shape[0]
 
@@ -236,7 +247,6 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
                 ax.set_title(f'{src}: {n_rois} ROIs')
 
             if with_legend:
-                #
                 if legend_number_limit is not None:
                     areas = self._filter_rois_counts(df, legend_number_limit)
                     for a in areas:
@@ -258,6 +268,7 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
                 ax.legend(handles=table, loc='center', ncol=10)
 
     def plot_ibl_view(self, ax: Axes, ibl: IBLAtlasPlotWrapper):
+        """plot ibl dorsal cortex view with given mpl.axes"""
         if self.area_family is None or self.area_family == 'ISOCORTEX':
             ibl.plot_scalar_on_slice(['root'], ax=ax, coord=-2000, plane='top', background='boundary')
         else:

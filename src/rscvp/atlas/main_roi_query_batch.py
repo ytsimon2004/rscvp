@@ -1,13 +1,13 @@
 from typing import Final
 
 import polars as pl
-from rscvp.util.cli import HistOptions, ROIOptions
 
 from argclz import AbstractParser, as_argument, str_tuple_type, argument
 from neuralib.atlas.ccf import ROIS_NORM_TYPE
 from neuralib.atlas.typing import Area, TreeLevel
 from neuralib.plot import plot_figure, dotplot
 from neuralib.util.verbose import printdf, fprint
+from rscvp.util.cli import HistOptions, ROIOptions
 
 __all__ = ['RoiQueryBatchOptions']
 
@@ -41,11 +41,13 @@ class RoiQueryBatchOptions(AbstractParser, ROIOptions):
 
     def get_batch_subregion_data(self) -> pl.DataFrame:
         ret = []
-        for ccf_dir in self.foreach_ccf_dir(self.animal):
-            subregion = (self.load_roi_dataframe(ccf_dir)
-                         .to_subregion(self.area, source_order=('aRSC', 'pRSC', 'overlap'),
-                                       show_col=self.force_set_show_col,
-                                       animal=ccf_dir.animal))
+        for ccf_dir in self.foreach_ccf_dir():
+            subregion = (
+                self.load_roi_dataframe(ccf_dir)
+                .to_subregion(self.area, source_order=('aRSC', 'pRSC', 'overlap'),
+                              show_col=self.force_set_show_col,
+                              animal=ccf_dir.animal)
+            )
 
             ret.append(subregion.dataframe())
 

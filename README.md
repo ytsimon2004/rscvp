@@ -31,12 +31,13 @@ pip install -e .[all]
 
 ------------------------------
 
-## See the [documentation](https://rscvp.readthedocs.io/en/latest/) for more information
+## See the detail information in [documentation](https://rscvp.readthedocs.io/en/latest/)
 
+## See the example demo and data structure in [Demo Run](https://rscvp.readthedocs.io/en/latest/index.html#demo-run)
 
-------------------------------
+---------------------------
 
-## Annotation for published figures
+## Annotation for published figures in the source code
 
 - Checkout class/function with `@publish_annotation('main' | 'sup',project='rscvp', figure=[FIGURE_NUMBER])` decorator
 
@@ -58,40 +59,9 @@ class FigureClass:
   def _prepare_data(self):
     pass
 
-
 ```
 
------------------------------
 
-## Data Folder structure (See also in [io.py](./src/rscvp/util/io.py))
-
-### Physiological dataset (per recording date/mouse id, i.e., 2P data)
-
-    phys/
-        ├── summary/ -- (1)
-        └── [EXP_DATE]_[ANIMAL_ID]__[EXP_TYPE]_[USER]
-              ├── plane[*NUM]/ -- (2)
-              ├── behavior/ -- (3)
-              ├── cache/ -- (4)
-              ├── track/ -- (5)
-              └── *optional/ --(6)
-
-* (1) For statistical and population visualization purposes
-* (2) Different optical planes physiological data
-* (3) Animal's behavior-related data
-* (4) Cache files for avoid duplicated computing (e.g., .pkl, .npy., etc.)
-* (5) Camera tracking data (e.g., pupil, running, location., etc.)
-* (6) Preprocessing data storage (e.g., suite2p, kilosort., etc.)
-
-### Anatomical dataset (per animal, i.e., posthoc histology)
-
-     hist/
-        ├── [ANIMAL_ID]/
-        └── summary/
-
-- Detail can be found in [histology readme](src/rscvp/atlas/README.md)
-
----------------------------
 
 ## Contact
 

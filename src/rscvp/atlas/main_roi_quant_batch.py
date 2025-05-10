@@ -7,10 +7,6 @@ import numpy as np
 import polars as pl
 import seaborn as sns
 from matplotlib.axes import Axes
-from rscvp.atlas.util_plot import plot_categorical_region
-from rscvp.statistic.core import print_var
-from rscvp.util.cli import HistOptions, PlotOptions, ROIOptions
-from rscvp.util.util_plot import REGION_COLORS_HIST
 
 from argclz import AbstractParser, argument, as_argument, str_tuple_type, var_argument
 from argclz.dispatch import Dispatch, dispatch
@@ -18,6 +14,10 @@ from neuralib.atlas.typing import Source, Area
 from neuralib.plot import plot_figure, dotplot
 from neuralib.typing import AxesArray
 from neuralib.util.verbose import publish_annotation
+from rscvp.atlas.util_plot import plot_categorical_region
+from rscvp.statistic.core import print_var
+from rscvp.util.cli import HistOptions, PlotOptions, ROIOptions
+from rscvp.util.util_plot import REGION_COLORS_HIST
 
 __all__ = ['RoiQuantBatchOptions']
 
@@ -27,7 +27,8 @@ __all__ = ['RoiQuantBatchOptions']
                     figure=['fig.6F', 'fig.6H', 'fig.7A-G bar', 'fig.7H'],
                     as_doc=True)
 class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
-    DESCRIPTION = 'ROIs distribution analysis for batch animals'
+    """ROIs analysis for batch animals, see ``@dispatch(...) on method`` for different plot types"""
+    DESCRIPTION = 'ROIs analysis for batch animals'
 
     animal = as_argument(HistOptions.animal).with_options(
         type=str_tuple_type,
@@ -52,6 +53,7 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
     _source: tuple[Source, ...] | None = None
 
     def post_parsing(self):
+        """post argument parsing settings"""
         self.setup_logger(Path(__file__).name)
         self.set_background()
 
@@ -62,15 +64,18 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
             self._source = ('aRSC', 'pRSC', 'overlap')
 
     def run(self):
+        """Runs the main execution logic of the object"""
         self.post_parsing()
         self.invoke_command(self.dispatch_plot, *self.plot_args)
 
     @property
     def n_animals(self) -> int:
+        """number of animals"""
         return len(self.animal)
 
     @property
     def output_file(self) -> Path | None:
+        """output file path. If debug mode then return None"""
         if self.debug_mode:
             return None
 
@@ -89,13 +94,15 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
     def _concat_classified_dataframe(self, area: Area | None = None) -> pl.DataFrame:
         """Concat classified data for batch animals analysis"""
         ret = []
-        for ccf_dir in self.foreach_ccf_dir(self.animal):
-            norm = (self.load_roi_dataframe(ccf_dir)
-                    .to_normalized(self.roi_norm,
-                                   self.merge_level,
-                                   top_area=self.top_area,
-                                   hemisphere=self.hemisphere,
-                                   animal=self.animal))
+        for ccf_dir in self.foreach_ccf_dir():
+            norm = (
+                self.load_roi_dataframe(ccf_dir)
+                .to_normalized(self.roi_norm,
+                               self.merge_level,
+                               top_area=self.top_area,
+                               hemisphere=self.hemisphere,
+                               animal=ccf_dir.animal)
+            )
 
             if not ret:
                 self._classified_column = norm.classified_column
@@ -117,14 +124,17 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
     # ======== #
 
     @dispatch('region_x')
-    def plot_categorical_region(self, flatten: bool = True):
-        """Plot a specific region bar/cat plot across animals (x axis)"""
+    def plot_categorical_region(self, flatten: bool = False):
+        """
+        Plot a specific region bar/cat plot across animals (x axis)
+
+        :param flatten: If True, plot all animals with connected line, otherwise categorical group plot foreach animal
+        """
         if self.area is None:
             raise ValueError('specify region')
 
         df = self._concat_classified_dataframe(self.area)
 
-        #
         with plot_figure(self.output_file, figsize=(2.5, 6)) as ax:
             if flatten:
                 order = self._source
@@ -303,7 +313,7 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
 
     def _get_bias_value_dataframe(self) -> pl.DataFrame:
         ret = []
-        for i, ccf_dir in enumerate(self.foreach_ccf_dir(self.animal)):
+        for i, ccf_dir in enumerate(self.foreach_ccf_dir()):
             norm = (self.load_roi_dataframe(ccf_dir)
                     .to_normalized(self.roi_norm, self.merge_level, top_area=self.top_area, hemisphere=self.hemisphere))
 

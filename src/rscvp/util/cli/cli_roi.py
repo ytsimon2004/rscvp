@@ -18,6 +18,7 @@ __all__ = ['ROIOptions',
 
 class ROIOptions(HistOptions):
     GROUP_ROI: ClassVar[str] = 'ROI Options'
+    """group roi options"""
 
     top_area: int | None = argument(
         '--top', '--top-area',
@@ -73,6 +74,7 @@ class ROIOptions(HistOptions):
 
     @property
     def classified_column(self) -> str:
+        """column name based on :attr:`merge_level`"""
         field = self.merge_level
         match field:
             case int():

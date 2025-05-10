@@ -22,6 +22,8 @@ __all__ = ['RoiAtlasOptions']
 
 @publish_annotation('main', project='rscvp', figure='fig.6E', as_doc=True)
 class RoiAtlasOptions(AbstractParser, HistOptions):
+    """Plot the local maxima roi selection and atlas annotation based on transformed matrix & images"""
+
     DESCRIPTION = 'Plot the local maxima roi selection and atlas annotation based on transformed matrix & images'
 
     affine_transform: bool = argument(
@@ -30,17 +32,31 @@ class RoiAtlasOptions(AbstractParser, HistOptions):
     )
 
     def run(self):
+        """runs the main execution logic of the object"""
         ccf_dir = self.get_ccf_dir()
         n_images = len(list(ccf_dir.transformed_folder.glob('*.mat')))
         out = ccf_dir.roi_atlas_output
 
-        foreach_atlas = tqdm(self.roi_atlas_iter(ccf_dir), total=n_images, unit='images', desc='plot roi atlas')
+        foreach_atlas = tqdm(self.foreach_slice(ccf_dir), total=n_images, unit='images', desc='plot roi atlas')
         for ratlas in foreach_atlas:
             output_file = None if self.debug_mode else out / f'{ratlas.name}.pdf'
             with plot_figure(output_file, figsize=(8, 8)) as ax:
                 ratlas.plot(ax, affine_transform=self.affine_transform)
 
-    def roi_atlas_iter(self, ccf_dir: AbstractCCFDir, overlap: bool = True) -> Iterable[RoiAtlas]:
+    def foreach_slice(self, ccf_dir: AbstractCCFDir, overlap: bool = True) -> Iterable[RoiAtlas]:
+        """
+        Iterates through the slices in a transformed directory, applying a series
+        of operations to each identified image transformation file. Each operation
+        is responsible for loading transformation matrices, processing image data,
+        and constructing an object representing the region of interest (ROI) atlas.
+        When the overlap flag is enabled, an additional overlapping image is
+        processed and included in the ROI atlas.
+
+        :param ccf_dir: An object representing the transformed directory structure: :class:`~rscvp.atlas.dir.AbstractCCFDir`
+        :param overlap: A boolean indicating whether to process overlap data for the images. Defaults to True.
+        :return: An iterable of :class:`RoiAtlas` objects, each representing the
+            processed atlas for a region of interest identified in an image.
+        """
         directory = ccf_dir.transformed_folder
         mats = sorted(list(directory.glob('*mat')))
 

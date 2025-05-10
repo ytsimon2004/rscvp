@@ -28,13 +28,14 @@ Installation
     $ pip install .[all]
 
 
-Figure Instruction
+Data Structure
 -------------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   fig_instruction/index
+   data_structure/physiology
+   data_structure/anatomy
 
 
 Demo Run
@@ -43,7 +44,17 @@ Demo Run
 .. toctree::
    :maxdepth: 2
 
+
    demo/index
+
+
+Figure Instruction
+-------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   fig_instruction/index
 
 
 
@@ -54,12 +65,4 @@ API Reference
    :maxdepth: 1
    :caption: Modules
 
-   api/rscvp.atlas
-   api/rscvp.model
-   api/rscvp.retinotopic
-   api/rscvp.selection
-   api/rscvp.spatial
-   api/rscvp.statistic
-   api/rscvp.topology
-   api/rscvp.visual
-   api/rscvp.util
+   api/rscvp

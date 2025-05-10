@@ -13,8 +13,8 @@ FIG_MODE = Literal['simplified', 'presentation']
 
 
 class PlotOptions:
-    """cli options for the plotting"""
     GROUP_PLOT: ClassVar = 'Plot Options'
+    """group plot options"""
 
     plot_summary: bool = argument(
         '--summary',
@@ -36,9 +36,13 @@ class PlotOptions:
     )
 
     line_color: str = 'k'
+    """line color"""
+
     cmap_color: str = 'Greys'
+    """color map colors"""
 
     def set_background(self, style='dark_background'):
+        """set plotting background style"""
         if self.black_bg:
             plt.style.use(style)
             self._set_black_default_color()

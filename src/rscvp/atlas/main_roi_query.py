@@ -20,11 +20,9 @@ __all__ = ['RoiQueryOptions']
 
 @publish_annotation('main', project='rscvp', figure='fig.7E-F stacked', caption='@dispatch(stacked)', as_doc=True)
 class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
-    DESCRIPTION = """
-    Plot the fraction of subregion / hierarchical classification information in a queried area 
-    i.e., 1) layer info (cortical layer 2/3~6...) ; 
-          2) subregions based on anatomical classification (merge area)
-    """
+    """Plot the fraction of subregions in a queried region"""
+
+    DESCRIPTION = 'Plot the fraction of subregions in a queried region'
 
     DEFAULT_AREA_SORT: ClassVar[dict[Area, list[Area]]] = {
         'VIS': ['VISp', 'VISam', 'VISpm', 'VISl', 'VISal', 'VISpor', 'VISli', 'VISpl', 'VISC'],
@@ -39,10 +37,10 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
         help='region name for query'
     )
 
-    graph: Literal['bar', 'dot', 'stacked'] = argument(
+    dispatch_plot: Literal['bar', 'dot', 'stacked'] = argument(
         '-g', '--graph',
         default='stacked',
-        help='graph type',
+        help='graph type options',
     )
 
     source_order = ('aRSC', 'pRSC', 'overlap')
@@ -51,15 +49,16 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
 
     def run(self):
         self.setup_logger(Path(__file__).name)
+
         ccf_dir = self.get_ccf_dir()
         roi = self.load_roi_dataframe(ccf_dir)
 
         # single region
         if len(self.area) == 1:
             result = self._get_single_query(roi)
-            file = f'{self.area}_{self.graph}.pdf'
+            file = f'{self.area}_{self.dispatch_plot}.pdf'
             out = ccf_dir.output_folder / file if not self.debug_mode else None
-            self.invoke_command(self.graph, result, out)
+            self.invoke_command(self.dispatch_plot, result, out)
 
         # multiple regions
         else:
@@ -82,6 +81,7 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
 
     @dispatch('bar')
     def plot_bar_foreach(self, result: RoiSubregionDataFrame, output: Path | None):
+        """Plot the bar plot for each source"""
         nr = 2 if self.disable_overlap_in_plot else 3
         with plot_figure(output, nr, 1, sharey=True) as ax:
             for i, row in enumerate(result.dataframe().iter_rows()):
@@ -91,6 +91,7 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
 
     @dispatch('dot')
     def plot_dot_foreach(self, result: RoiSubregionDataFrame, output: Path | None):
+        """Plot the dot plot for each source"""
         with plot_figure(output, default_style=False) as ax:
             dotplot(result.sources,
                     result.subregion,
@@ -106,10 +107,10 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
         """
         Plot the stacked bar in a single region
 
-        :param result:
-        :param output: Fig output path
-        :param with_width: If True, X axis indicates the proportion of inputs in channels, otherwise, used default value
-        :param fill: If True, fill the stacked bar with all regions
+        :param result: :class:`~neuralib.atlas.ccf.dataframe.RoiSubregionDataFrame`
+        :param output: fig output path
+        :param with_width: if X axis indicates the proportion of inputs in channels, otherwise, used default value
+        :param fill: if fill the stacked bar with all regions
         """
         dy = result.to_dict(as_series=False)
         # sort
@@ -143,11 +144,12 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
         xaxis is each region, width indicates the proportion of inputs in different regions.
 
         Shape Info:
-        R: number of regions (queried)
-        C: number of channels
-        sR: number of subregions (common max for all the queried regions)
 
-        :param results:
+            R: number of regions (queried)
+            C: number of channels
+            sR: number of subregions (common max for all the queried regions)
+
+        :param results: list of :class:`~neuralib.atlas.ccf.dataframe.RoiSubregionDataFrame`
         :param output:
         :param fill:
 

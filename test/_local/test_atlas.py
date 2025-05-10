@@ -213,7 +213,7 @@ class TestAtlasModule(unittest.TestCase):
     def test_roi_query_bar(self, *args):
         class Opt(RoiQueryOptions):
             animal = 'YW043'
-            graph = 'bar'
+            dispatch_plot = 'bar'
             debug_mode = True
             area = ('VIS',)
 
@@ -224,7 +224,7 @@ class TestAtlasModule(unittest.TestCase):
     def test_roi_query_dot(self, *args):
         class Opt(RoiQueryOptions):
             animal = 'YW043'
-            graph = 'dot'
+            dispatch_plot = 'dot'
             debug_mode = True
             area = ('VIS',)
 
@@ -235,7 +235,7 @@ class TestAtlasModule(unittest.TestCase):
     def test_roi_query_stacked(self, *args):
         class Opt(RoiQueryOptions):
             animal = 'YW043'
-            graph = 'stacked'
+            dispatch_plot = 'stacked'
             debug_mode = True
             area = ('VIS',)
 

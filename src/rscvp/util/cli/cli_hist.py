@@ -2,17 +2,17 @@ import logging
 from pathlib import Path
 from typing import ClassVar, Iterable
 
-from rscvp.atlas.dir import AbstractCCFDir
-from rscvp.util.io import get_io_config
-
 from argclz import argument, str_tuple_type
 from neuralib.atlas.typing import Channel, Source, HEMISPHERE_TYPE, Area, PLANE_TYPE
+from rscvp.atlas.dir import AbstractCCFDir
+from rscvp.util.io import get_io_config
 
 __all__ = ['HistOptions']
 
 
 class HistOptions:
     GROUP_HIST: ClassVar = 'Histology Options'
+    """group histology options"""
 
     SOURCE_ROOT: Path = argument(
         '-S', '--src-path',
@@ -22,7 +22,7 @@ class HistOptions:
         help='histology folder source root path'
     )
 
-    animal: str = argument(
+    animal: str | tuple[str, ...] = argument(
         '-A', '--id', '--animal-id', '--mouse-id',
         metavar='NAME',
         required=True,
@@ -85,46 +85,50 @@ class HistOptions:
         help='enable debug mode for qt show figure'
     )
 
-    #
-    _logging_level: str | int = logging.DEBUG
-    logger: logging.Logger | None = None
-
     @property
     def histology_cache_directory(self) -> Path:
+        """cached directory for histology data processing"""
         ret = self.SOURCE_ROOT / 'cache'
         if not ret.exists():
             ret.mkdir(exist_ok=True)
         return ret
 
-    @property
-    def hemi_prefix(self) -> str | None:
-        if self.hemisphere == 'ipsi':
-            return 'i'
-        elif self.hemisphere == 'contra':
-            return 'c'
-        return
+    def get_ccf_dir(self) -> AbstractCCFDir:
+        """Got an instance of :class:`~rscvp.atlas.dir.AbstractCCFDir` initialized with the given
+        ``SOURCE_ROOT``, ``animal``, ``cut_plane`` and ``hemisphere`` arguments.
+        """
+        return AbstractCCFDir(
+            self.SOURCE_ROOT / f'{self.animal}',
+            with_overlap_sources=True,
+            plane_type=self.cut_plane,
+            hemisphere_type=self.hemisphere
+        )
 
-    def get_ccf_dir(self) -> 'AbstractCCFDir':
-        root = self.SOURCE_ROOT / f'{self.animal}'
-        return AbstractCCFDir(root,
-                              with_overlap_sources=True,
-                              plane_type=self.cut_plane,
-                              hemisphere_type=self.hemisphere)
-
-    def foreach_ccf_dir(self, animal: tuple[str, ...]) -> Iterable['AbstractCCFDir']:
-        """for multiple animals"""
-        if not isinstance(animal, tuple):
-            raise TypeError('')
+    def foreach_ccf_dir(self) -> Iterable[AbstractCCFDir]:
+        """Generate :class:`~rscvp.atlas.dir.AbstractCCFDir` instances for each animal."""
+        animals = self.animal
+        if not isinstance(animals, tuple):
+            raise TypeError(f'animals should be tuple type: {type(animals)}')
 
         try:
-            for a in animal:
-                self.animal = a
-                yield self.get_ccf_dir()
+            for animal in animals:
+                self.animal = animal
+                yield AbstractCCFDir(
+                    self.SOURCE_ROOT / f'{self.animal}',
+                    with_overlap_sources=True,
+                    plane_type=self.cut_plane,
+                    hemisphere_type=self.hemisphere
+                )
         finally:
-            # noinspection PyTypeChecker
-            self.animal = animal  # set back for tuple type after generator loop
+            # set back for tuple type after generator loop
+            self.animal = animals
 
-    # ======== #
+    # ============= #
+    # Logging Usage #
+    # ============= #
+
+    _logging_level: str | int = logging.DEBUG
+    logger: logging.Logger | None = None
 
     def setup_logger(self, caller_name: str | None = None):
         from neuralib.util.logging import setup_clogger
