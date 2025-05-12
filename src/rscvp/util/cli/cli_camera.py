@@ -3,22 +3,24 @@ from pathlib import Path
 from typing import ClassVar, Final, Literal
 
 import numpy as np
-from rscvp.util.pixviz import PixVizResult
-from rscvp.util.util_camera import truncate_video_to_pulse
-from rscvp.util.util_lick import LICK_EVENT_TYPE, LickTracker
-
-from argclz import argument, int_tuple_type, str_tuple_type
 from neuralib.tracking import read_facemap
 from neuralib.tracking.facemap import FaceMapResult, KeyPoint
 from neuralib.util.interp import interp_timestamp
 from neuralib.util.utils import ensure_dir, uglob
+from rscvp.util.pixviz import PixVizResult
+from rscvp.util.util_camera import truncate_video_to_pulse
+from rscvp.util.util_lick import LICK_EVENT_TYPE, LickTracker
 from stimpyp import RiglogData, CAMERA_VERSION
+
+from argclz import argument, int_tuple_type, str_tuple_type
 from .cli_stimpy import StimpyOptions
 
 __all__ = ['CameraOptions']
 
 
 class CameraOptions(StimpyOptions):
+    """Camera tracking options"""
+
     GROUP_CAM: ClassVar = 'Camera options'
     """group camera options"""
 
@@ -116,11 +118,12 @@ class CameraOptions(StimpyOptions):
 
     @property
     def pixviz_directory(self) -> Path:
-        """"""
+        """customized package ``pixviz`` output directory, for tracking licking video with pixel changing"""
         ret = self.get_src_path('track') / 'pixviz'
         return ensure_dir(ret)
 
     def load_pixviz_result(self) -> PixVizResult:
+        """load ``pixviz`` results from :attr:`pixviz_directory`"""
         file = uglob(self.pixviz_directory, '*.npy')
         meta = uglob(self.pixviz_directory, '*.json')
         return PixVizResult.load(file, meta)
@@ -138,10 +141,10 @@ class CameraOptions(StimpyOptions):
 
     def get_lick_event(self, rig: RiglogData | None = None) -> tuple[np.ndarray, np.ndarray]:
         """
+        Get lick event with time and signal
 
         :param rig: ``RiglogData`` or None
-        :return: lick time: `Array[float, L]`
-            lick signal: `Array[float, L]`
+        :return: lick time: `Array[float, L]` and lick signal: `Array[float, L]`
         """
         if rig is None:
             rig = self.load_riglog_data()
@@ -164,11 +167,13 @@ class CameraOptions(StimpyOptions):
     # Facemap analysis #
     # ================ #
 
-    def load_facemap_result(self) -> FaceMapResult:
-        return read_facemap(self.facemap_directory)
-
     @property
     def facemap_directory(self) -> Path:
+        """``facemap`` output directory for video tracking of keypoints and pupil size"""
         ret = self.get_src_path('track') / 'facemap'
         ensure_dir(ret)
         return ret
+
+    def load_facemap_result(self) -> FaceMapResult:
+        """load facemap result from :attr:`facemap_directory`"""
+        return read_facemap(self.facemap_directory)

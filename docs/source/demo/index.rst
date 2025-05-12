@@ -1,14 +1,32 @@
 Demo Run
 ========
 
+Preparation
+-------------------------
+
+Token Request
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Since the paper is not yet published, the example dataset is provided via a private link.
-Please contact the author, Yu-Ting Wei (ytsimon2004@gmail.com), to request the access token.
+Please contact the author, Yu-Ting Wei (ytsimon2004@gmail.com), to request an access token.
 Once received, replace the placeholder in ``demo/util.py``:
 
 .. code-block:: python
 
     TOKEN = "your_token_here"
-    #         ^^^^^^^^^^^^^^^ Replace with your token string (e.g., "mY1NSIsImRhdGEiOnt")
+    #        ^^^^^^^^^^^^^^^ Replace with your token string (e.g., "mY1NSIsImRhdGEiOnt")
+
+Run Example with Module Path
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    $ python -m demo.[EXAMPLE_SCRIPT]
+
+.. seealso::
+
+    `Demo examples on GitHub <https://github.com/ytsimon2004/rscvp/tree/main/demo>`_
+
 
 
 Physiological Figure Demo

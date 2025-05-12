@@ -40,7 +40,7 @@ Folder Details
   Cache files to avoid redundant computations (e.g., ``.pkl``, ``.npy``, or other serialized intermediate results).
 
 - (5) ``track/``
-  Camera-based tracking data such as pupil size, locomotion speed, and animal position.
+  Camera-based tracking data such as pupil size, locomotion speed, and animal position. (e.g., ``pixviz``, ``facemap``)
 
 - (6) ``suite2p/``
   Preprocessing outputs from pipelines like **Suite2p** or **Kilosort**.

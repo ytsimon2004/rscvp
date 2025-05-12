@@ -3,8 +3,6 @@ from typing import NamedTuple, Literal, ClassVar, cast
 import attrs
 import numpy as np
 import scipy
-from typing_extensions import Self
-
 from neuralib.locomotion import CircularPosition
 from neuralib.typing import PathLike
 from neuralib.util.interp import interp_timestamp
@@ -13,6 +11,7 @@ from rscvp.util.pixviz import PixVizResult
 from rscvp.util.util_camera import truncate_video_to_pulse
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import Session, RiglogData, RigEvent
+from typing_extensions import Self
 
 __all__ = ['LICK_EVENT_TYPE',
            'LickTracker',
@@ -107,7 +106,6 @@ class LickTracker:
 
         :param rig: ``RiglogData``
         :param file: filepath from the pixel-based analysis result
-        :param backend: backend type: {'micelick', 'pixviz'}
         :param meta: If pixviz backend, specify the meta filepath
         :param threshold: threshold for pixel cutoff. If None then auto calculate after `init()`
         :return: ``LickTracker``
