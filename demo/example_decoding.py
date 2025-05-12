@@ -1,8 +1,11 @@
-from demo.util import mkdir_test_dataset
 from rscvp.model.bayes_decoding.main_decode_analysis import DecodeAnalysisOptions
 from rscvp.selection.main_neuropil_error import NeuropilErrOptions
 from rscvp.selection.main_trial_reliability import TrialReliabilityOptions
+from rscvp.util.util_demo import run_demo
 from rscvp.visual.main_reliability import VisualReliabilityOptions
+
+# contact author since paper is not published yet
+TOKEN = ...
 
 
 class ExampleNeuropil(NeuropilErrOptions):
@@ -49,18 +52,11 @@ class ExampleDecoding(DecodeAnalysisOptions):
     plot_concat_time = True
 
 
-def main():
-    mkdir_test_dataset()
-
-    # run preselection of neuron pipeline
-    ExampleNeuropil().main()
-    ExampleTrialReliability().main()
-    ExampleVisualReliability().main()
-
-    #
-    ExampleDecoding().main()
-    # clean_cache_dataset()  # clean all if needed
-
-
 if __name__ == '__main__':
-    main()
+    # run preselection of neuron pipeline
+    run_demo(ExampleNeuropil, token=TOKEN, clean_cached=False)
+    run_demo(ExampleTrialReliability, token=TOKEN, clean_cached=False)
+    run_demo(ExampleVisualReliability, token=TOKEN, clean_cached=False)
+
+    # decoding pipeline
+    run_demo(ExampleDecoding, token=TOKEN, clean_cached=False)

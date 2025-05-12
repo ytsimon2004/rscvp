@@ -1,23 +1,24 @@
 Demo Run
 ========
 
-Preparation
--------------------------
-
 Token Request
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 Since the paper is not yet published, the example dataset is provided via a private link.
 Please contact the author, Yu-Ting Wei (ytsimon2004@gmail.com), to request an access token.
-Once received, replace the placeholder in ``demo/util.py``:
+
+- Replace ``TOKEN = ...`` in the example scripts or colab notebook
 
 .. code-block:: python
 
     TOKEN = "your_token_here"
     #        ^^^^^^^^^^^^^^^ Replace with your token string (e.g., "mY1NSIsImRhdGEiOnt")
 
-Run Example with Module Path
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Run on Local Module Path
+-------------------------
+
+- ``cd`` to the project root
 
 .. code-block:: bash
 
@@ -26,6 +27,18 @@ Run Example with Module Path
 .. seealso::
 
     `Demo examples on GitHub <https://github.com/ytsimon2004/rscvp/tree/main/demo>`_
+
+
+Run on Google Colab
+-------------------------
+
+Copy the entire example script from `Demo examples on GitHub <https://github.com/ytsimon2004/rscvp/tree/main/demo>`_
+and paste on the colab block
+
+.. image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/drive/1m7_3tHrPOjX5TRdMGJoor68RlySgTVbt
+   :alt: Open In Colab
+   :width: 150px
 
 
 

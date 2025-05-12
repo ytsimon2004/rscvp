@@ -3,8 +3,11 @@ Visual Response Tuning
 
 .. code-block:: python
 
-    from demo.util import mkdir_test_dataset
+    from rscvp.util.util_demo import run_demo
     from rscvp.visual.main_tuning import VisualTuningOptions
+
+    # contact author since paper is not published yet
+    TOKEN = ...
 
 
     class ExampleRun(VisualTuningOptions):
@@ -18,14 +21,10 @@ Visual Response Tuning
         debug_mode = True
 
 
-    def main():
-        mkdir_test_dataset()
-        ExampleRun().main()
-        # clean_cache_dataset() clean all if needed
-
-
     if __name__ == '__main__':
-        main()
+        run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+
+
 
 
 

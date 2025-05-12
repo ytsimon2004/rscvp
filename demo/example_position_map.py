@@ -1,5 +1,8 @@
-from demo.util import mkdir_test_dataset
 from rscvp.spatial.main_slb import PositionLowerBoundOptions
+from rscvp.util.util_demo import run_demo
+
+# contact author since paper is not published yet
+TOKEN = ...
 
 
 class ExampleRun(PositionLowerBoundOptions):
@@ -16,11 +19,5 @@ class ExampleRun(PositionLowerBoundOptions):
     do_signal_smooth = True
 
 
-def main():
-    mkdir_test_dataset()
-    ExampleRun().main()
-    # clean_cache_dataset() # clean all if needed
-
-
 if __name__ == '__main__':
-    main()
+    run_demo(ExampleRun, token=TOKEN, clean_cached=False)

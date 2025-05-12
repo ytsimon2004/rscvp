@@ -3,6 +3,13 @@ Visual Direction Polars
 
 .. code-block:: python
 
+    from rscvp.util.util_demo import run_demo
+    from rscvp.visual.main_polar import VisualPolarOptions
+
+    # contact author since paper is not published yet
+    TOKEN = '...'
+
+
     class ExampleRun(VisualPolarOptions):
         exp_date = '210315'
         animal_id = 'YW006'
@@ -13,14 +20,9 @@ Visual Direction Polars
         debug_mode = True
 
 
-    def main():
-        mkdir_test_dataset()
-        ExampleRun().main()
-        # clean_cache_dataset() clean all if needed
-
-
     if __name__ == '__main__':
-        main()
+        run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+
 
 
 

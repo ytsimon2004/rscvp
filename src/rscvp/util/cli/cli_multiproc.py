@@ -2,9 +2,9 @@ from typing import ClassVar
 
 import joblib
 import polars as pl
+from neuralib.util.verbose import fprint
 
 from argclz import argument, validator
-from neuralib.util.verbose import fprint
 from .cli_output import DataOutput
 
 __all__ = ['MultiProcOptions']
@@ -46,6 +46,10 @@ class MultiProcOptions:
         for csv in files:
             ret.append(pl.read_csv(csv))
             csv.unlink()
+
+        if len(ret) == 0:
+            fprint('empty file of csv aggregate', vtype='warning')
+            return
 
         df = pl.concat(ret).sort('neuron_id')
         df.write_csv(output.csv_output)

@@ -21,6 +21,7 @@ rscvp.util
     rscvp.util.util_cascade
     rscvp.util.util_dat
     rscvp.util.util_dataframe
+    rscvp.util.util_demo
     rscvp.util.util_gspread
     rscvp.util.util_ibl
     rscvp.util.util_lick

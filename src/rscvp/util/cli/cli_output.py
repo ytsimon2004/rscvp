@@ -121,5 +121,8 @@ class TempDirWrapper:
             return
         return Path(self.tmp.name) / other
 
-    def glob(self, pattern: str):
-        raise NotImplementedError('glob not implemented in TempDirWrapper')
+    def glob(self, pattern: str, raise_error: bool = False):
+        if raise_error:
+            raise NotImplementedError('glob not implemented in TempDirWrapper')
+        else:
+            return []

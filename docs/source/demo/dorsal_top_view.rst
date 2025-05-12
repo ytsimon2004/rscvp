@@ -3,10 +3,13 @@ ROI Dorsal Cortex View
 
 .. code-block:: python
 
-    from demo.util import mkdir_test_dataset
     from neuralib.util.utils import ensure_dir
     from rscvp.atlas.main_roi_top_view import RoiTopViewOptions
     from rscvp.util.io import RSCVP_CACHE_DIRECTORY
+    from rscvp.util.util_demo import run_demo
+
+    # contact author since paper is not published yet
+    TOKEN = ...
 
 
     class ExampleRun(RoiTopViewOptions):
@@ -16,14 +19,9 @@ ROI Dorsal Cortex View
         legend_number_limit = 20
 
 
-    def main():
-        mkdir_test_dataset()
-        ExampleRun().main()
-        # clean_cache_dataset() clean all if needed
-
-
     if __name__ == '__main__':
-        main()
+        run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+
 
 
 

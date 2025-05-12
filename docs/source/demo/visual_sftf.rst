@@ -3,8 +3,11 @@ Visual SFTF preference
 
 .. code-block:: python
 
-    from demo.util import mkdir_test_dataset
+    from rscvp.util.util_demo import run_demo
     from rscvp.visual.main_sftf_pref import VisualSFTFPrefOptions
+
+    # contact author since paper is not published yet
+    TOKEN = '...'
 
 
     class ExampleRun(VisualSFTFPrefOptions):
@@ -17,14 +20,9 @@ Visual SFTF preference
         debug_mode = True
 
 
-    def main():
-        mkdir_test_dataset()
-        ExampleRun().main()
-        # clean_cache_dataset() clean all if needed
-
-
     if __name__ == '__main__':
-        main()
+        run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+
 
 
 

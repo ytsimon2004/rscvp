@@ -3,8 +3,11 @@ Position Map
 
 .. code-block:: python
 
-    from demo.util import mkdir_test_dataset
+    from rscvp.util.util_demo import mkdir_test_dataset, run_demo
     from rscvp.spatial.main_slb import PositionLowerBoundOptions
+
+    # contact author since paper is not published yet
+    TOKEN = ...
 
 
     class ExampleRun(PositionLowerBoundOptions):
@@ -21,14 +24,8 @@ Position Map
         do_signal_smooth = True
 
 
-    def main():
-        mkdir_test_dataset()
-        ExampleRun().main()
-        # clean_cache_dataset() clean all if needed
-
-
     if __name__ == '__main__':
-        main()
+        run_demo(ExampleRun, token=TOKEN, clean_cached=False)
 
 
 .. seealso::
