@@ -39,35 +39,18 @@ def clean_cache_dataset():
 
 
 def run_demo(cls: Type[AbstractParser], token: str, *,
+             force_download: bool = False,
              clean_cached: bool = False):
     """
     Run demo for a class, download dataset from zenodo, and run main function.
 
     :param cls: Running class, must be subclass of AbstractParser
     :param token: token for downloading dataset from zenodo
+    :param force_download: force re-download dataset from zenodo
     :param clean_cached: clean cached dataset after running demo
-    :return:
     """
-    if in_notebook():
-        import sys
-        sys.argv = [sys.argv[0]]
-
-    mkdir_test_dataset(token=token)
-    cls().main()
+    mkdir_test_dataset(token=token, force_download=force_download)
+    cls().main([])
 
     if clean_cached:
         clean_cache_dataset()
-
-
-def in_notebook() -> bool:
-    try:
-        from IPython import get_ipython
-        shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
-            return True  # jupyter notebook or Colab
-        elif shell == 'TerminalInteractiveShell':
-            return False  # IPython
-        else:
-            return False
-    except (NameError, ImportError):
-        return False  # standard Python interpreter
