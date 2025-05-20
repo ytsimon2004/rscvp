@@ -5,16 +5,6 @@
     <content url="file://$MODULE_DIR$/../argclz">
       <sourceFolder url="file://$MODULE_DIR$/../argclz/src" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/../rscvp-port/neuralib">
-      <sourceFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/test" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/.venv" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/build" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/dist" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/doc/build" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/src/neura_library.egg-info" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/doc/source/api/_autosummary" />
-    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
@@ -28,6 +18,19 @@
       <excludeFolder url="file://$MODULE_DIR$/doc/build" />
       <excludeFolder url="file://$MODULE_DIR$/res/env" />
       <excludeFolder url="file://$MODULE_DIR$/src/rscvp.egg-info" />
+    </content>
+    <content url="file://$MODULE_DIR$/../rscvp-port/neuralib">
+      <sourceFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/test" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/doc/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/src/neura_library.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/doc/source/api/_autosummary" />
+    </content>
+    <content url="file://$MODULE_DIR$/../sqlclz">
+      <sourceFolder url="file://$MODULE_DIR$/../sqlclz/src" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../stimpyp">
       <sourceFolder url="file://$MODULE_DIR$/../stimpyp/src" isTestSource="false" />
