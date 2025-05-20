@@ -8,10 +8,6 @@ import numpy as np
 import scipy.optimize
 import scipy.stats
 from matplotlib.axes import Axes
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
-from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.cli.cli_suite2p import get_neuron_list
 from scipy.interpolate import interp1d
 from tqdm import tqdm
 
@@ -19,8 +15,11 @@ from argclz import AbstractParser, argument, int_tuple_type
 from neuralib.imaging.suite2p import get_neuron_signal, Suite2PResult, sync_s2p_rigevent
 from neuralib.persistence import *
 from neuralib.plot import plot_figure
-from neuralib.plot.setting import ax_log_setting
 from neuralib.util.verbose import fprint
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
+from rscvp.util.cli.cli_selection import SelectionOptions
+from rscvp.util.cli.cli_suite2p import get_neuron_list
 from stimpyp import GratingPattern
 
 __all__ = ['SFTFModelCacheBuilder']
@@ -621,6 +620,31 @@ def sftf_model(tf: int, sf: int, tfmat, sfmat, amp, mu_sf, sigma_sf, mu_tf, sigm
     if ravel:
         R = R.ravel()  # for scipy curve fit
     return R
+
+
+def ax_log_setting(ax: Axes, **kwargs):
+    """log scale and tick setting"""
+    import matplotlib.ticker as mticker
+
+    ax.set_xscale('log', base=2)
+    ax.set_yscale('log', base=2)
+    ax.set_yticks([0.04, 0.08, 0.16])  # hardcode that used for interpolation plotting
+    ax.set_xticks([1, 2, 4])  # hardcode that used for interpolation plotting
+    ax.xaxis.set_major_formatter(mticker.ScalarFormatter())
+    ax.xaxis.get_major_formatter().set_scientific(False)
+    ax.xaxis.get_major_formatter().set_useOffset(False)
+    ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+    ax.yaxis.get_major_formatter().set_scientific(False)
+    ax.yaxis.get_major_formatter().set_useOffset(False)
+    ax.set_aspect(1.0 / ax.get_data_ratio(), adjustable='box')  # no matter xy scaling, set square
+
+    # against the `plot_figure` ctx manager
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    for axis in ['bottom', 'top', 'left', 'right']:
+        ax.spines[axis].set_linewidth(1)
+
+    ax.set(**kwargs)
 
 
 if __name__ == '__main__':
