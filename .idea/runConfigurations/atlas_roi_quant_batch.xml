@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.atlas.main_roi_quant_batch" />
-    <option name="PARAMETERS" value="-A YW043,YW051,YW063,YW064 --analysis bias_index plot_type=bar --level 2 --norm volume --top 60 --area MO --debug" />
+    <option name="PARAMETERS" value="-A YW043,YW051,YW063,YW064 --plot bias_index --level 2 --norm volume --top 60 --area RHP --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

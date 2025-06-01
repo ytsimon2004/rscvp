@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_trial_profile" />
-    <option name="PARAMETERS" value="-D 210315 -A YW006 -P 0 -t 6,10 --debug" />
+    <option name="PARAMETERS" value="-D 210315 -A YW006 -P 0 -t 5,15" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

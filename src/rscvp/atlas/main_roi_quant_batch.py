@@ -280,9 +280,12 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
                         exclude: tuple[Area, ...] | None = ('DP', 'AI', 'TEa', 'RSP')) -> None:
         """
         :param common: only left common area existed in all animals
-        :param plot_type: bar plot or dot plot
+        :param plot_type: bar plot or heatmap plot
         :param exclude: area(s) not to shown in the plot (i.e., not informative)
         """
+
+        self.roi_norm = 'channel'
+
         df = self._get_bias_value_dataframe()
 
         if common:
@@ -339,6 +342,7 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
             dat[i] = val['bias_index'].to_numpy()
 
         norm = mcolors.TwoSlopeNorm(vmin=np.min(dat), vcenter=0, vmax=np.max(dat))
+        # norm=None
         im = ax.imshow(dat.T, cmap=sns.diverging_palette(230, 20, n=200, as_cmap=True), norm=norm)
         cbar = ax.figure.colorbar(im)
         cbar.ax.set_ylabel('bias_index')

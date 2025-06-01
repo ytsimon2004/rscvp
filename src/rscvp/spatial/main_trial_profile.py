@@ -49,13 +49,12 @@ class TrialActProfile(AbstractParser, Suite2pOptions, StimpyOptions):
 
         try:
             si = self._get_spatial_info(iter_session)
-        except FileNotFoundError:
+        except (FileNotFoundError, ValueError):  # debug mode
             si = None
 
         #
         for n in tqdm(range(s2p.n_neurons)):
-            with plot_figure(output.figure_output(n),
-                             5, 3,
+            with plot_figure(output.figure_output(n), 5, 3,
                              figsize=(10, 4),
                              gridspec_kw={'height_ratios': [1.5, 1, 1.5, 1.5, 1.5]}) as _ax:
 

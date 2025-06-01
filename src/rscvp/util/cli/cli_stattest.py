@@ -2,8 +2,6 @@ from typing import Literal, Any
 
 import numpy as np
 import polars as pl
-from rscvp.util.cli.cli_statistic import StatisticOptions
-from rscvp.util.util_stat import CollectDataSet
 from scipy.stats import cramervonmises_2samp, wilcoxon, mannwhitneyu
 from scipy.stats._hypotests import CramerVonMisesResult
 from scipy.stats._mannwhitneyu import MannwhitneyuResult
@@ -21,6 +19,8 @@ from scipy.stats._stats_py import (
 from argclz import argument
 from neuralib.io import save_json
 from neuralib.typing import PathLike, ArrayLike, DataFrame
+from rscvp.util.cli.cli_statistic import StatisticOptions
+from rscvp.util.util_stat import CollectDataSet
 
 __all__ = [
     'StatResults',
@@ -205,6 +205,7 @@ class StatisticTestOptions(StatisticOptions):
             between=between,
             subject=subject,
             parametric=self.parametric,
+            padjust='bonf',
             **kwargs
         )
 

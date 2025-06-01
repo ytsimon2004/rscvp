@@ -13,29 +13,28 @@ __all__ = [
 
 
 def get_velocity_per_trial(lap_time: np.ndarray,
-                           interp_pos: CircularPosition,
-                           n_position_bins: int = 150,
+                           pos: CircularPosition,
+                           bins: int = 150,
                            smooth: bool = False) -> np.ndarray:
     """
+    Get running velocity per trial
 
-    :param lap_time:
-    :param interp_pos:
-    :param n_position_bins:
-    :param smooth:
-    :return:
-        (L, B)
+    :param lap_time: time array foreach lap. `Array[float, L]`
+    :param pos: :class:`~neuralib.locomotion.position.CircularPosition`
+    :param bins: number of position bins for each trial(lap)
+    :param smooth: do gaussian smoothing
+    :return: velocity 2D numpy array. `Array[float, [L, B]]`
     """
 
-    p = interp_pos.p
-    pt = interp_pos.t
-    vel = interp_pos.v
+    p = pos.p
+    pt = pos.t
+    vel = pos.v
 
     pt_trial = np.zeros_like(pt, dtype=bool)
-    p_bin = np.linspace(0, n_position_bins, num=n_position_bins + 1, endpoint=True)
+    p_bin = np.linspace(0, bins, num=bins + 1, endpoint=True)
 
     ret = []
     left_t = lap_time[0]
-
     for i, lt in enumerate(lap_time[1:]):
         right_t = lt
         if right_t - left_t < 1:
@@ -55,28 +54,26 @@ def get_velocity_per_trial(lap_time: np.ndarray,
         ret.append(hist_vel)
         left_t = right_t
 
-    # ret[np.isnan(ret)] = 0
-
     return np.array(ret)
 
 
 def peri_reward_velocity(reward_time: np.ndarray,
                          position_time: np.ndarray,
                          velocity: np.ndarray,
-                         n_bins_trial: int = 100,
+                         bins: int = 100,
                          limit: float = 5) -> np.ndarray:
     """
+    Get Peri-reward velocity
 
-    :param reward_time:
-    :param position_time:
-    :param velocity:
-    :param n_bins_trial: number of bins per trial in a given time bins (peri-left + peri-right)
+    :param reward_time: reward time array. `Array[float, L]`
+    :param position_time: position time array. `Array[float, P]`
+    :param velocity: velocity array. `Array[float, P]`
+    :param bins: number of bins per trial in a given time bins (peri-left + peri-right)
     :param limit: peri-event time (left / right)
-    :return:
-        (L, BT) peri-reward velocity
-            BT, number of bins per trial in a given time bins (peri-left + peri-right)
+    :return: peri-reward velocity. `Array[float, [L, B]]`. B = number of bins per trial in a given time bins (peri-left + peri-right)
+
     """
-    ret = np.zeros((len(reward_time), n_bins_trial))
+    ret = np.zeros((len(reward_time), bins))
     for i, rt in enumerate(reward_time):
         left = rt - limit
         right = rt + limit
@@ -84,7 +81,7 @@ def peri_reward_velocity(reward_time: np.ndarray,
         t = position_time[time_mask]
         v = velocity[time_mask]
 
-        hist, edg = np.histogram(t, n_bins_trial, range=(left, right), weights=v)
+        hist, edg = np.histogram(t, bins, range=(left, right), weights=v)
         occ = np.histogram(t, edg)[0]
         hist /= occ
         hist[np.isnan(hist)] = 0

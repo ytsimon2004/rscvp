@@ -3,6 +3,8 @@ from typing import NamedTuple, Literal, ClassVar, cast
 import attrs
 import numpy as np
 import scipy
+from typing_extensions import Self
+
 from neuralib.locomotion import CircularPosition
 from neuralib.typing import PathLike
 from neuralib.util.interp import interp_timestamp
@@ -11,7 +13,6 @@ from rscvp.util.pixviz import PixVizResult
 from rscvp.util.util_camera import truncate_video_to_pulse
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import Session, RiglogData, RigEvent
-from typing_extensions import Self
 
 __all__ = ['LICK_EVENT_TYPE',
            'LickTracker',
@@ -291,8 +292,7 @@ def peri_reward_transformation(position: np.ndarray, limit: float) -> np.ndarray
 
     :param position: (N, )
     :param limit:
-    :return:
-        transformed position (N, )
+    :return: transformed position (N, )
     """
     return (position + limit) % (2 * limit) - limit
 
@@ -302,29 +302,22 @@ def peri_reward_raster_hist(t: np.ndarray,
                             limit: float,
                             nbins: int = 100) -> tuple[list[np.ndarray], np.ndarray, np.ndarray]:
     """
-    calculate the peri-reward raster and its histogram
+    Calculate peri-reward raster and histogram.
 
-    :param t: 1d event time. i.e., event for peri-reward
-    :param reward_time: reward time array
-    :param limit: single side time limit
-    :param nbins:
-    :return:
-        event_per_trial: list[np.ndarray], len of list equal to trial numbers, len of array equal to lick numbers
-        histogram: histogram with percentage normalization
-        histogram edge: ()
+    :param t: 1D array of event times (e.g., licks).
+    :param reward_time: 1D array of reward times.
+    :param limit: time window around each reward (single-sided, e.g., 2.0s means [-2, +2]).
+    :param nbins: number of histogram bins.
+    :return: tuple containing:
+        - event_per_trial: list of arrays of event times relative to each reward.
+        - hist: normalized histogram (% per bin).
+        - bin_edges: edges of the histogram bins.
     """
-    event_per_trial = []
-    for rt in reward_time:
-        x = np.logical_and(rt - limit <= t, t <= rt + limit)
-        event_per_trial.append(t[x] - rt)
+    event_per_trial = [t[(rt - limit <= t) & (t <= rt + limit)] - rt for rt in reward_time]
 
-    ret = []
-    for time in event_per_trial:  # t
-        hist, edg = np.histogram(time, nbins, range=(-limit, limit))
-        ret.append(hist)
+    all_aligned_events = np.concatenate(event_per_trial) if event_per_trial else np.array([])
 
-    ret = np.array(ret)  # shape: (trial, bins)
-    hist_sum = np.sum(ret, axis=0)
-    hist = 100 * hist_sum / np.sum(hist_sum)
+    hist, bin_edges = np.histogram(all_aligned_events, bins=nbins, range=(-limit, limit))
+    hist_percent = 100 * hist / hist.sum() if hist.sum() > 0 else np.zeros_like(hist, dtype=float)
 
-    return event_per_trial, hist, edg
+    return event_per_trial, hist_percent, bin_edges

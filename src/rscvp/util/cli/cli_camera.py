@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import ClassVar, Final, Literal
 
 import numpy as np
+
+from argclz import argument, int_tuple_type, str_tuple_type
 from neuralib.tracking import read_facemap
 from neuralib.tracking.facemap import FaceMapResult, KeyPoint
 from neuralib.util.interp import interp_timestamp
@@ -11,8 +13,6 @@ from rscvp.util.pixviz import PixVizResult
 from rscvp.util.util_camera import truncate_video_to_pulse
 from rscvp.util.util_lick import LICK_EVENT_TYPE, LickTracker
 from stimpyp import RiglogData, CAMERA_VERSION
-
-from argclz import argument, int_tuple_type, str_tuple_type
 from .cli_stimpy import StimpyOptions
 
 __all__ = ['CameraOptions']
@@ -30,7 +30,7 @@ class CameraOptions(StimpyOptions):
     camera_version: CAMERA_VERSION = argument(
         '--camera',
         metavar='VERSION',
-        default='labcam',
+        default='labcams',
         group=GROUP_CAM,
         help='which camera acquisition system'
     )
