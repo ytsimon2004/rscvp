@@ -93,6 +93,14 @@ class CommonOptions:
         help='remote disk name'
     )
 
+    mnt_prefix: str = argument(
+        '--mount',
+        metavar='PATH',
+        default='/mnt',
+        group=GROUP_IO,
+        help='mount path prefix',
+    )
+
     reuse_output: bool = argument(
         '-R', '--re',
         group=GROUP_IO,
@@ -120,7 +128,8 @@ class CommonOptions:
         if self.__config is None:
             self.__config = get_io_config(
                 remote_disk=self.remote_disk,
-                force_use_default=self.use_default
+                force_use_default=self.use_default,
+                mnt_prefix=self.mnt_prefix,
             )
         return self.__config
 

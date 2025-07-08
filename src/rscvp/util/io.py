@@ -25,7 +25,13 @@ CONFIG_FOLDER = RSCVP_CACHE_DIRECTORY / 'config'
 HISTOLOGY_HOME_ROOT = RSCVP_CACHE_DIRECTORY / 'histology'
 
 #
-DISK_TYPE = Literal['local', 'WD-2T', 'BigDATA', 'bkrunch', 'bkrunch2', 'bkrunch-linux', 'default']
+DISK_TYPE = Literal[
+    'default',
+    'local', 'WD-2T', 'BigDATA',
+    'bkrunch', 'bkrunch2',
+    'bkrunch-linux', 'bkrunch-linux-bigdata'
+]
+
 DATA_SRC_TYPE = Literal['stimpy', 'suite2p', 'behavior', 'histology', 'track', 'cache']
 
 
@@ -153,6 +159,12 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
         stimpy=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'presentation',
         physiology=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'analysis' / 'phys',
         histology=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'analysis' / 'hist'
+    )),
+
+    'bkrunch-linux-bigdata': IOConfig(source_root=dict(
+        stimpy='/mnt/bigdata/data/user/yu-ting/presentation',
+        physiology='/mnt/bigdata/data/user/yu-ting/analysis/phys',
+        histology='/mnt/bigdata/data/user/yu-ting/analysis/hist'
     ))
 
 }
@@ -160,7 +172,7 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
 
 def get_io_config(config: dict[str, IOConfig] | None = None,
                   remote_disk: str | None = None,
-                  mnt_prefix: Literal['/mnt', '/Volumes'] = '/Volumes',
+                  mnt_prefix: str = '/Volumes',
                   force_use_default: bool = False) -> IOConfig:
     """
     Determines and retrieves the appropriate IO configuration for the current node and remote disk
@@ -211,6 +223,8 @@ def get_io_config(config: dict[str, IOConfig] | None = None,
             return config['bkrunch2']
         case ('bkrunch-linux', None):
             return config['bkrunch-linux']
+        case ('bkrunch-linux', 'bigdata'):
+            return config['bkrunch-linux-bigdata']
         case _:
             return config['default']
 
