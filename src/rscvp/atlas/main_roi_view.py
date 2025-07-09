@@ -1,20 +1,22 @@
 from typing import Literal
 
 import seaborn as sns
-from matplotlib import pyplot as plt
-from rscvp.atlas.dir import AbstractCCFDir
-from rscvp.util.cli import HistOptions, PlotOptions
-from rscvp.util.util_plot import REGION_COLORS_HIST
-
 from argclz import AbstractParser, as_argument, argument
 from argclz.dispatch import Dispatch, dispatch
+from matplotlib import pyplot as plt
 from neuralib.atlas.util import iter_source_coordinates
 from neuralib.plot import plot_figure
+from neuralib.util.verbose import publish_annotation
+
+from rscvp.atlas.dir import AbstractCCFDir
+from rscvp.util.cli import HistOptions, PlotOptions, ROIOptions
+from rscvp.util.util_plot import REGION_COLORS_HIST
 
 __all__ = ['RoisViewOptions']
 
 
-class RoisViewOptions(AbstractParser, HistOptions, Dispatch, PlotOptions):
+@publish_annotation('sup', project='rscvp', caption='intra subregion topology (i.e., SUB)')
+class RoisViewOptions(AbstractParser, ROIOptions, Dispatch, PlotOptions):
     DESCRIPTION = '3d roi for particular region(s)'
 
     hemisphere = as_argument(HistOptions.hemisphere).with_options(default='ipsi')
@@ -31,6 +33,9 @@ class RoisViewOptions(AbstractParser, HistOptions, Dispatch, PlotOptions):
         self.set_background()
 
         self.ccf_dir = self.get_ccf_dir()
+        if not self.ccf_dir.parse_csv.exists():
+            self.load_roi_dataframe()
+
         self.invoke_command(self.dispatch_plot)
 
     @property
