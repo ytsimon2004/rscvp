@@ -342,7 +342,6 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
             dat[i] = val['bias_index'].to_numpy()
 
         norm = mcolors.TwoSlopeNorm(vmin=np.min(dat), vcenter=0, vmax=np.max(dat))
-        # norm=None
         im = ax.imshow(dat.T, cmap=sns.diverging_palette(230, 20, n=200, as_cmap=True), norm=norm)
         cbar = ax.figure.colorbar(im)
         cbar.ax.set_ylabel('bias_index')

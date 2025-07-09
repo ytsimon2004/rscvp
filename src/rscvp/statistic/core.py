@@ -8,6 +8,14 @@ import polars as pl
 from matplotlib.axes import Axes
 from polars.polars import ColumnNotFoundError
 from rich.pretty import pprint
+from scipy.stats import wilcoxon, mannwhitneyu
+
+from argclz import argument, AbstractParser
+from neuralib.plot import plot_figure
+from neuralib.typing import DataFrame, PathLike, ArrayLike, is_numeric_arraylike
+from neuralib.util.utils import joinn
+from neuralib.util.utils import uglob
+from neuralib.util.verbose import fprint
 from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.util.cli.cli_stattest import StatisticTestOptions, StatResults
 from rscvp.util.database import (
@@ -20,19 +28,12 @@ from rscvp.util.database import (
 from rscvp.util.util_gspread import get_statistic_key_info, GSPREAD_SHEET_PAGE
 from rscvp.util.util_plot import REGION_COLORS_HIST, SESSION_COLORS
 from rscvp.util.util_stat import GROUP_HEADER_TYPE, CollectDataSet, get_stat_group_vars
-from scipy.stats import wilcoxon, mannwhitneyu
-
-from argclz import argument, AbstractParser
-from neuralib.plot import plot_figure
-from neuralib.typing import DataFrame, PathLike, ArrayLike, is_numeric_arraylike
-from neuralib.util.utils import joinn
-from neuralib.util.utils import uglob
-from neuralib.util.verbose import fprint
 
 __all__ = [
     'StatPipeline',
     'print_pkl',
-    'print_var'
+    'print_var',
+    'pval_verbose'
 ]
 
 
@@ -486,3 +487,14 @@ def print_var(arr: ArrayLike,
     msg += f'mean +/- {t}: {mean:.4f} +/- {v:.4f}'
 
     fprint(msg)
+
+
+def pval_verbose(pval: float) -> str:
+    if pval < 0.001:
+        return f"*** (p={pval:.3g})"
+    elif pval < 0.01:
+        return f"** (p={pval:.3g})"
+    elif pval < 0.05:
+        return f"* (p={pval:.3g})"
+    else:
+        return f"n.s. (p={pval:.3g})"

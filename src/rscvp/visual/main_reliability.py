@@ -3,10 +3,6 @@ from typing import NamedTuple
 
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_plot import PlotOptions
-from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 from scipy.signal import butter, lfilter
 from scipy.stats import pearsonr
 
@@ -16,6 +12,10 @@ from neuralib.io import csv_header
 from neuralib.plot import plot_figure
 from neuralib.plot.tools import AnchoredScaleBar
 from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_plot import PlotOptions
+from rscvp.util.cli.cli_selection import SelectionOptions
+from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 from stimpyp import GratingPattern
 
 __all__ = [
