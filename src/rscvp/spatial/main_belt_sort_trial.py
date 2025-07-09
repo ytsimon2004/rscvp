@@ -22,7 +22,7 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
         '--sl', '--sort-lap',
         metavar='INDEX',
         default=None,
-        help='sorting index in certain lap',
+        help='sorting index in certain lap, otherwise use trial averaged sorting',
     )
 
     signal_type: SIGNAL_TYPE = as_argument(Suite2pOptions.signal_type).with_options(default='df_f')
@@ -30,16 +30,12 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
+
         output_info = self.get_data_output('spv')
         self.calactivity_belt_trial(output_info)
 
     def calactivity_belt_trial(self, output: DataOutput):
-        """
-        plot the sorting calcium activity per lap, and corresponding position and running speed
-
-        :param output:
-        :return:
-        """
+        """plot the sorting calcium activity per lap, and corresponding position and running speed"""
 
         s2p = self.load_suite_2p()
         rig = self.load_riglog_data()

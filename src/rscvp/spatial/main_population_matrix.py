@@ -85,9 +85,9 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
         mean_x = np.nanmean(signal_x, axis=1)  # (N', B) trial average
         mean_y = np.nanmean(signal_y, axis=1)  # (N', B)
 
-        matrix = np.zeros((self.window, self.window))
-        for x in range(self.window):
-            for y in range(self.window):
+        matrix = np.zeros((self.pos_bins, self.pos_bins))
+        for x in range(self.pos_bins):
+            for y in range(self.pos_bins):
                 a = mean_x[:, x]  # population neural act in position x
                 b = mean_y[:, y]
                 corr_coef = pearsonr(a, b)[0]

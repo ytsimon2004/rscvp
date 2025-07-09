@@ -1,5 +1,5 @@
 from argclz.commands import parse_command_args
-from .cache_bayes import BayesDecodeCacheBuilder
+from .main_cache_bayes import BayesDecodeCacheBuilder
 from .main_decode_analysis import DecodeAnalysisOptions
 from .main_disengagement import DecodeDisengageOptions
 

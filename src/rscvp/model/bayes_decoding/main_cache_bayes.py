@@ -108,7 +108,7 @@ class BayesDecodeCache(ETLConcatable):
     """concat thus validator false"""
     session: str = persistence.field(validator=True, filename=True)
     cv_info: str = persistence.field(validator=True, filename=True)
-    window: int = persistence.field(validator=True, filename=True, filename_prefix='window')
+    bins: int = persistence.field(validator=True, filename=True, filename_prefix='bins_')
     signal_type: SIGNAL_TYPE = persistence.field(validator=True, filename=True)
     selection: str = persistence.field(validator=True, filename=False)
     run_epoch: bool = persistence.field(validator=True, filename=False)
@@ -232,7 +232,7 @@ class BayesDecodeCache(ETLConcatable):
             plane_index='_concat',
             session=data[0].session,
             cv_info=data[0].cv_info,
-            window=data[0].window,
+            bins=data[0].bins,
             signal_type=data[0].signal_type,
             selection=data[0].selection,
             run_epoch=data[0].run_epoch,
@@ -335,8 +335,8 @@ class BayesDecodeCacheBuilder(AbstractParser,
 
         #
         if self.spatial_bin_size is None:
-            self.spatial_bin_size = self.belt_length / self.window
-        self.window = int(self.belt_length / self.spatial_bin_size)  # force set
+            self.spatial_bin_size = self.belt_length / self.pos_bins
+        self.pos_bins = int(self.belt_length / self.spatial_bin_size)  # force set
 
         #
         if self.temporal_bin_size is None:
@@ -396,7 +396,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
             plane_index=self.plane_index,
             session=self.session,
             cv_info=self.cv_info,
-            window=self.window,
+            bins=self.pos_bins,
             signal_type=self.signal_type,
             selection=self.selection_prefix(),
             run_epoch=self.running_epoch,
@@ -557,7 +557,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
         :return: Position-binned decoding error across trials. `Array[float, [L, B]]`
         """
         rig = self.load_riglog_data()
-        pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.window))
+        pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.pos_bins))
 
         # trial range for model testing
         if self.cross_validation != 0:

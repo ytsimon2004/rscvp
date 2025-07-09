@@ -40,7 +40,7 @@ class ExampleDecoding(DecodeAnalysisOptions):
     session = 'light'
     used_session = 'light'
     random = 200
-    window = 100
+    pos_bins = 100
     spatial_bin_size = 1.5
     cross_validation = 'odd'
     pre_selection = True

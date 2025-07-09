@@ -1,16 +1,15 @@
 import numpy as np
+from argclz import AbstractParser, argument, as_argument, copy_argument
+from neuralib.persistence import ETLConcatable, persistence
+from neuralib.persistence.cli_persistence import get_options_and_cache
+from typing_extensions import Self
+
 from rscvp.spatial.util import PositionSignal, normalized_trial_avg
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_stimpy import StimpyOptions
 from rscvp.util.cli.cli_suite2p import NORMALIZE_TYPE, Suite2pOptions
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.typing import SIGNAL_TYPE
-from typing_extensions import Self
-
-from argclz import AbstractParser, argument, as_argument, copy_argument
-from argclz.core import as_dict
-from neuralib.persistence import ETLConcatable, persistence
-from neuralib.persistence.cli_persistence import get_options_and_cache
 
 __all__ = [
     'PosBinActCache',
@@ -26,10 +25,10 @@ class PosBinActCache(ETLConcatable):
     animal: str = persistence.field(validator=True, filename=True)
     plane_index: str = persistence.field(validator=False, filename=True, filename_prefix='plane')
     signal_type: SIGNAL_TYPE = persistence.field(validator=True, filename=True)
-    smooth: str = persistence.field(validator=True, filename=False)
+    smooth: str = persistence.field(validator=False, filename=False)
     normalized_method: NORMALIZE_TYPE = persistence.field(validator=True, filename=False)
-    window: int = persistence.field(validator=True, filename=False)
-    run_epoch: bool = persistence.field(validator=True, filename=False)
+    bins: int = persistence.field(validator=True, filename=True, filename_prefix='bins_')
+    run_epoch: bool = persistence.field(validator=True, filename=True, filename_prefix='run_epoch_')
 
     #
     occ_activity: np.ndarray
@@ -46,7 +45,7 @@ class PosBinActCache(ETLConcatable):
         return self.occ_activity.shape[1]
 
     @property
-    def n_windows(self) -> int:
+    def n_bins(self) -> int:
         return self.occ_activity.shape[2]
 
     @classmethod
@@ -62,7 +61,7 @@ class PosBinActCache(ETLConcatable):
             signal_type=const.signal_type,
             smooth=const.smooth,
             normalized_method=const.normalized_method,
-            window=const.window,
+            bins=const.bins,
             run_epoch=const.run_epoch,
         )
         ret.occ_activity = np.vstack([it.occ_activity for it in data])
@@ -118,7 +117,6 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-        print(as_dict(self))
         self.load_cache()
 
     def empty_cache(self) -> PosBinActCache:
@@ -129,7 +127,7 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
             signal_type=self.signal_type,
             smooth=self.binned_smooth,
             normalized_method=self.act_normalized,
-            window=self.window,
+            bins=self.pos_bins,
             run_epoch=self.running_epoch,
         )
 
@@ -137,7 +135,7 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
         s2p = self.load_suite_2p()
         rig = self.load_riglog_data()
 
-        ps = PositionSignal(s2p, rig, window_count=self.window,
+        ps = PositionSignal(s2p, rig, window_count=self.pos_bins,
                             signal_type=self.signal_type,
                             plane_index=self.plane_index)
 

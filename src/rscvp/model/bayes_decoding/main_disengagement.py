@@ -1,5 +1,5 @@
 import numpy as np
-from rscvp.model.bayes_decoding.cache_bayes import ApplyBayesDecodeOptions
+from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions
 from rscvp.model.bayes_decoding.util import calc_wrap_distance
 from rscvp.util.cli import CameraOptions
 from rscvp.util.position import load_interpolated_position

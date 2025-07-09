@@ -2,7 +2,7 @@ import unittest
 import warnings
 from unittest.mock import patch
 
-from rscvp.model.bayes_decoding.cache_bayes import BayesDecodeCacheBuilder
+from rscvp.model.bayes_decoding.main_cache_bayes import BayesDecodeCacheBuilder
 from rscvp.model.bayes_decoding.main_decode_analysis import DecodeAnalysisOptions
 from rscvp.statistic.persistence_agg.main_decode_err import BayesDecodePersistenceAgg
 from .util import check_attr
@@ -23,7 +23,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -40,7 +40,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = '50%'
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -58,7 +58,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -78,7 +78,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -98,7 +98,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -118,7 +118,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -146,7 +146,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -165,7 +165,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -186,7 +186,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True
@@ -205,7 +205,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             random = 200
-            window = 100
+            pos_bins = 100
             spatial_bin_size = 1.5
             cross_validation = 'odd'
             pre_selection = True

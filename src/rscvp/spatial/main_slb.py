@@ -87,7 +87,7 @@ class PositionLowerBoundOptions(AbstractParser,
         s2p = self.load_suite_2p()
         rig = self.load_riglog_data()
         cp = PositionSignal(s2p, rig,
-                            window_count=self.window,
+                            window_count=self.pos_bins,
                             signal_type=self.signal_type,
                             plane_index=self.plane_index)
 
@@ -147,7 +147,7 @@ class PositionLowerBoundOptions(AbstractParser,
             bottom_shuffle = np.percentile(act_shuffle, 2.5, axis=0)  # (B,)
 
             # how many percentage of lower bound that exceed the shuffled data
-            nbin_exceed = np.count_nonzero(lower_bound > thres) / self.window * 100
+            nbin_exceed = np.count_nonzero(lower_bound > thres) / self.pos_bins * 100
             nbin_exceed = round(nbin_exceed)
             csv(neuron, nbin_exceed)
 
@@ -160,7 +160,7 @@ class PositionLowerBoundOptions(AbstractParser,
             "bottom_shuffle": bottom_shuffle,
             "nbin_exceed": nbin_exceed,
             "belt_length": self.belt_length,
-            "window": self.window,
+            "window": self.pos_bins,
             "percentile": self.percentage,
             "pf_threshold": pf_thres,
             "pf_reliability": pf_rel,
@@ -198,7 +198,7 @@ class PositionLowerBoundOptions(AbstractParser,
         :return: shape: (S, B), where S is shuffle_times
         """
 
-        ret = np.zeros((self.shuffle_times, self.window), dtype=float)
+        ret = np.zeros((self.shuffle_times, self.pos_bins), dtype=float)
         t, sig, _ = cp.get_signal(neuron, lap_range, dff=True)
 
         for i in range(self.shuffle_times):

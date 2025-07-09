@@ -234,7 +234,7 @@ class SiSrcData(NamedTuple):
         :return:
         """
         if window is None:
-            window = self.opt.window  # bin size, from BeltOptions
+            window = self.opt.pos_bins  # bin size, from BeltOptions
 
         if isinstance(neuron, int):
             signal = self.signal(neuron)
@@ -250,7 +250,7 @@ class SiSrcData(NamedTuple):
                              shuffle_method: SHUFFLE_METHOD,
                              window: int = None):
         if window is None:
-            window = self.opt.window
+            window = self.opt.pos_bins
 
         if isinstance(neuron, int):
             signal = self.signal(neuron)

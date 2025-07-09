@@ -1,4 +1,5 @@
 import argparse
+from functools import cached_property
 from typing import Any
 
 import numpy as np
@@ -36,13 +37,6 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
     pre_selection = True
     reuse_output = True
 
-    @classmethod
-    def new_parser(cls, **kwargs) -> argparse.ArgumentParser:
-        return super().new_parser(
-            formatter_class=argparse.RawTextHelpFormatter,
-            **kwargs
-        )
-
     def post_parsing(self):
         if self.session is not None:
             raise ValueError('opt.use_trial instead to avoid misunderstand')
@@ -69,9 +63,11 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
     # Signal processing methods #
     # ========================= #
 
-    def signal_all(self):
+    @cached_property
+    def selected_signal(self) -> np.ndarray:
         """get binned data (N', L, B)"""
-        signal_all = self._signal_all()
+        mx = self.get_selected_neurons()
+        signal_all = self.apply_binned_act_cache().occ_activity[mx]
 
         # trial selection (use_trial instead of opt.session)
         if isinstance(self.use_trial, str):
@@ -85,33 +81,12 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
         return signal_all[:, trial_range, :]  # (N', L', B)
 
-    _signal_all_cache = None
-
-    def _signal_all(self) -> np.ndarray:
-        """get cached binned data (N, L, B)"""
-        if self._signal_all_cache is None:
-            self._signal_all_cache = self.apply_binned_act_cache().occ_activity
-
-        # neuron selection
-        cell_mask = self.get_selected_neurons()
-
-        return self._signal_all_cache[cell_mask]
-
-    _sorted_index = None
-
-    @property
-    def sorted_index(self) -> np.ndarray:
-        if self._sorted_index is None:
-            self._sorted_index = self.apply_sort_idx_cache(error_when_missing=False).sort_idx
-
-        return self._sorted_index
-
     # ================ #
     # Plotting methods #
     # ================ #
 
     @property
-    def default_fig_kwargs(self) -> dict[str, Any]:
+    def fig_kwargs(self) -> dict[str, Any]:
         return dict(
             total_length=self.belt_length,
             cue_loc=self.cue_loc,
@@ -121,17 +96,17 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
     def calactivity_belt_sorted(self, output: DataOutput):
         if self.plot_trial is None:
-            index = self.sorted_index
+            index = self.apply_sort_idx_cache().sort_idx
 
             if index is None:
                 index = slice(None, None)
 
-            signal_all = self.signal_all()[index]
+            signal_all = self.selected_signal[index]
             signal = normalized_trial_avg(signal_all)
 
             self.plot_trial_average(signal, output)
         else:
-            self.plot_selected_trials(self.signal_all(), self.plot_trial, output)
+            self.plot_selected_trials(self.selected_signal, self.plot_trial, output)
 
     def plot_trial_average(self, signal: np.ndarray, output: DataOutput):
         """
@@ -150,7 +125,7 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
         with plot_figure(output_file, 3, 1, figsize=(6, 12)) as _ax:
             ax = ax_merge(_ax)[:2]
-            plot_sorted_trial_averaged_heatmap(signal, ax=ax, **self.default_fig_kwargs)
+            plot_sorted_trial_averaged_heatmap(signal, ax=ax, **self.fig_kwargs)
 
             ax = ax_merge(_ax)[2:]
             plot_fraction_active(ax, signal, belt_length=self.belt_length, cue_loc=self.cue_loc)
@@ -188,9 +163,9 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
                 #
                 ax = ax_merge(_ax)[:2, i]
                 if last_panel:
-                    plot_sorted_trial_averaged_heatmap(signal[:, i, :], cmap='hot', ax=ax, **self.default_fig_kwargs)
+                    plot_sorted_trial_averaged_heatmap(signal[:, i, :], cmap='hot', ax=ax, **self.fig_kwargs)
                 else:
-                    plot_sorted_trial_averaged_heatmap(signal[:, i, :], cmap='hot', ax=ax, **self.default_fig_kwargs)
+                    plot_sorted_trial_averaged_heatmap(signal[:, i, :], cmap='hot', ax=ax, **self.fig_kwargs)
 
                 if first_panel:
                     ax.set_ylabel('Neurons #')

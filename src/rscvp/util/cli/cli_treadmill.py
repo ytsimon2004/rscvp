@@ -13,8 +13,8 @@ class TreadmillOptions:
 
     # ----- Position ----- #
 
-    window: int = argument(
-        '-w', '--window',
+    pos_bins: int = argument(
+        '--pbins',
         metavar='VALUE',
         default=100,
         validator=lambda it: it > 0,

@@ -2,7 +2,7 @@ from typing import Literal, cast
 
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.model.bayes_decoding.cache_bayes import ApplyBayesDecodeOptions, BayesDecodeData, BayesDecodeCache
+from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions, BayesDecodeData, BayesDecodeCache
 from rscvp.model.bayes_decoding.util_plot import (
     plot_decoding_err_position,
     plot_confusion_scatter,
@@ -118,8 +118,7 @@ class DecodeAnalysisOptions(AbstractParser,
     # ======== #
 
     @dispatch('overview')
-    def plot_decoding_overview(self,
-                               cache: BayesDecodeCache,
+    def plot_decoding_overview(self, cache: BayesDecodeCache,
                                output: DataOutput):
         """
         plot the decoding error and actual position in running epoch
@@ -364,7 +363,7 @@ class DecodeAnalysisOptions(AbstractParser,
             plot_decoding_err_position(result.binned_error_median,
                                        result.binned_error_sem,
                                        total_length=self.belt_length,
-                                       window=self.window, ax=ax)
+                                       window=self.pos_bins, ax=ax)
 
 
 if __name__ == '__main__':

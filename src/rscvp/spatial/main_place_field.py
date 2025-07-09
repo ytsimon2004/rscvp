@@ -105,14 +105,14 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
         help='threshold for the difference between peak and baseline activity',
     )
 
-    reliability_threshold: Optional[float] = argument(
+    reliability_threshold: float | None = argument(
         '--reliability',
         metavar='VALUE',
         default=0.33,
         help='fraction of the trials presented the place field activity'
     )
 
-    signal_type: SIGNAL_TYPE = 'spks'
+    signal_type: SIGNAL_TYPE = 'spks'  # TODO why df_f has issue?
 
     def post_parsing(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
@@ -234,7 +234,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
                 pf_result_raw = calc_place_field(sig,
                                                  signal_bas[neuron],
                                                  self.peak_baseline_thres,
-                                                 self.window,
+                                                 self.pos_bins,
                                                  self.belt_length)
 
                 # width filter
@@ -263,7 +263,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
                 )
 
                 with plot_figure(output.figure_output(neuron)) as ax:
-                    plot_place_field(ax, pf_result, self.window, self.signal_type)
+                    plot_place_field(ax, pf_result, self.pos_bins, self.signal_type)
 
 
 def calc_place_field(signal: np.ndarray,

@@ -1,7 +1,7 @@
 from typing import Final, Literal
 
 import numpy as np
-from rscvp.model.bayes_decoding.cache_bayes import ApplyBayesDecodeOptions, BayesDecodeCache
+from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions, BayesDecodeCache
 from rscvp.model.bayes_decoding.util_plot import (
     plot_decoding_err_position,
     plot_confusion_scatter,
@@ -108,14 +108,14 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
             for i, dat in enumerate(data):
                 plot_decoding_err_position(dat[0], dat[1],
                                            total_length=self.belt_length,
-                                           window=self.window,
+                                           window=self.pos_bins,
                                            color=None,
                                            label=self.get_label(i),
                                            ax=ax[0])
 
             ax[0].legend()
 
-            x = np.linspace(0, self.belt_length, self.window)
+            x = np.linspace(0, self.belt_length, self.pos_bins)
             ax[1].plot(x, np.abs(data[0][0] - data[1][0]), 'ko', markerfacecolor='none', markersize=6)
 
     def _position_bins_error_foreach(self, data: list[np.ndarray]):
@@ -127,7 +127,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
             hide_axis=False,
             figsize=(8, 8),
             total_length=self.belt_length,
-            window=self.window,
+            window=self.pos_bins,
             title=[f'{self.exp_list[i]}_{self.animal_list[i]}' for i in range(len(data))]
         )
 

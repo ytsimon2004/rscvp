@@ -59,7 +59,7 @@ class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         signal, baseline = get_neuron_signal(s2p, neuron_list, signal_type='df_f', normalize=False)
         signal = gaussian_filter1d(signal, 5)
 
-        bin_size = self.belt_length / self.window
+        bin_size = self.belt_length / self.pos_bins
         binned_sig = self.apply_binned_act_cache().occ_activity  # (N,L,B)
         binned_sig[np.isnan(binned_sig)] = 0
         binned_sig = gaussian_filter1d(binned_sig, 2, axis=2, mode='wrap')
@@ -126,13 +126,13 @@ class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         rb = np.zeros(len(points))  # reliability of each points
         ret = np.zeros(len(points))
         trial = np.zeros(len(sig_trial))
-        bin_size = self.belt_length / self.window
+        bin_size = self.belt_length / self.pos_bins
 
         for i, p in enumerate(points):
 
             for j, sig in enumerate(sig_trial):
-                t = np.arange(0, len(sig) / self.window, 1 / self.window)
-                s, _ = np.histogram(t, bins=self.window, weights=sig)
+                t = np.arange(0, len(sig) / self.pos_bins, 1 / self.pos_bins)
+                s, _ = np.histogram(t, bins=self.pos_bins, weights=sig)
                 if s[int(p / bin_size)] > threshold:
                     trial[j] = 1
 

@@ -38,7 +38,7 @@ run_python() {
     -s "light_bas" \
     --used_session "light_bas" \
     --random 200 \
-    --window 100 \
+    --pbins 100 \
     --spatial-bin 1.5 \
     --CV odd \
     "$@"

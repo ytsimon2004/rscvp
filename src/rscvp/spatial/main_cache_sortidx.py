@@ -1,7 +1,7 @@
 from typing import Union
 
 import numpy as np
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions, PosBinActCacheBuilder
 from rscvp.spatial.util import sort_neuron, normalized_trial_avg
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
@@ -73,11 +73,13 @@ class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
     def run(self):
+        self.post_parsing()
         self.load_cache()
 
-    def signal_all(self):
+    def selected_signal(self) -> np.ndarray:
         """get binned data (N', L, B)"""
-        signal_all = self._signal_all()
+        mx = self.get_selected_neurons()
+        signal_all = get_options_and_cache(PosBinActCacheBuilder, self).occ_activity[mx]
 
         # trial selection (use_trial instead of opt.session)
         if isinstance(self.use_trial, str):
@@ -89,18 +91,6 @@ class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
             raise TypeError(f'use_trial: {type(self.use_trial)} type error')
 
         return signal_all[:, trial_range, :]  # (N', L', B)
-
-    _signal_all_cache = None
-
-    def _signal_all(self) -> np.ndarray:
-        """get cached binned data (N, L, B)"""
-        if self._signal_all_cache is None:
-            self._signal_all_cache = self.apply_binned_act_cache().occ_activity
-
-        # neuron selection
-        cell_mask = self.get_selected_neurons()
-
-        return self._signal_all_cache[cell_mask]
 
     # ============= #
     # Cache methods #
@@ -135,7 +125,7 @@ class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
             raise RuntimeError(f'cannot make cache from {self.use_sorted_strategy}')
 
         cache.neuron_idx = self.selected_neurons
-        cache.sort_idx = sort_neuron(normalized_trial_avg(self.signal_all()))
+        cache.sort_idx = sort_neuron(normalized_trial_avg(self.selected_signal()))
         return cache
 
 

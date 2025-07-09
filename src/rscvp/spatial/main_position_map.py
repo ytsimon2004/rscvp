@@ -96,7 +96,7 @@ class PositionMapOptions(AbstractParser, ApplyPosBinActOptions):
             plot_trial_avg_curve(
                 ax,
                 sig_sep[i],
-                window=self.window,
+                bins=self.pos_bins,
                 belt_length=self.belt_length,
                 label=names[i],
                 color=label_color[i]
@@ -114,7 +114,7 @@ class PositionMapOptions(AbstractParser, ApplyPosBinActOptions):
         #
         for i in range(3):
             ax = axes[1, i + 1]
-            plot_trial_avg_curve(ax, norm[i], window=self.window, belt_length=self.belt_length,
+            plot_trial_avg_curve(ax, norm[i], bins=self.pos_bins, belt_length=self.belt_length,
                                  label=names[i], color=label_color[i])
 
     def plot_single_session(self, ax, signal: np.ndarray):
@@ -125,12 +125,12 @@ class PositionMapOptions(AbstractParser, ApplyPosBinActOptions):
 
 def plot_trial_avg_curve(ax: Axes,
                          signal: np.ndarray, *,
-                         window: int = 100,
+                         bins: int = 100,
                          belt_length: int = 150,
                          **kwargs):
     mean = np.nanmean(signal, axis=0)
     sem = stats.sem(signal, axis=0, nan_policy='omit')
-    x = np.arange(window) * (belt_length / window)
+    x = np.arange(bins) * (belt_length / bins)
     ax.plot(x, mean, **kwargs)
     ax.fill_between(x, mean + sem, mean - sem, alpha=0.3, **kwargs)
     ax.set(xlim=(0, belt_length), xlabel='Position (cm)', ylabel='Norm. dF/F')

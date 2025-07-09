@@ -71,7 +71,7 @@ run_python model.bayes_decoding analysis \
   -s "light" \
   --used_session "light" \
   --random 200 \
-  --window 100 \
+  --pbins 100 \
   --spatial-bin 1.5 \
   --CV odd \
   --load 0 \
