@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib.axes import Axes
 from scipy import stats
+from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 
 from argclz import AbstractParser, argument
@@ -45,7 +46,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         if self.overview:
             self.plot_overview(output_info)
         else:
-            self.foreach_belt_activity(output_info, self.neuron_id)
+            self.foreach_position_map(output_info, self.neuron_id)
 
     # ============= #
     # Overview Plot #
@@ -72,7 +73,8 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
                 cmap='viridis',
                 title=titles,
                 figsize=(8, 8),
-                output=output.summary_figure_output()
+                output=output.summary_figure_output(),
+                aspect='auto'
             )
 
     def _extract_signals(self) -> tuple[np.ndarray, np.ndarray]:
@@ -101,13 +103,16 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         signal = signal[:, slice(*indices), :]
         signal = signal / np.max(signal, axis=(1, 2), keepdims=True)
 
+        if self.binned_smooth:
+            signal = gaussian_filter1d(signal, 3, mode='wrap', axis=2)
+
         return signal, np.where(orig_indices)[0]
 
     # ============ #
     # Foreach Plot #
     # ============ #
 
-    def foreach_belt_activity(self, output: DataOutput, neuron_ids: NeuronID):
+    def foreach_position_map(self, output: DataOutput, neuron_ids: NeuronID):
         """
         plot normalized dff in the belt env
 
@@ -119,16 +124,19 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         neuron_list = get_neuron_list(s2p, neuron_ids)
 
         rig = self.load_riglog_data()
-        signal_all = self.apply_binned_act_cache().occ_activity
         protocol = self.get_protocol_alias()
+
+        signal_all = self.apply_binned_act_cache().occ_activity
+
+        if self.binned_smooth:
+            signal_all = gaussian_filter1d(signal_all, 3, mode='wrap', axis=2)
 
         for neuron_id in tqdm(neuron_list, desc='plot_calactivity_belt', unit='neurons', ncols=80):
             signal = signal_all[neuron_id]
 
             match protocol:
                 case 'visual_open_loop' | 'light_dark_light':
-                    with plot_figure(output.figure_output(neuron_id, self.signal_type),
-                                     2, 4,
+                    with plot_figure(output.figure_output(neuron_id, self.signal_type), 2, 4,
                                      tight_layout=False,
                                      figsize=(16, 6),
                                      gridspec_kw={'width_ratios': [1.618, 1, 1, 1]}) as ax:

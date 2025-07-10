@@ -1,9 +1,9 @@
 import numpy as np
+from typing_extensions import Self
+
 from argclz import AbstractParser, argument, as_argument, copy_argument
 from neuralib.persistence import ETLConcatable, persistence
 from neuralib.persistence.cli_persistence import get_options_and_cache
-from typing_extensions import Self
-
 from rscvp.spatial.util import PositionSignal, normalized_trial_avg
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_stimpy import StimpyOptions
@@ -25,7 +25,6 @@ class PosBinActCache(ETLConcatable):
     animal: str = persistence.field(validator=True, filename=True)
     plane_index: str = persistence.field(validator=False, filename=True, filename_prefix='plane')
     signal_type: SIGNAL_TYPE = persistence.field(validator=True, filename=True)
-    smooth: str = persistence.field(validator=False, filename=False)
     normalized_method: NORMALIZE_TYPE = persistence.field(validator=True, filename=False)
     bins: int = persistence.field(validator=True, filename=True, filename_prefix='bins_')
     run_epoch: bool = persistence.field(validator=True, filename=True, filename_prefix='run_epoch_')
@@ -59,7 +58,6 @@ class PosBinActCache(ETLConcatable):
             animal=const.animal,
             plane_index='_concat',
             signal_type=const.signal_type,
-            smooth=const.smooth,
             normalized_method=const.normalized_method,
             bins=const.bins,
             run_epoch=const.run_epoch,
@@ -125,7 +123,6 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
             animal=self.animal_id,
             plane_index=self.plane_index,
             signal_type=self.signal_type,
-            smooth=self.binned_smooth,
             normalized_method=self.act_normalized,
             bins=self.pos_bins,
             run_epoch=self.running_epoch,
@@ -139,12 +136,8 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
                             signal_type=self.signal_type,
                             plane_index=self.plane_index)
 
-        cache.occ_activity = ps.load_binned_data(
-            self.act_normalized, self.running_epoch, 'transient', self.binned_smooth
-        )
-        cache.occ_baseline = ps.load_binned_data(
-            self.act_normalized, self.running_epoch, 'baseline', self.binned_smooth
-        )
+        cache.occ_activity = ps.load_binned_data(self.act_normalized, self.running_epoch, 'transient', False)
+        cache.occ_baseline = ps.load_binned_data(self.act_normalized, self.running_epoch, 'baseline', False)
 
         return cache
 
@@ -154,9 +147,15 @@ class ApplyPosBinActOptions(AbstractPosBinActOptions):
 
     def apply_binned_act_cache(self, error_when_missing=False) -> PosBinActCache:
         if self.plane_index is not None:
-            return self._apply_binned_act_cache_plane(error_when_missing)
+            ret = self._apply_binned_act_cache_plane(error_when_missing)
         else:
-            return self._apply_binned_act_cache_concat(error_when_missing)
+            ret = self._apply_binned_act_cache_concat(error_when_missing)
+
+        if hasattr(ret, 'smooth'):  # legacy issue check
+            if ret.smooth:
+                raise ValueError('the raw position cache should not be smoothed')
+
+        return ret
 
     def _apply_binned_act_cache_plane(self, error_when_missing=False) -> PosBinActCache:
         return get_options_and_cache(PosBinActCacheBuilder, self, error_when_missing)
