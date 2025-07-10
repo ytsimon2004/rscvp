@@ -1,17 +1,17 @@
-from typing import Final
-
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 from scipy import stats
 from tqdm import tqdm
 
-from argclz import AbstractParser
-from neuralib.plot import plot_figure
+from argclz import AbstractParser, argument
+from neuralib.plot import plot_figure, grid_subplots
 from neuralib.typing import AxesArray
 from neuralib.util.verbose import publish_annotation
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.util.cli import SelectionOptions
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
+from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData, Session
 from .util_plot import plot_tuning_heatmap
 
@@ -19,17 +19,93 @@ __all__ = ['PositionMapOptions']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.2A & fig.S5B-C', as_doc=True)
-class PositionMapOptions(AbstractParser, ApplyPosBinActOptions):
+class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions):
     DESCRIPTION = 'Plot normalized position binned calcium activity across trials'
 
-    binned_smooth: Final = True
+    overview: bool = argument('--overview', help='plot batch overview')
+    pc_only: bool = argument('--pc-only', help='overview only plot place cell')
+    si_filter: float | None = argument('--si-filter', default=None, help='overview spatial information filter')
+
+    binned_smooth = True
     reuse_output = True
 
-    def run(self):
+    def post_parsing(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
+        if self.overview:
+            self.pre_selection = True
+            self.pc_selection = 'slb'
+            self.session = 'light'
+            self.used_session = 'light'
+
+    def run(self):
+        self.post_parsing()
         output_info = self.get_data_output('ba', self.signal_type, running_epoch=self.running_epoch)
-        self.foreach_belt_activity(output_info, self.neuron_id)
+
+        if self.overview:
+            self.plot_overview(output_info)
+        else:
+            self.foreach_belt_activity(output_info, self.neuron_id)
+
+    # ============= #
+    # Overview Plot #
+    # ============= #
+
+    def plot_overview(self, output: DataOutput, batch_size: int = 25):
+        signal, orig_indices = self._extract_signals()
+        n_neurons = signal.shape[0]
+
+        n_batches = (n_neurons + batch_size - 1) // batch_size
+        for i in range(n_batches):
+            start = i * batch_size
+            end = min((i + 1) * batch_size, n_neurons)
+
+            batch_signal = signal[start:end]
+            batch_ids = orig_indices[start:end]
+            titles = [f'ID_{idx}' for idx in batch_ids]
+
+            grid_subplots(
+                batch_signal,
+                images_per_row=5,
+                plot_func='imshow',
+                dtype='img',
+                cmap='viridis',
+                title=titles,
+                figsize=(8, 8),
+                output=output.summary_figure_output()
+            )
+
+    def _extract_signals(self) -> tuple[np.ndarray, np.ndarray]:
+        """Get activity with neurons and trials selection
+
+        :return: activity (N', L', B) and neuron indices (N',)
+        """
+        rig = self.load_riglog_data()
+        signal = self.apply_binned_act_cache().occ_activity
+        orig_indices = np.ones(signal.shape[0], dtype=bool)
+
+        # neuron selection
+        if self.pc_only:
+            mx = self.get_selected_neurons()
+            orig_indices &= mx
+
+        if self.si_filter is not None:
+            si = self.get_csv_data(f'si_{self.session}')
+            mx = si > self.si_filter
+            orig_indices &= mx
+
+        signal = signal[orig_indices]
+
+        # trial selection
+        indices = TrialSelection.from_rig(rig, self.session).get_time_profile().trial_range
+        signal = signal[:, slice(*indices), :]
+        signal = signal / np.max(signal, axis=(1, 2), keepdims=True)
+
+        return signal, np.where(orig_indices)[0]
+
+    # ============ #
+    # Foreach Plot #
+    # ============ #
 
     def foreach_belt_activity(self, output: DataOutput, neuron_ids: NeuronID):
         """
@@ -147,7 +223,6 @@ def get_session_sig(rig: RiglogData, signal: np.ndarray) -> dict[Session, np.nda
         session_sig
     """
     session = rig.get_stimlog().session_trials()
-
     lap_event = rig.lap_event
 
     session_sig = {
