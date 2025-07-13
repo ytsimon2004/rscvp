@@ -28,7 +28,7 @@ dependencies = [
 [project.optional-dependencies]
 
 opt = [
-    "memory_profiler", # more memory heavily data io
+    "memory_profiler",  # for memory-heavy data I/O
     "pingouin",
     "gspread",
     "rastermap"
@@ -51,7 +51,7 @@ all = ["rscvp[opt]"]
 
 [project.urls]
 Homepage = "https://github.com/ytsimon2004/rscvp"
-Documentation = "https://neuralib.readthedocs.io/en/latest/index.html"
+Documentation = "https://rscvp.readthedocs.io/en/latest/index.html"
 Repository = "https://github.com/ytsimon2004/rscvp"
 Issues = "https://github.com/ytsimon2004/rscvp/issues"
 
