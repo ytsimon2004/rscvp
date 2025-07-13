@@ -70,6 +70,27 @@ def slice_transform_helper(raw_image: PathLike,
                            plane_type: PLANE_TYPE = 'coronal',
                            flip_lr: bool = False,
                            flip_ud: bool = False) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Transforms an input image according to the specified transformation matrix,
+    plane orientation, and optional flipping parameters. This function reads a raw
+    image, optionally flips it horizontally or vertically, applies a transformation
+    matrix, and resizes it to a defined dimension based on the plane type. The
+    result is a tuple containing the raw image and the transformed image.
+
+    :param raw_image: Path to the raw input image. The image is loaded and
+        processed to apply transformations. Must be a valid path-like object.
+    :param trans_matrix: Transformation matrix to apply to the image. It can be a
+        numpy array or the path to a valid file containing the matrix. Supported
+        files are `.mat` for MATLAB files and `.npy` for NumPy files.
+    :param plane_type: Defines the anatomical plane for transformation.
+        Defaults to 'coronal'.
+    :param flip_lr: Boolean flag to determine whether to flip the image
+        horizontally (left to right).
+    :param flip_ud: Boolean flag to determine whether to flip the image
+        vertically (up to down).
+    :return: A tuple containing two numpy arrays: the raw image as processed,
+        and the transformed image.
+    """
     raw_image = cv2.cvtColor(cv2.imread(raw_image), cv2.COLOR_BGR2RGB)
 
     if flip_ud:

@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.atlas.main_roi_atlas" />
-    <option name="PARAMETERS" value="-A YW043 -P coronal" />
+    <option name="PARAMETERS" value="-A YW064 -P coronal -S /Volumes/BigDATA/data/user/yu-ting/analysis/hist/" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_position_map" />
-    <option name="PARAMETERS" value="-D 210409 -A YW006 -P 0 -T spks --debug" />
+    <option name="PARAMETERS" value="-D 220930 -A YW048 -P 0 -T spks --debug --overview --pc-only --disk BigDATA --mount /Volumes" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

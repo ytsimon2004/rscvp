@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.atlas.main_roi_quant" />
-    <option name="PARAMETERS" value="-A YW043 -g bias --level 2 --method channel --area VIS --debug" />
+    <option name="PARAMETERS" value="-A YW051 -g bar --level 2 --method channel --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
