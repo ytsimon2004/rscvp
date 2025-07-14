@@ -162,7 +162,8 @@ class PositionBinnedSig:
                            smooth: bool = False,
                            running_epoch: bool = False,
                            enable_tqdm: bool = False,
-                           norm: bool = False) -> np.ndarray:
+                           norm: bool = False,
+                           desc: str | None = None) -> np.ndarray:
         """
         Calculate binned signal
 
@@ -177,6 +178,7 @@ class PositionBinnedSig:
         :param running_epoch: If only take running epoch
         :param enable_tqdm: enable tqdm progress bar
         :param norm: whether do the maximal normalization
+        :param desc: description in tqdm
         :return: Position binned signal. `Array[float, [N, L, B] | [L, B]]`
         """
 
@@ -209,7 +211,7 @@ class PositionBinnedSig:
 
         if enable_tqdm:
             from tqdm import tqdm
-            lap_iter = tqdm(enum, desc='get_binned_signal', unit='laps', ncols=80)
+            lap_iter = tqdm(enum, desc=desc if desc is not None else 'get_binned_signal', unit='laps', ncols=80)
         else:
             lap_iter = enum
 
@@ -296,21 +298,21 @@ class PositionBinnedSig:
         return r
 
 
-def load_interpolated_position(log: RiglogData,
+def load_interpolated_position(rig: RiglogData,
                                sample_rate: int = 1000,
                                force_compute: bool = False,
                                save_cache: bool = True) -> CircularPosition:
     """
     get 'CircularPosition' and save as cache
 
-    :param log: ``RiglogData``
+    :param rig: ``RiglogData``
     :param sample_rate: sampling rate for interpolation
     :param force_compute: force recalculate and save as a new cache
     :param save_cache: save cache in the same directory as riglog file
     :return: ``CircularPosition``
     """
 
-    file = log.riglog_file
+    file = rig.riglog_file
     cache_file = file.with_name(file.stem + '_position_cache.npy')
 
     if cache_file.exists() and not force_compute:
@@ -319,7 +321,7 @@ def load_interpolated_position(log: RiglogData,
         lt = lt[~np.isnan(lt)].astype(int)
         return CircularPosition(d[:, 0], d[:, 1], d[:, 2], d[:, 3], lt)
     else:
-        p = log.position_event
+        p = rig.position_event
         d = interp_pos1d(p.time, p.value, sampling_rate=sample_rate, remove_nan=True)
 
         lt = np.full_like(d.t, np.nan, dtype=np.double)  # make (N,) array

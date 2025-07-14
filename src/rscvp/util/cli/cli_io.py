@@ -79,6 +79,7 @@ CELLULAR_IO: dict[CodeAlias, CodeInfo] = {
     'spr': CodeInfo('spr', 'sparsity', 'sparsity', 'spr_tr_lincorr', h('sparsity*')),
     'ev': CodeInfo('ev', 'ev', 'ev', 'ev', h('ev_trial_avg*')),
     'tcc': CodeInfo('tcc', 'tcc', 'tcc', 'tcc_population', h('trial_cc*')),
+    'sc': CodeInfo('sc', 'sc', 'sc', None, h('sc*')),
     # sig
     'ds': CodeInfo('ds', 'ds', 'ds', None, h('mean_dff*', 'median_dff*', 'perc95_dff*', 'max_dff*')),
     'npc': CodeInfo('npc', 'neuropil_corr', None, 'neuropil_corr', ),
