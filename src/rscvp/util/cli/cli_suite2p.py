@@ -73,7 +73,7 @@ class Suite2pOptions(CommonOptions):
     def suite2p_directory(self) -> Path:
         """suite2p result directory with given plane index"""
         if self.plane_index is None:
-            raise ValueError('')
+            return self.get_src_path('suite2p') / 'combined'  # placeholder
         return self.get_src_path('suite2p') / f'plane{self.plane_index}'
 
     @property

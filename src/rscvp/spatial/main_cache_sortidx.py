@@ -79,7 +79,7 @@ class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
     def selected_signal(self) -> np.ndarray:
         """get binned data (N', L, B)"""
         mx = self.get_selected_neurons()
-        signal_all = get_options_and_cache(PosBinActCacheBuilder, self).occ_activity[mx]
+        signal_all = self.apply_binned_act_cache().occ_activity[mx]
 
         # trial selection (use_trial instead of opt.session)
         if isinstance(self.use_trial, str):
