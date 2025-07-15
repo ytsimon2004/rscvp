@@ -11,6 +11,7 @@ from .main_position_map import PositionMapOptions
 from .main_si import SiOptions
 from .main_slb import PositionLowerBoundOptions
 from .main_sparsity import SparsityOptions
+from .main_speed_score import SpeedScoreOptions
 from .main_trial_corr import TrialCorrOptions
 
 parse_command_args(
@@ -29,6 +30,7 @@ parse_command_args(
         spv=CPBeltSortTrialOptions,
         sa_cache=SortIdxCacheBuilder,
         pba_cache=PosBinActCacheBuilder,
-        cm=PopulationMTXOptions
+        cm=PopulationMTXOptions,
+        ss=SpeedScoreOptions,
     )
 )
