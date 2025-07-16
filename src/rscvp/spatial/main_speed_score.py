@@ -50,7 +50,6 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
         with plot_figure(None) as ax:
             ax.hist(sc, bins=30)
             ax.set(xlabel='speed_score', ylabel='neuron #')
-            ax.set_title(f'mean: {sc.mean():.3f}, median: {sc.median():.3f}')
 
     def foreach_speed_score(self, output: DataOutput):
         rig = self.load_riglog_data()

@@ -1,13 +1,10 @@
 from typing import ClassVar
 
+from argclz import argument, as_argument
 from rscvp.util.cli import HEADER, SelectionOptions, CommonOptions
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
-from argclz import argument, as_argument
-
-__all__ = [
-    'StatisticOptions'
-]
+__all__ = ['StatisticOptions']
 
 
 class StatisticOptions(SelectionOptions):

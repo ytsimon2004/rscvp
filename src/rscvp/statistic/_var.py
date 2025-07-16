@@ -17,7 +17,7 @@ GENERIC_HEADERS = ('perc95_dff', 'max_dff')
 
 #
 SPATIAL_HEADERS = (
-    'si', 'trial_cc', 'ev_trial_avg', 'trial_reliability',
+    'si', 'trial_cc', 'ev_trial_avg', 'trial_reliability', 'speed_score',
     'ap_cords', 'ml_cords', 'ap_cords_scale', 'ml_cords_scale', 'dv_cords'
 )
 
