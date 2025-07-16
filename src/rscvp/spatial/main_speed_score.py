@@ -1,16 +1,18 @@
 from typing import Literal
 
 import numpy as np
+import polars as pl
 from matplotlib.axes import Axes
 from tqdm import trange
 
-from argclz import AbstractParser
+from argclz import AbstractParser, as_argument
 from neuralib.imaging.suite2p import get_neuron_signal, SIGNAL_TYPE, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.locomotion import CircularPosition
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
 from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.util.cli import PlotOptions, DataOutput
 from rscvp.util.position import PositionBinnedSig, load_interpolated_position
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
@@ -19,15 +21,38 @@ __all__ = ['SpeedScoreOptions']
 
 
 @publish_annotation('appendix', project='rscvp', caption='rev')
-class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
+class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
     DESCRIPTION = 'Calculate the speed score for each cell (Kropff et al., 2015)'
+
+    plot_summary: bool = as_argument(PlotOptions.plot_summary).with_options(help='plot speed score summary histogram')
 
     signal_type: SIGNAL_TYPE = 'df_f'
 
-    def run(self):
+    def post_parsing(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
+
+        if self.plot_summary:
+            self.reuse_output = True
+
+    def run(self):
+        self.post_parsing()
         output = self.get_data_output('sc', self.session, running_epoch=self.running_epoch)
 
+        if self.plot_summary:
+            self.plot_summary_hist(output)
+        else:
+            self.foreach_speed_score(output)
+
+    def plot_summary_hist(self, output: DataOutput):
+        field = f'speed_score_{self.session}'
+        sc = pl.read_csv(output.csv_output)[field]
+
+        with plot_figure(None) as ax:
+            ax.hist(sc, bins=30)
+            ax.set(xlabel='speed_score', ylabel='neuron #')
+            ax.set_title(f'mean: {sc.mean():.3f}, median: {sc.median():.3f}')
+
+    def foreach_speed_score(self, output: DataOutput):
         rig = self.load_riglog_data()
         s2p = self.load_suite_2p()
         image_time = rig.imaging_event.time
