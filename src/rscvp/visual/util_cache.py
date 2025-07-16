@@ -23,7 +23,7 @@ __all__ = [
     'plot_visual_pattern_trace'
 ]
 
-BINNED_SIGNAL_TYPE = Literal['pupil', 'df_f', 'spks']
+BINNED_SIGNAL_TYPE = Literal['pupil', 'speed', 'df_f', 'spks']
 TRIAL_VALUE_TYPE = Literal['mean', 'median']
 
 
@@ -52,14 +52,14 @@ class AbstractVisualTuningOptions(Suite2pOptions, StimpyOptions, PlotOptions):
 class VisualTuningResult(NamedTuple):
     stim_pattern: list[tuple[Direction, SFTF]]
     """stimulus pattern. list of ``P``"""
-    pre_post: tuple[int, int]
+    pre_post: tuple[float, float]
     """pre post in second"""
     stim_index: np.ndarray
     """`Array[int, [P, F]]`"""
-    dat: np.ndarray
-    """`Array[float, [N, C] | C]` -> C if not neural activity"""
+    signal: np.ndarray
+    """`Array[float, [P, F] | [N, C] | C]`"""
     signal_type: BINNED_SIGNAL_TYPE
-    """{'pupil', 'df_f', 'spks'}"""
+    """{'pupil', 'speed', 'df_f', 'spks'}"""
     value_type: TRIAL_VALUE_TYPE
     """trial-averaged(mean) or trial-median(median)"""
 
@@ -75,9 +75,11 @@ class VisualTuningResult(NamedTuple):
         else:
             raise RuntimeError('error cache saving')
 
-    def with_mask(self, mask: np.ndarray) -> Self:
+    def select_neuron(self, mask: np.ndarray) -> Self:
         """cell mask"""
-        return self._replace(dat=self.dat[mask])
+        if not self.signal.ndim == 2:
+            raise ValueError('')
+        return self._replace(dat=self.signal[mask])
 
 
 @persistence.persistence_class
@@ -102,7 +104,7 @@ class VisualTuningCache(ETLConcatable):
     plane_index: int | str = persistence.field(validator=False, filename=True, filename_prefix='plane')
     """optical imaging plane"""
     signal_type: BINNED_SIGNAL_TYPE = persistence.field(validator=True, filename=True)
-    """{'pupil', 'df_f', 'spks'}"""
+    """{'pupil', 'speed', 'df_f', 'spks'}"""
     value_type: TRIAL_VALUE_TYPE = persistence.field(validator=True, filename=True, filename_prefix='trial_')
     """trial-averaged(mean) or trial-median(median)"""
     direction_invert: bool = persistence.field(validator=True, filename=False)
@@ -114,21 +116,21 @@ class VisualTuningCache(ETLConcatable):
     src_neuron_idx: np.ndarray | None
     """source optic plane if neural activity"""
 
-    pre_post: tuple[int, int]
+    pre_post: tuple[float, float]
     """pre post in second"""
     stim_pattern: list[tuple[Direction, SFTF]]
     """[``P``]"""
     stim_index: np.ndarray
     """`Array[int, [P, F]]`"""
-    dat: np.ndarray
-    """`Array[float, [N, C] | C]` -> C if not neural activity"""
+    signal: np.ndarray
+    """`Array[float, [P, F] | [N, C] | C]`"""
 
     def load_result(self) -> VisualTuningResult:
         return VisualTuningResult(
             stim_pattern=self.stim_pattern,
             pre_post=self.pre_post,
             stim_index=self.stim_index,
-            dat=self.dat,
+            signal=self.signal,
             signal_type=self.signal_type,
             value_type=self.value_type
         )
@@ -160,7 +162,7 @@ class VisualTuningCache(ETLConcatable):
         ret.pre_post = const.pre_post
         ret.stim_pattern = const.stim_pattern
         ret.stim_index = const.stim_index
-        ret.dat = np.vstack([it.dat for it in data])
+        ret.signal = np.vstack([it.signal for it in data])
 
         return ret
 
@@ -176,10 +178,10 @@ class VisualTuningCache(ETLConcatable):
         for i, it in enumerate(data):
             if it.stim_index.shape[1] != lower_bound:  # find the planes have more frames
                 ret[i].stim_index = it.stim_index[:, :lower_bound]
-                mask = np.full(it.dat.shape[1], 1, dtype=bool)
+                mask = np.full(it.signal.shape[1], 1, dtype=bool)
                 st = lower_bound + prestim + 1
                 mask[st::per_stim] = 0
-                ret[i].dat = it.dat[:, mask]
+                ret[i].signal = it.signal[:, mask]
 
         return ret
 
@@ -205,7 +207,7 @@ class StimPatternSignal(NamedTuple):
     signal: np.ndarray
     """`Array[float, F]`"""
     signal_type: BINNED_SIGNAL_TYPE
-    """{'pupil', 'df_f', 'spks'}"""
+    """{'pupil', 'speed', 'df_f', 'spks'}"""
 
     @property
     def n_frames(self) -> int:

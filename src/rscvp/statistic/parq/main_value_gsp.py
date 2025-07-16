@@ -33,10 +33,8 @@ class ValStatGSP(StatPipeline, Dispatch):
 
     sheet_name = as_argument(StatisticOptions.sheet_name).with_options(required=True)
 
-    #
     load_source = 'parquet'
 
-    #
     dependent = False
     ttest_parametric_infer = True
 

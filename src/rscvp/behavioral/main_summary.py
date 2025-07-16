@@ -1,5 +1,5 @@
 from argclz import AbstractParser, union_type, str_tuple_type, argument
-from neuralib.plot import plot_figure, ax_merge
+from neuralib.plot import plot_figure, ax_merge, plot_peri_onset_1d
 from rscvp.behavioral.util import *
 from rscvp.behavioral.util import check_treadmill_trials
 from rscvp.behavioral.util_plot import *
@@ -74,14 +74,14 @@ class BehaviorSumOptions(AbstractParser, StimpyOptions, Suite2pOptions, Treadmil
 
             # peri-reward lick and histogram
             ax = _ax[0, 1]
-            lick_per_trial, lick_hist, _ = peri_reward_raster_hist(lick_event.time, reward_event.time, self.peri_event_margin)
-            plot_peri_reward_lick_raster(ax, lick_per_trial, limit=self.peri_event_margin)
+            lick_per_trial, lick_hist, _ = peri_reward_raster_hist(lick_event.time, reward_event.time, self.psth_sec)
+            plot_peri_reward_lick_raster(ax, lick_per_trial, limit=self.psth_sec)
             ax = _ax[1, 1]
-            plot_peri_reward_lick_hist(ax, lick_hist, limit=self.peri_event_margin)
+            plot_peri_reward_lick_hist(ax, lick_hist, limit=self.psth_sec)
 
             # peri-reward velocity
             ax = _ax[2, 1]
-            plot_peri_reward_velocity(ax, reward_event.time, pos_time, vel, limit=self.peri_event_margin)
+            plot_peri_onset_1d(reward_event.time, pos_time, vel, pre=self.psth_sec, post=self.psth_sec, ax=ax)
 
             # lap interval to check dj mice
             ax = _ax[3, 1]

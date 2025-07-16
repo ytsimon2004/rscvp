@@ -63,8 +63,8 @@ class TreadmillOptions:
 
     # ----- Plot ----- #
 
-    peri_event_margin: float = argument(
-        '--margin',
+    psth_sec: float = argument(
+        '--psth',
         metavar='VALUE',
         group=GROUP_TREADMILL,
         default=3,

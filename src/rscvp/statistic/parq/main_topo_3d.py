@@ -36,6 +36,7 @@ class TopoMetricVolumeOptions(StatPipeline):
         self.ap_field = 'ap_cords'
         self.ml_field = 'ml_cords'
         self.dv_field = 'dv_cords'
+
         if self.scaled:
             self.ap_field += '_scale'
             self.ml_field += '_scale'

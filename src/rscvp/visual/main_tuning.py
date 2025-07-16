@@ -98,7 +98,7 @@ class VisualTuningOptions(AbstractParser, AbstractVisualTuningOptions, Persisten
 
         #
         cache.stim_pattern = patterns
-        cache.dat = np.array(act_all)
+        cache.signal = np.array(act_all)
         cache.stim_index = np.array(stim_indices)
 
 

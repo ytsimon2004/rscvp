@@ -2,18 +2,18 @@ from datetime import datetime
 from typing import Callable, Literal, TypeVar, Generic, ParamSpec, Any
 
 import numpy as np
-from rscvp.behavioral.util import get_velocity_per_trial
-from rscvp.behavioral.util_plot import plot_peri_reward_velocity, plot_velocity_line
-from rscvp.util.cli.cli_camera import CameraOptions
-from rscvp.util.cli.cli_treadmill import TreadmillOptions
-from rscvp.util.position import load_interpolated_position
-from rscvp.util.util_lick import peri_reward_raster_hist
 from scipy.stats import sem
 
 from argclz import AbstractParser, as_argument, try_float_type, argument
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
+from rscvp.behavioral.util import get_velocity_per_trial
+from rscvp.behavioral.util_plot import plot_peri_reward_velocity, plot_velocity_line
+from rscvp.util.cli.cli_camera import CameraOptions
+from rscvp.util.cli.cli_treadmill import TreadmillOptions
+from rscvp.util.position import load_interpolated_position
+from rscvp.util.util_lick import peri_reward_raster_hist
 
 __all__ = ['BehaviorBatchPlotOptions']
 
@@ -29,9 +29,11 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
         'peri_reward_vel',
         'vel_as_position',
         'peri_reward_lick'
-    ] = argument('--plot',
-                 required=True,
-                 help='which dispatch analysis')
+    ] = argument(
+        '--plot',
+        required=True,
+        help='which dispatch analysis'
+    )
 
     lick_thres = as_argument(CameraOptions.lick_thres).with_options(
         help='Foreach set threshold corresponding to the dataset'
@@ -102,7 +104,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
 
             if self.cutoff_vel is not None:
                 v[(v < self.cutoff_vel)] = 0
-            dataset.append((reward_time, pt, v, self.peri_event_margin))
+            dataset.append((reward_time, pt, v, self.psth_sec))
 
             name = f'{self.exp_date}_{self.animal_id}'
             self.names.append(name)
@@ -183,7 +185,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
                 t = tracker.electrical_timestamp
             else:
                 raise ValueError('')
-            res = peri_reward_raster_hist(t, riglog.reward_event.time, self.peri_event_margin)
+            res = peri_reward_raster_hist(t, riglog.reward_event.time, self.psth_sec)
             dataset.append(res)
 
             #
@@ -227,7 +229,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
                             alpha=0.4)
 
             ax.legend()
-            ax.set_xlim(-self.peri_event_margin, self.peri_event_margin)
+            ax.set_xlim(-self.psth_sec, self.psth_sec)
             ax.set(xlabel='time relative to reward time(s)', ylabel='lick percentage(%)')
 
 

@@ -7,7 +7,6 @@ from stimpyp import RiglogData
 
 __all__ = [
     'get_velocity_per_trial',
-    'peri_reward_velocity',
     'check_treadmill_trials'
 ]
 
@@ -55,39 +54,6 @@ def get_velocity_per_trial(lap_time: np.ndarray,
         left_t = right_t
 
     return np.array(ret)
-
-
-def peri_reward_velocity(reward_time: np.ndarray,
-                         position_time: np.ndarray,
-                         velocity: np.ndarray,
-                         bins: int = 100,
-                         limit: float = 5) -> np.ndarray:
-    """
-    Get Peri-reward velocity
-
-    :param reward_time: reward time array. `Array[float, L]`
-    :param position_time: position time array. `Array[float, P]`
-    :param velocity: velocity array. `Array[float, P]`
-    :param bins: number of bins per trial in a given time bins (peri-left + peri-right)
-    :param limit: peri-event time (left / right)
-    :return: peri-reward velocity. `Array[float, [L, B]]`. B = number of bins per trial in a given time bins (peri-left + peri-right)
-
-    """
-    ret = np.zeros((len(reward_time), bins))
-    for i, rt in enumerate(reward_time):
-        left = rt - limit
-        right = rt + limit
-        time_mask = np.logical_and(left < position_time, position_time < right)
-        t = position_time[time_mask]
-        v = velocity[time_mask]
-
-        hist, edg = np.histogram(t, bins, range=(left, right), weights=v)
-        occ = np.histogram(t, edg)[0]
-        hist /= occ
-        hist[np.isnan(hist)] = 0
-        ret[i] = hist
-
-    return ret
 
 
 def check_treadmill_trials(rig: RiglogData, error_when_abnormal: bool = False) -> list[int] | None:

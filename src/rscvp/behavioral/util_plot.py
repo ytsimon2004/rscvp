@@ -1,9 +1,7 @@
 import numpy as np
-import scipy
 from matplotlib.axes import Axes
 
 from neuralib.plot.colormap import insert_colorbar
-from rscvp.behavioral.util import peri_reward_velocity
 from stimpyp import RigEvent
 
 __all__ = [
@@ -12,7 +10,6 @@ __all__ = [
     #
     'plot_peri_reward_lick_raster',
     'plot_peri_reward_lick_hist',
-    'plot_peri_reward_velocity',
     #
     'plot_lap_time_interval',
     #
@@ -115,50 +112,6 @@ def plot_peri_reward_lick_hist(ax: Axes,
     ax.axvline(0, color='r', linestyle='--', zorder=1)
     ax.set_xlim(-limit, limit)
     ax.set_ylabel('Count (%)')
-
-
-def plot_peri_reward_velocity(ax: Axes,
-                              reward_time: np.ndarray,
-                              pt: np.ndarray,
-                              v: np.ndarray,
-                              limit: float,
-                              plot_all: bool = False,
-                              n_bins: int = 100,
-                              with_fill_between: bool = True,
-                              **kwargs) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Plot peri-reward velocity
-
-    :param ax:
-    :param reward_time:
-    :param pt: position time
-    :param v: velocity time
-    :param limit: peri-reward time limit in sec.
-    :param plot_all: plot velocity every laps
-    :param n_bins: number of bins `B`
-    :param with_fill_between: fill_between for the sem
-    :param kwargs: additional arguments to ``ax.plot()``
-    :return: x (`Array[float, B]`) and average velocity (`Array[float, B]`)
-    """
-    x = np.linspace(-limit, limit, n_bins)
-    v = peri_reward_velocity(reward_time, pt, v, limit=limit)
-    v_mean = np.nanmean(v, axis=0)
-
-    ax.plot(x, v_mean, **kwargs)
-    ax.axvline(0, color="r", linestyle="--", zorder=1)
-
-    if plot_all:
-        for vlap in v:
-            ax.plot(x, vlap, color='grey', alpha=0.1)
-
-    if with_fill_between:
-        v_sem = scipy.stats.sem(v)
-        ax.fill_between(x, v_mean + v_sem, v_mean - v_sem, alpha=0.3)
-
-    ax.set_xlabel('Time relative to reward given (s)')
-    ax.set_ylabel('Velocity (cm/s)')
-
-    return x, v_mean
 
 
 def plot_lap_time_interval(ax: Axes, lap_time: np.ndarray):
