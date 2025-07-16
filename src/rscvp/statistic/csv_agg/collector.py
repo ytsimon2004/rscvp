@@ -2,12 +2,12 @@ from typing import Any, NamedTuple
 
 import polars as pl
 from polars import SchemaFieldNotFoundError
-from rscvp.util.cli import CommonOptions
-from rscvp.util.cli.cli_io import CELLULAR_IO, HEADER, CodeAlias
-from rscvp.util.cli.cli_statistic import StatisticOptions
 
 from neuralib.util.utils import joinn
 from neuralib.util.verbose import fprint
+from rscvp.util.cli import CommonOptions
+from rscvp.util.cli.cli_io import CELLULAR_IO, HEADER, CodeAlias
+from rscvp.util.cli.cli_statistic import StatisticOptions
 from stimpyp import Session
 
 __all__ = ['CSVCollector']
@@ -45,7 +45,7 @@ class CSVCollector:
         :param truncate_session_agg: truncate the session for aggregate the csv
         """
         if code not in CELLULAR_IO:
-            raise ValueError(f'unknown{code}')
+            raise ValueError(f'unknown code: {code}')
 
         self.code = code
         self.fields = fields or {}

@@ -1,19 +1,20 @@
 import subprocess
+import sys
 import typing
 from pathlib import Path
 
 import attrs
 import pandas as pd
 import polars as pl
+
+from neuralib.typing import DataFrame
+from neuralib.util.utils import keys_with_value
+from neuralib.util.verbose import fprint, print_load
 from rscvp.spatial.main_place_field import split_flatten_lter
 from rscvp.util.cli import Region
 from rscvp.util.util_dataframe import check_null, to_numeric
 from rscvp.util.util_gspread import truncate_before_todo_hash, RSCGoogleWorkSheet, skip_comment_primary_key, \
     GSPREAD_SHEET_PAGE
-
-from neuralib.typing import DataFrame
-from neuralib.util.utils import keys_with_value
-from neuralib.util.verbose import fprint, print_load
 from stimpyp import Session
 
 __all__ = [
@@ -385,7 +386,7 @@ class CliGspreadGenerator:
                         opt_args = [opt] if isinstance(opt, str) else opt
                         cmds += opt_args
 
-                    ret.append(['python', '-m', self.lut.module_path] + cmds)
+                    ret.append([sys.executable, '-m', self.lut.module_path] + cmds)
             else:
                 if n_planes == 1:
                     cmds.extend(['-P', '0'])
@@ -394,7 +395,7 @@ class CliGspreadGenerator:
                     opt_args = [opt] if isinstance(opt, str) else opt
                     cmds += opt_args
 
-                ret.append(['python', '-m', self.lut.module_path] + cmds)
+                ret.append([sys.executable, '-m', self.lut.module_path] + cmds)
 
         return ret
 
@@ -407,7 +408,7 @@ class CliGspreadGenerator:
         :param kwargs: pass to ``create_common_cli_batch()``
         :return: subprocess command list
         """
-        cmds = ['python', '-m', self.lut.module_path]
+        cmds = [sys.executable, '-m', self.lut.module_path]
         cmds.extend(self.create_common_cli_batch(**kwargs))
 
         # optional

@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from pathlib import Path
 from typing import ClassVar, Optional
 
@@ -80,7 +81,7 @@ class RasterMapOptions(CommonOptions):
         :return:
         """
 
-        cmds = ['python', '-m', 'rastermap']
+        cmds = [sys.executable, '-m', 'rastermap']
 
         if spike_file is not None:
             cmds.extend(['--S', spike_file])

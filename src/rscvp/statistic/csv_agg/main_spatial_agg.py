@@ -27,7 +27,7 @@ class SpeedStat(LocalSpreadsheetSync):
 
     def __init__(self, opt: StatisticOptions):
         collector = CSVCollector(
-            code='ss',
+            code='sc',
             stat_col=['speed_score'],
             exclude_col=None,
             fields=dict(rec_region=str, plane_index=try_int_type),
