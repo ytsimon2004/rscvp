@@ -5,7 +5,7 @@ import polars as pl
 from matplotlib.axes import Axes
 from tqdm import trange
 
-from argclz import AbstractParser, as_argument
+from argclz import AbstractParser, as_argument, argument
 from neuralib.imaging.suite2p import get_neuron_signal, SIGNAL_TYPE, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.locomotion import CircularPosition
@@ -25,6 +25,8 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
     DESCRIPTION = 'Calculate the speed score for each cell (Kropff et al., 2015)'
 
     plot_summary: bool = as_argument(PlotOptions.plot_summary).with_options(help='plot speed score summary histogram')
+
+    plot_raw: bool = argument('--raw', help='plot raw correlation, otherwise plot the binned trial-averaged')
 
     signal_type: SIGNAL_TYPE = 'df_f'
 
@@ -75,8 +77,11 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
                 score = corr_signal_helper(dff, speed, image_time, position_time)
 
                 with plot_figure(output.figure_output(n)) as ax:
-                    self.plot_speed_corr(ax, x, binned_dff[n], binned_speed,
-                                         title=f'Neuron {n} | Speed score: {score:.2f}')
+                    title = f'Neuron {n} | Speed score: {score:.2f}'
+                    if self.plot_raw:
+                        self.plot_corr_raw(ax, dff, speed, image_time, position_time, title=title)
+                    else:
+                        self.plot_corr_trial_averaged(ax, x, binned_dff[n], binned_speed, title=title)
 
                 csv(n, score)
 
@@ -101,11 +106,11 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
         return mx_a, mx_b
 
     @staticmethod
-    def plot_speed_corr(ax: Axes,
-                        x: np.ndarray,
-                        dff: np.ndarray,
-                        speed: np.ndarray,
-                        title: str = ''):
+    def plot_corr_trial_averaged(ax: Axes,
+                                 x: np.ndarray,
+                                 dff: np.ndarray,
+                                 speed: np.ndarray,
+                                 title: str = ''):
         ax1 = ax
         ax1.plot(x, dff, 'g-', label='dFF')
         ax1.set_ylabel('norm dFF (%)')
@@ -122,12 +127,31 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
         ax1.legend(loc='upper left')
         ax2.legend(loc='upper right')
 
+    @staticmethod
+    def plot_corr_raw(ax: Axes,
+                      x: np.ndarray,
+                      y: np.ndarray,
+                      tx: np.ndarray,
+                      ty: np.ndarray,
+                      title: str = ''):
+        x_norm = (x - np.mean(x)) / np.std(x)
+        y_norm = (y - np.mean(y)) / np.std(y)
+
+        ax.plot(tx, x_norm, 'g-', alpha=0.7, label='dFF (normalized)')
+        ax.plot(ty, y_norm, 'gray', alpha=0.7, label='Speed (normalized)')
+
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Normalized Signal')
+        ax.set_title(title)
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
 
 def corr_signal_helper(x: np.ndarray,
                        y: np.ndarray,
                        tx: np.ndarray,
                        ty: np.ndarray,
-                       interp_method: Literal['a2b', 'b2a'] = 'b2a'):
+                       interp_method: Literal['a2b', 'b2a'] = 'b2a') -> float:
     """
     This function helps correlate two signals by aligning their time stamps
     and optionally interpolating one signal to match the other. It supports
