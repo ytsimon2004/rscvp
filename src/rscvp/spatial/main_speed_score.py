@@ -1,18 +1,18 @@
-from typing import Literal
+from typing import Literal, NamedTuple
 
 import numpy as np
 import polars as pl
 from matplotlib.axes import Axes
 from tqdm import trange
 
-from argclz import AbstractParser, as_argument, argument
+from argclz import AbstractParser, argument
 from neuralib.imaging.suite2p import get_neuron_signal, SIGNAL_TYPE, sync_s2p_rigevent
 from neuralib.io import csv_header
-from neuralib.locomotion import CircularPosition
+from neuralib.locomotion import CircularPosition, running_mask1d
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
 from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.util.cli import PlotOptions, DataOutput
+from rscvp.util.cli import DataOutput
 from rscvp.util.position import PositionBinnedSig, load_interpolated_position
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
@@ -21,29 +21,35 @@ __all__ = ['SpeedScoreOptions']
 
 
 @publish_annotation('appendix', project='rscvp', caption='rev')
-class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
+class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
     DESCRIPTION = 'Calculate the speed score for each cell (Kropff et al., 2015)'
 
-    plot_summary: bool = as_argument(PlotOptions.plot_summary).with_options(help='plot speed score summary histogram')
-
-    plot_raw: bool = argument('--raw', help='plot raw correlation, otherwise plot the binned trial-averaged')
+    plot_type: Literal['time_course', 'pos_binned', 'scatter', 'hist_summary'] = argument(
+        '--plot',
+        default='scatter',
+        help='plot type',
+    )
 
     signal_type: SIGNAL_TYPE = 'df_f'
+    reuse_output = True
 
     def post_parsing(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        if self.plot_summary:
+        if self.plot_type == 'hist_summary':
             self.reuse_output = True
 
     def run(self):
         self.post_parsing()
         output = self.get_data_output('sc', self.session, running_epoch=self.running_epoch)
 
-        if self.plot_summary:
-            self.plot_summary_hist(output)
-        else:
-            self.foreach_speed_score(output)
+        match self.plot_type:
+            case 'hist_summary':
+                self.plot_summary_hist(output)
+            case 'time_course' | 'pos_binned' | 'scatter':
+                self.foreach_speed_score(output)
+            case _:
+                raise ValueError('')
 
     def plot_summary_hist(self, output: DataOutput):
         field = f'speed_score_{self.session}'
@@ -58,30 +64,54 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
         s2p = self.load_suite_2p()
         image_time = rig.imaging_event.time
         image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
-        pos = load_interpolated_position(rig)
+
+        dff = get_neuron_signal(s2p, signal_type=self.signal_type)[0]
+        pos = load_interpolated_position(rig).interp_time(image_time)
+
+        if self.running_epoch:
+            mx = running_mask1d(pos.t, pos.v)
+            pos = pos.with_run_mask1d()
+            dff = dff[:, mx]
+            image_time = image_time[mx]
+
         speed = pos.v
         position_time = pos.t
 
-        ix, px = self.trial_time_masking(rig, image_time, position_time)
-        image_time = image_time[ix]
-        speed = speed[px]
-        position_time = position_time[px]
+        trial = TrialSelection.from_rig(rig, self.session)
+        mx = trial.masking_time(image_time)
+        dff = dff[:, mx]
+        image_time = image_time[mx]
+        speed = speed[mx]
+        position_time = position_time[mx]
 
         binned_dff, binned_speed = self.load_binned_data(rig, pos)
         x = np.linspace(0, self.belt_length, num=self.pos_bins)
 
-        with csv_header(output.csv_output, ['neuron_id', f'speed_score_{self.session}']) as csv:
+        # csv + plot
+        header = 'speed_score'
+        if self.running_epoch:
+            header += f'_run'
+
+        if self.session is not None:
+            header += f'_{self.session}'
+
+        with csv_header(output.csv_output, ['neuron_id', header]) as csv:
             for n in trange(s2p.n_neurons, desc='calculate speed score', unit='neurons', ncols=80):
-                dff = get_neuron_signal(s2p, n, signal_type=self.signal_type)[0]
-                dff = dff[ix]
-                score = corr_signal_helper(dff, speed, image_time, position_time)
+                xx, yy, score = corr_signal_helper(dff[n], speed, image_time, position_time, interp_method='none')
 
                 with plot_figure(output.figure_output(n)) as ax:
                     title = f'Neuron {n} | Speed score: {score:.2f}'
-                    if self.plot_raw:
-                        self.plot_corr_raw(ax, dff, speed, image_time, position_time, title=title)
-                    else:
-                        self.plot_corr_trial_averaged(ax, x, binned_dff[n], binned_speed, title=title)
+
+                    match self.plot_type:
+                        case 'time_course':
+                            self.plot_corr_time(ax, dff[n], speed, image_time, position_time, title=title)
+                        case 'scatter':
+                            self.plot_corr_scatter(
+                                ax, xx, yy,
+                                title=title, xlabel='zscore_dff', ylabel='z_score_speed (cm/s)'
+                            )
+                        case 'pos_binned':
+                            self.plot_corr_trial_averaged(ax, x, binned_dff[n], binned_speed, title=title)
 
                 csv(n, score)
 
@@ -97,13 +127,6 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
         speed = speed[slice(*indices), :]  # shape (L, B)
 
         return dff.mean(axis=1), speed.mean(axis=0)
-
-    def trial_time_masking(self, rig, ta, tb) -> tuple[np.ndarray, np.ndarray]:
-        trial = TrialSelection.from_rig(rig, self.session)
-        mx_a = trial.masking_time(ta)
-        mx_b = trial.masking_time(tb)
-
-        return mx_a, mx_b
 
     @staticmethod
     def plot_corr_trial_averaged(ax: Axes,
@@ -128,12 +151,12 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
         ax2.legend(loc='upper right')
 
     @staticmethod
-    def plot_corr_raw(ax: Axes,
-                      x: np.ndarray,
-                      y: np.ndarray,
-                      tx: np.ndarray,
-                      ty: np.ndarray,
-                      title: str = ''):
+    def plot_corr_time(ax: Axes,
+                       x: np.ndarray,
+                       y: np.ndarray,
+                       tx: np.ndarray,
+                       ty: np.ndarray,
+                       title: str = ''):
         x_norm = (x - np.mean(x)) / np.std(x)
         y_norm = (y - np.mean(y)) / np.std(y)
 
@@ -146,12 +169,30 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions, PlotOptions):
         ax.legend()
         ax.grid(True, alpha=0.3)
 
+    @staticmethod
+    def plot_corr_scatter(ax: Axes,
+                          x: np.ndarray,
+                          y: np.ndarray,
+                          **kwargs):
+        x_norm = (x - np.mean(x)) / np.std(x)
+        y_norm = (y - np.mean(y)) / np.std(y)
+
+        ax.scatter(x_norm, y_norm, s=2, c='gray')
+        ax.set(**kwargs)
+        ax.set_aspect(1.0 / ax.get_data_ratio(), adjustable='box')
+
+
+class CorrResult(NamedTuple):
+    x: np.ndarray
+    y: np.ndarray
+    score: float
+
 
 def corr_signal_helper(x: np.ndarray,
                        y: np.ndarray,
                        tx: np.ndarray,
                        ty: np.ndarray,
-                       interp_method: Literal['a2b', 'b2a'] = 'b2a') -> float:
+                       interp_method: Literal['a2b', 'b2a', 'none'] = 'b2a') -> CorrResult:
     """
     This function helps correlate two signals by aligning their time stamps
     and optionally interpolating one signal to match the other. It supports
@@ -190,13 +231,15 @@ def corr_signal_helper(x: np.ndarray,
             ty = ty[mx]
             y = y[mx]
             x = np.interp(ty, tx, x)
+        case 'none':
+            pass
         case _:
             raise ValueError(f'invalid {interp_method}')
 
     if np.std(x) == 0 or np.std(y) == 0:
         raise RuntimeError('')
 
-    return np.corrcoef(x, y)[0, 1]
+    return CorrResult(x, y, float(np.corrcoef(x, y)[0, 1]))
 
 
 if __name__ == '__main__':
