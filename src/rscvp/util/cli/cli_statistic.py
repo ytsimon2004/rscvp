@@ -1,13 +1,13 @@
 from typing import ClassVar
 
 from argclz import argument, as_argument
-from rscvp.util.cli import HEADER, SelectionOptions, CommonOptions
+from rscvp.util.cli import HEADER, SelectionOptions, CommonOptions, TreadmillOptions
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
 __all__ = ['StatisticOptions']
 
 
-class StatisticOptions(SelectionOptions):
+class StatisticOptions(SelectionOptions, TreadmillOptions):
     GROUP_STAT: ClassVar[str] = 'statistical options'
 
     exp_date = as_argument(CommonOptions.exp_date).with_options(required=False)

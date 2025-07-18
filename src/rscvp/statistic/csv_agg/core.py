@@ -3,11 +3,11 @@ from typing import Literal
 
 import numpy as np
 import polars as pl
+
+from neuralib.util.verbose import fprint
 from rscvp.statistic.csv_agg.collector import CSVCollector
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.util_gspread import RSCGoogleWorkSheet, truncate_before_todo_hash, GSPREAD_SHEET_PAGE
-
-from neuralib.util.verbose import fprint
 
 __all__ = ['LocalSpreadsheetSync']
 
@@ -46,7 +46,6 @@ class LocalSpreadsheetSync:
         """
 
         self.opt = opt
-        self.code = collector.code
         self.sheet_page = sheet_page
         self.df = collector.find_all(opt)
 

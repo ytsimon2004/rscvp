@@ -68,7 +68,7 @@ class CSVCollector:
             opt.session = s
 
             if opt.plane_index is not None:
-                p = opt.get_data_output(self.code, s, latest=True).csv_output
+                p = opt.get_data_output(self.code, s, running_epoch=opt.running_epoch, latest=True).csv_output
                 df = pl.read_csv(p).filter(cell_mask)
 
                 # exclude unnecessary info
