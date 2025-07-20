@@ -32,7 +32,7 @@ class PlotOptions:
     )
 
     dark_theme: bool = argument(
-        '--black',
+        '--dark',
         group=GROUP_PLOT,
         help='make plot as dark theme for presentation'
     )
