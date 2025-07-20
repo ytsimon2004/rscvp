@@ -1,8 +1,11 @@
 from typing import ClassVar
 
 from argclz import argument, as_argument
-from rscvp.util.cli import HEADER, SelectionOptions, CommonOptions, TreadmillOptions
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
+from .cli_core import CommonOptions
+from .cli_io import HEADER
+from .cli_selection import SelectionOptions
+from .cli_treadmill import TreadmillOptions
 
 __all__ = ['StatisticOptions']
 
