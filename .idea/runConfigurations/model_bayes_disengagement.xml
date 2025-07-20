@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.model.bayes_decoding.main_disengagement" />
-    <option name="PARAMETERS" value="-D 210401 -A YW006 -P 0 --session light --used_session light --random 200 --CV odd --load 0 --debug -e lickmeter" />
+    <option name="PARAMETERS" value="-D 210601 -A YW006 -P 0 --session light --used_session light --random 200 --CV odd --load 0 --debug --disk BigDATA --mount /Volumes" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

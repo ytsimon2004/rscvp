@@ -84,7 +84,6 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
         speed = speed[mx]
         position_time = position_time[mx]
 
-        binned_dff, binned_speed = self.load_binned_data(rig, pos)
         x = np.linspace(0, self.belt_length, num=self.pos_bins)
 
         # csv + plot
@@ -108,25 +107,33 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
                         case 'scatter':
                             self.plot_corr_scatter(
                                 ax, xx, yy,
-                                title=title, xlabel='zscore_dff', ylabel='z_score_speed (cm/s)'
+                                title=title, xlabel='∆F/F', ylabel='speed (cm/s)'
                             )
                         case 'pos_binned':
-                            self.plot_corr_trial_averaged(ax, x, binned_dff[n], binned_speed, title=title)
+                            self.plot_corr_trial_averaged(ax, x, self.binned_dff[n], self.binned_speed, title=title)
 
                 csv(n, score)
 
+    binned_dff = None
+    binned_speed = None
+
     def load_binned_data(self, rig: RiglogData, pos: CircularPosition) -> tuple[np.ndarray, np.ndarray]:
         """Load trial-averaged activity and speed signals"""
-        indices = TrialSelection.from_rig(rig, self.session).get_time_profile().trial_range
-        trial_range = np.arange(*indices)
 
-        dff = self.apply_binned_act_cache().with_trial(trial_range).occ_activity  # shape (N, L, B)
+        if self.binned_dff is None or self.binned_speed is None:
+            indices = TrialSelection.from_rig(rig, self.session).get_time_profile().trial_range
+            trial_range = np.arange(*indices)
 
-        pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.pos_bins))
-        speed = pbs.calc_binned_signal(pos.t, pos.v, desc='calculate binned speed')
-        speed = speed[slice(*indices), :]  # shape (L, B)
+            dff = self.apply_binned_act_cache().with_trial(trial_range).occ_activity  # shape (N, L, B)
 
-        return dff.mean(axis=1), speed.mean(axis=0)
+            pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.pos_bins))
+            speed = pbs.calc_binned_signal(pos.t, pos.v, desc='calculate binned speed')
+            speed = speed[slice(*indices), :]  # shape (L, B)
+
+            self.binned_dff = dff.mean(axis=1)
+            self.binned_speed = speed.mean(axis=0)
+
+        return self.binned_dff, self.binned_speed
 
     @staticmethod
     def plot_corr_trial_averaged(ax: Axes,
@@ -174,10 +181,8 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
                           x: np.ndarray,
                           y: np.ndarray,
                           **kwargs):
-        x_norm = (x - np.mean(x)) / np.std(x)
-        y_norm = (y - np.mean(y)) / np.std(y)
 
-        ax.scatter(x_norm, y_norm, s=2, c='gray')
+        ax.scatter(x, y, s=4, alpha=0.7, c='gray', edgecolor='none')
         ax.set(**kwargs)
         ax.set_aspect(1.0 / ax.get_data_ratio(), adjustable='box')
 

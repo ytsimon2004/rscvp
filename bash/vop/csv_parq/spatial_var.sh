@@ -28,6 +28,19 @@ run_stat parq.main_value_gsp \
   -H si \
   --stat-test ttest
 
+# =========== #
+# Speed Score #
+# =========== #
+
+run_stat csv_agg.auto_cli \
+  -H speed_score \
+  --trunc-session \
+  -s light
+
+run_stat csv_agg.auto_cli \
+  -H speed_score_run \
+  --trunc-session \
+  -s light
 
 # ============================= #
 # Trial Correlation Coefficient #

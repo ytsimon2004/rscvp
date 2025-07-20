@@ -12,7 +12,12 @@ from rscvp.util.cli import StatisticOptions
 class SpeedStatGSP(StatPipeline):
     DESCRIPTION = 'Speed score histogram (note the negative value is meaningful, not use mean-based statistics)'
 
-    header = 'speed_score'
+    header = as_argument(StatisticOptions.header).with_options(
+        choices=['speed_score', 'speed_score_run'],
+        required=False,
+        default='speed_score'
+    )
+
     sheet_name = as_argument(StatisticOptions.sheet_name).with_options(required=True)
     load_source = 'parquet'
     test_type = 'kstest'
