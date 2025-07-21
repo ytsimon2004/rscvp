@@ -28,5 +28,4 @@ run_python() {
 
 run_python behavioral bs \
   --vcut -20 \
-  --ssl light,visual \
-  --pattern YW,2P
+  --session light,visual

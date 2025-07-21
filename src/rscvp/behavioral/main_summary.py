@@ -1,4 +1,4 @@
-from argclz import AbstractParser, union_type, str_tuple_type, argument
+from argclz import AbstractParser, union_type, str_tuple_type, as_argument
 from neuralib.plot import plot_figure, ax_merge, plot_peri_onset_1d
 from rscvp.behavioral.util import *
 from rscvp.behavioral.util import check_treadmill_trials
@@ -9,6 +9,7 @@ from rscvp.util.cli.cli_suite2p import Suite2pOptions
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.position import load_interpolated_position
 from rscvp.util.util_lick import peri_reward_raster_hist
+from stimpyp import Session
 
 __all__ = ['BehaviorSumOptions']
 
@@ -16,9 +17,7 @@ __all__ = ['BehaviorSumOptions']
 class BehaviorSumOptions(AbstractParser, StimpyOptions, Suite2pOptions, TreadmillOptions):
     DESCRIPTION = 'Plot single animal in treadmill behavioral overview'
 
-    session_selection: str | tuple[str, ...] | None = argument(
-        '-SL', '--ssl',
-        metavar='SESSION',
+    session: Session | tuple[Session, ...] | None = as_argument(StimpyOptions.session).with_options(
         type=union_type(str_tuple_type, str),
         default=None,
         help='select single OR multiple behavioral sessions'
@@ -37,8 +36,8 @@ class BehaviorSumOptions(AbstractParser, StimpyOptions, Suite2pOptions, Treadmil
         riglog = self.load_riglog_data()
         interp_pos = load_interpolated_position(riglog)
 
-        if self.session_selection is not None:
-            riglog = riglog.with_sessions(self.session_selection)
+        if self.session is not None:
+            riglog = riglog.with_sessions(self.session)
             t0 = riglog.dat[0, 2] / 1000
             t1 = riglog.dat[-1, 2] / 1000
             interp_pos = interp_pos.with_time_range(t0, t1)
@@ -60,7 +59,7 @@ class BehaviorSumOptions(AbstractParser, StimpyOptions, Suite2pOptions, Treadmil
         m = get_velocity_per_trial(lap_event.time, interp_pos, self.belt_length, self.smooth_vel)
 
         output_file = output.summary_figure_output(
-            self.session_selection if self.session_selection is not None else None
+            self.session if self.session is not None else None
         )
 
         with plot_figure(output_file, 6, 2, figsize=(8, 12), tight_layout=False) as _ax:
