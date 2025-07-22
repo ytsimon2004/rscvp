@@ -6,6 +6,7 @@ from brainrender import Scene
 from brainrender.actors import Volume
 
 from argclz import argument
+from neuralib.atlas.brainrender.core import CAMERA_ANGLE_TYPE
 from neuralib.atlas.util import allen_to_brainrender_coord
 from rscvp.statistic.core import StatPipeline
 
@@ -19,6 +20,12 @@ class TopoMetricVolumeOptions(StatPipeline):
         '--plot',
         default='3d',
         help='projection type'
+    )
+
+    camera_3d: CAMERA_ANGLE_TYPE = argument(
+        '--camera-3d',
+        default='three_quarters',
+        help='camera angle in 3d view'
     )
 
     bin_size: int = argument('--bin', default=50, help='bin size for 3d histogram (um)')
@@ -65,7 +72,7 @@ class TopoMetricVolumeOptions(StatPipeline):
                 ml = np.zeros_like(ap)
                 camera = 'sagittal'
             case '3d':
-                camera = 'three_quarters'
+                camera = self.camera_3d
             case _:
                 raise ValueError(f'invalid plot type: {self.plot_type}')
 
@@ -77,6 +84,7 @@ class TopoMetricVolumeOptions(StatPipeline):
             bins=(ap_edges, dv_edges, ml_edges),
             weights=w,
         )
+
         count, _ = np.histogramdd(
             (ap, dv, ml),
             bins=(ap_edges, dv_edges, ml_edges),
@@ -84,13 +92,21 @@ class TopoMetricVolumeOptions(StatPipeline):
 
         self.render_3d(data, edges, count, camera)
 
-    def render_3d(self, data, edges, count, camera='top'):
+    def render_3d(self, data: np.ndarray,
+                  edges: tuple[np.ndarray, ...],
+                  count: tuple[np.ndarray, ...],
+                  camera: CAMERA_ANGLE_TYPE,
+                  no_value: bool = False):
         data_mean = np.divide(data, count, where=count > 0)
+
+        if no_value:
+            data_mean = np.ones_like(data_mean)
+
         data_mean[count == 0] = np.nan
 
-        #
         brainrender.settings.SHOW_AXES = False
-        scene = Scene(inset=False)
+        brainrender.settings.DEFAULT_CAMERA = camera
+        scene = Scene(root=False, inset=False)
         actor = Volume(data_mean, voxel_size=self.bin_size, cmap='inferno')
 
         ox, oy, oz = edges[0][0], edges[1][0], edges[2][0]
@@ -98,9 +114,9 @@ class TopoMetricVolumeOptions(StatPipeline):
         scene.add(actor)
 
         a = 0.5
-        scene.add_brain_region("RSPd", alpha=a, color='lightblue')
-        scene.add_brain_region("RSPv", alpha=a, color='pink')
-        scene.add_brain_region("RSPagl", alpha=a, color='turquoise')
+        scene.add_brain_region("RSPd", alpha=a, color='lightblue', hemisphere='left')
+        scene.add_brain_region("RSPv", alpha=a, color='pink', hemisphere='left')
+        scene.add_brain_region("RSPagl", alpha=a, color='turquoise', hemisphere='left')
         scene.render(camera=camera)
 
     def _compute_coordinates(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
