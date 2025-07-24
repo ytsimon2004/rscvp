@@ -1,13 +1,13 @@
 import numpy as np
 import polars as pl
 from polars.exceptions import SchemaError
-from rscvp.util.cli.cli_io import CELLULAR_IO
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_selection import SelectionOptions
 
 from argclz import AbstractParser
 from neuralib.imaging.suite2p import Suite2PResult
 from neuralib.util.verbose import fprint, print_save
+from rscvp.util.cli.cli_io import CELLULAR_IO
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_selection import SelectionOptions
 
 __all__ = ['ConcatCellCSVOptions']
 
@@ -68,7 +68,7 @@ class ConcatCellCSVOptions(AbstractParser, SelectionOptions):
             d = {}
             for csv_path in p.glob(f'*/*.csv'):
                 filename = csv_path.parent.name
-                data = pl.read_csv(csv_path)
+                data = pl.read_csv(csv_path, infer_schema_length=10000, ignore_errors=True)
                 d[filename] = data
 
             csv_data.append(d)
@@ -125,8 +125,14 @@ class ConcatCellCSVOptions(AbstractParser, SelectionOptions):
             try:
                 concate_csv[field] = pl.concat([ds, dat])
             except SchemaError:  # casting special dtype
-                ds = ds.cast(dat.dtype)
-                concate_csv[field] = pl.concat([ds, dat])
+                try:
+                    ds = ds.cast(dat.dtype)
+                    concate_csv[field] = pl.concat([ds, dat])
+                except pl.exceptions.InvalidOperationError:
+                    # Handle string values that can't be cast to numeric
+                    dat = dat.cast(pl.Utf8)
+                    ds = ds.cast(pl.Utf8)
+                    concate_csv[field] = pl.concat([ds, dat])
 
         for s2p_d in s2p_pdata:
             concat_to('cell_prob', pl.Series(s2p_d['iscell']), 0)
