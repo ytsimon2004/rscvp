@@ -339,9 +339,9 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
 
         return ret
 
-    def get_selection_mask(self, with_preselection: bool = True) -> SelectionMask:
-        """get selection mask for all neurons"""
-        ps = self.pre_select() if with_preselection else np.full(self.get_all_neurons(), 0, dtype=bool)
+    def get_selection_mask(self) -> SelectionMask:
+        """get selection mask after preselection"""
+        ps = self.pre_select()
         n_neurons = np.count_nonzero(ps)
 
         if self.vc_selection is None:

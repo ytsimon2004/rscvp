@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import NamedTuple, Optional, Annotated, Type, Literal, overload
 
 import polars as pl
-from rscvp.util.io import IOConfig
 
 from neuralib import sqlp
 from neuralib.tools.gspread import upload_dataframe_to_spreadsheet, SpreadSheetName
 from neuralib.util.verbose import fprint
+from rscvp.util.io import IOConfig
 
 __all__ = [
     'DB_TYPE',
@@ -23,10 +23,12 @@ __all__ = [
     #
     'DarknessGenericDB',
     #
+    'BlankBeltGenericDB',
+    #
     'RSCDatabase',
 ]
 
-DB_TYPE = Literal['GenericDB', 'BayesDecodeDB', 'VisualSFTFDirDB', 'DarknessGenericDB']
+DB_TYPE = Literal['GenericDB', 'BayesDecodeDB', 'VisualSFTFDirDB', 'DarknessGenericDB', 'BlankBeltGenericDB']
 
 
 @sqlp.named_tuple_table_class
@@ -187,14 +189,30 @@ class DarknessGenericDB(NamedTuple):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-class DarknessBayesDecodeDB:
-    pass
+# ================== #
+# BlankBelt Analysis #
+# ================== #
+
+@sqlp.named_tuple_table_class
+class BlankBeltGenericDB(NamedTuple):
+    date: Annotated[str, sqlp.PRIMARY]
+    animal: Annotated[str, sqlp.PRIMARY]
+    rec: Annotated[str, sqlp.PRIMARY]
+    user: Annotated[str, sqlp.PRIMARY]
+    optic: Annotated[str, sqlp.PRIMARY]
+
+    region: Optional[str] = None
+    n_total_neurons: Optional[int] = None
+    n_selected_neurons: Optional[int] = None
+    n_spatial_neurons: Optional[int] = None
+    update_time: Optional[datetime.datetime] = None
+
+    @sqlp.foreign(PhysiologyDB)
+    def _animal(self):
+        return self.date, self.animal, self.rec, self.user, self.optic
 
 
-# ======================== #
-
-
-DataBaseType = GenericDB | BayesDecodeDB | VisualSFTFDirDB | DarknessGenericDB
+DataBaseType = GenericDB | BayesDecodeDB | VisualSFTFDirDB | DarknessGenericDB | BlankBeltGenericDB
 
 
 class RSCDatabase(sqlp.Database):
@@ -210,7 +228,7 @@ class RSCDatabase(sqlp.Database):
 
     @property
     def database_tables(self) -> list[type]:
-        return [PhysiologyDB, GenericDB, BayesDecodeDB, VisualSFTFDirDB, DarknessGenericDB]
+        return [PhysiologyDB, GenericDB, BayesDecodeDB, VisualSFTFDirDB, DarknessGenericDB, BlankBeltGenericDB]
 
     # ========= #
     # AnimalExp #

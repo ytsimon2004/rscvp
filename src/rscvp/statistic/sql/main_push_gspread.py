@@ -1,8 +1,7 @@
 from typing import Literal
 
-from rscvp.util.database import GenericDB, BayesDecodeDB, VisualSFTFDirDB, RSCDatabase, DarknessGenericDB
-
 from argclz import AbstractParser, argument
+from rscvp.util.database import *
 
 __all__ = ['DBtoGspreadOptions']
 
@@ -10,7 +9,7 @@ __all__ = ['DBtoGspreadOptions']
 class DBtoGspreadOptions(AbstractParser):
     DESCRIPTION = 'Push a DB table to a gspread'
 
-    db_type: Literal['generic', 'bayes', 'visual', 'generic_darkness'] = argument(
+    db_type: Literal['generic', 'bayes', 'visual', 'generic_darkness', 'generic_blankbelt'] = argument(
         '--db',
         required=True,
         help='push db type'
@@ -28,6 +27,8 @@ class DBtoGspreadOptions(AbstractParser):
                 db = VisualSFTFDirDB
             case 'generic_darkness':
                 db = DarknessGenericDB
+            case 'generic_blankbelt':
+                db = BlankBeltGenericDB
             case _:
                 raise ValueError(f'unknown db type: {self.db_type}')
 

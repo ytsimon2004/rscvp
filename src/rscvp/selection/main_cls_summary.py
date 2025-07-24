@@ -1,14 +1,14 @@
 import numpy as np
 from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, SelectionMask, SQLDatabaseOptions
-from rscvp.util.database import GenericDB, DarknessGenericDB
 
-from argclz import AbstractParser
+from argclz import AbstractParser, argument
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_set_default_style, VennDiagram
 from neuralib.plot.plot import axvline_histplot
 from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, SelectionMask, SQLDatabaseOptions
+from rscvp.util.database import GenericDB, DarknessGenericDB, BlankBeltGenericDB
 
 __all__ = ['ClsCellTypeOptions']
 
@@ -17,51 +17,64 @@ __all__ = ['ClsCellTypeOptions']
 class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatabaseOptions):
     DESCRIPTION = 'Quantification of proportion of visual/spatial/overlap/unclassified RSC neurons'
 
+    blankbelt_db: bool = argument('--blankbelt-db', help='populate to blank belt db instead of protocol based')
+
     pre_selection = True
     reuse_output = True
 
-    def post_parsing(self):
-        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-
-        if self.is_ldl_protocol():
-            self.vc_selection = None
-        elif self.is_vop_protocol():
-            self.vc_selection = 0.3
-        else:
-            raise ValueError('Unsupported protocol')
-
     def run(self):
-        self.post_parsing()
-
+        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         self.populate_database()
-
-        output_info = self.get_data_output('cls')
-        if self.is_ldl_protocol():
-            self.plot_lower_bound(output_info)
-        else:
-            self.plot_cell_type_summary(output_info)
 
     # ======== #
     # Database #
     # ======== #
 
     def populate_database(self):
-        if self.is_ldl_protocol():
-            db = self._populate_database_ldl()
-        elif self.is_vop_protocol():
-            db = self._populate_database_vop()
+        if self.blankbelt_db:
+            db = self._populate_blankbelt_database()
         else:
-            raise ValueError('unsupported protocol')
+            db = self._populate_protocol_database()
+            self.plot()
 
-        #
         print('NEW', db)
         if self.db_commit:
             self.add_data(db)
         else:
             print('use --commit to perform database operations')
 
+    def _populate_blankbelt_database(self) -> BlankBeltGenericDB:
+        self.vc_selection = 0.2  # for active neuron purpose
+        mask = self.get_selection_mask()
+        region = self.get_primary_key_field('region', page='apcls_blank')
+
+        return BlankBeltGenericDB(
+            date=self.exp_date,
+            animal=self.animal_id,
+            rec=self.daq_type,
+            user=self.username,
+            optic=self.plane_index if self.plane_index is not None else 'all',
+            region=region,
+            n_total_neurons=self.n_total_neurons,
+            n_selected_neurons=mask.n_neurons,
+            n_spatial_neurons=np.count_nonzero(mask.place_mask),
+            update_time=self.cur_time
+        )
+
+    def _populate_protocol_database(self) -> GenericDB | DarknessGenericDB:
+        if self.is_ldl_protocol():
+            self.vc_selection = None
+            db = self._populate_database_ldl()
+        elif self.is_vop_protocol():
+            self.vc_selection = 0.3
+            db = self._populate_database_vop()
+        else:
+            raise ValueError('unsupported protocol')
+
+        return db
+
     def _populate_database_vop(self) -> GenericDB:
-        mask = self.get_selection_mask(with_preselection=self.pre_selection)
+        mask = self.get_selection_mask()
         region = self.get_primary_key_field('region')
         n_planes = self.get_primary_key_field('n_planes')
 
@@ -106,8 +119,15 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
     # Plotting #
     # ======== #
 
+    def plot(self):
+        output_info = self.get_data_output('cls')
+        if self.is_ldl_protocol():
+            self.plot_lower_bound(output_info)
+        else:
+            self.plot_cell_type_summary(output_info)
+
     def plot_cell_type_summary(self, output: DataOutput, verbose: bool = True):
-        mask = self.get_selection_mask(with_preselection=self.pre_selection)
+        mask = self.get_selection_mask()
         n_total = mask.n_neurons
         n_visual = mask.n_visual
         n_place = mask.n_place

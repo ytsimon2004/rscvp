@@ -4,11 +4,6 @@ from typing import Literal
 
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.topology.util import RSCObjectiveFOV
-from rscvp.topology.util_plot import plot_registered_fov
-from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
-from rscvp.util.cli.cli_sbx import SBXOptions
-from rscvp.util.cli.cli_selection import SelectionOptions, SelectionMask
 
 from argclz import AbstractParser, as_argument, argument
 from neuralib.imaging.registration import CellularCoordinates
@@ -16,6 +11,11 @@ from neuralib.imaging.suite2p import Suite2PResult
 from neuralib.persistence import persistence
 from neuralib.plot import plot_figure
 from neuralib.plot.tools import AxesExtendHelper
+from rscvp.topology.util import RSCObjectiveFOV
+from rscvp.topology.util_plot import plot_registered_fov
+from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
+from rscvp.util.cli.cli_sbx import SBXOptions
+from rscvp.util.cli.cli_selection import SelectionOptions, SelectionMask
 
 __all__ = [
     'CellTypeCordCache',
@@ -86,7 +86,7 @@ class CellTypeCordCacheBuilder(AbstractParser, SelectionOptions, SBXOptions, Per
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
         self.s2p = self.load_suite_2p()
-        self.select_mask = self.get_selection_mask(with_preselection=True)
+        self.select_mask = self.get_selection_mask()
         cache = self.load_cache()
         output_file = self.get_data_output('topo').summary_figure_output('fraction')
         self.plot_cell_type_histogram(cache, output_file)
