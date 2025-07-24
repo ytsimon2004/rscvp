@@ -1,17 +1,21 @@
-from typing import Union
-
 import numpy as np
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions, PosBinActCacheBuilder
+
+from argclz import argument, AbstractParser, int_tuple_type, union_type
+from neuralib.persistence import persistence
+from neuralib.persistence.cli_persistence import get_options_and_cache
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
 from rscvp.spatial.util import sort_neuron, normalized_trial_avg
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.typing import SIGNAL_TYPE
-from rscvp.util.util_trials import TrialSelection
+from rscvp.util.util_trials import TRIAL_CV_TYPE, signal_trial_cv_helper
 
-from argclz import argument, AbstractParser, int_tuple_type, union_type
-from neuralib.persistence import persistence
-from neuralib.persistence.cli_persistence import get_options_and_cache
+__all__ = [
+    'SortIdxCache',
+    'AbstractSortIdxOptions',
+    'ApplySortIdxOptions'
+]
 
 
 @persistence.persistence_class
@@ -36,7 +40,7 @@ class SortIdxCache:
 
 
 class AbstractSortIdxOptions(TreadmillOptions, SelectionOptions):
-    use_trial: Union[str, tuple[int, int]] = argument(
+    use_trial: TRIAL_CV_TYPE | tuple[int, int] = argument(
         '-t', '--use-trial',
         type=union_type(int_tuple_type, str),
         default=None,
@@ -44,7 +48,7 @@ class AbstractSortIdxOptions(TreadmillOptions, SelectionOptions):
              'NOTE that this can replace opt.session in general'
     )
 
-    use_sorted_strategy: str = argument(
+    use_sorted_strategy: TRIAL_CV_TYPE = argument(
         '--sort',
         metavar='NAME',
         help='use which strategy for neuron sorting'
@@ -78,19 +82,12 @@ class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
 
     def selected_signal(self) -> np.ndarray:
         """get binned data (N', L, B)"""
+        rig = self.load_riglog_data()
+
         mx = self.get_selected_neurons()
         signal_all = self.apply_binned_act_cache().occ_activity[mx]
 
-        # trial selection (use_trial instead of opt.session)
-        if isinstance(self.use_trial, str):
-            rig = self.load_riglog_data()
-            trial_range = TrialSelection(rig, self.use_trial).get_time_profile().trial_slice
-        elif isinstance(self.use_trial, tuple):
-            trial_range = slice(*self.use_trial)
-        else:
-            raise TypeError(f'use_trial: {type(self.use_trial)} type error')
-
-        return signal_all[:, trial_range, :]  # (N', L', B)
+        return signal_trial_cv_helper(rig, signal_all, self.use_trial)
 
     # ============= #
     # Cache methods #

@@ -94,7 +94,7 @@ class TopoMetricVolumeOptions(StatPipeline):
 
     def render_3d(self, data: np.ndarray,
                   edges: tuple[np.ndarray, ...],
-                  count: tuple[np.ndarray, ...],
+                  count: np.ndarray,
                   camera: CAMERA_ANGLE_TYPE,
                   no_value: bool = False):
         data_mean = np.divide(data, count, where=count > 0)

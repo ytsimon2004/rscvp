@@ -1,18 +1,18 @@
-import argparse
+from functools import cached_property
 from functools import cached_property
 from typing import Any
 
 import numpy as np
+
+from argclz import AbstractParser, argument, int_tuple_type
+from neuralib.imaging.suite2p import SIGNAL_TYPE
+from neuralib.plot import plot_figure, ax_merge
 from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
 from rscvp.spatial.main_cache_sortidx import ApplySortIdxOptions
 from rscvp.spatial.util import sort_neuron, normalized_trial_avg
 from rscvp.spatial.util_plot import plot_sorted_trial_averaged_heatmap, plot_fraction_active
 from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.util_trials import TrialSelection
-
-from argclz import AbstractParser, argument, int_tuple_type
-from neuralib.imaging.suite2p import SIGNAL_TYPE
-from neuralib.plot import plot_figure, ax_merge
+from rscvp.util.util_trials import signal_trial_cv_helper
 
 __all__ = ['CPBeltSortOptions']
 
@@ -65,21 +65,13 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
     @cached_property
     def selected_signal(self) -> np.ndarray:
-        """get binned data (N', L, B)"""
+        """get binned data (N', L', B)"""
+        rig = self.load_riglog_data()
+
         mx = self.get_selected_neurons()
         signal_all = self.apply_binned_act_cache().occ_activity[mx]
 
-        # trial selection (use_trial instead of opt.session)
-        if isinstance(self.use_trial, str):
-            rig = self.load_riglog_data()
-            indices = TrialSelection(rig, self.use_trial).get_time_profile().trial_range
-            trial_range = slice(*indices)
-        elif isinstance(self.use_trial, tuple):
-            trial_range = slice(*self.use_trial)
-        else:
-            raise TypeError(f'use_trial: {type(self.use_trial)} type error')
-
-        return signal_all[:, trial_range, :]  # (N', L', B)
+        return signal_trial_cv_helper(rig, signal_all, self.use_trial)
 
     # ================ #
     # Plotting methods #
@@ -125,7 +117,13 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
         with plot_figure(output_file, 3, 1, figsize=(6, 12)) as _ax:
             ax = ax_merge(_ax)[:2]
-            plot_sorted_trial_averaged_heatmap(signal, ax=ax, **self.fig_kwargs)
+            plot_sorted_trial_averaged_heatmap(
+                signal,
+                ax=ax,
+                cmap='inferno',
+                interpolation='antialiased',
+                **self.fig_kwargs
+            )
 
             ax = ax_merge(_ax)[2:]
             plot_fraction_active(ax, signal, belt_length=self.belt_length, cue_loc=self.cue_loc)

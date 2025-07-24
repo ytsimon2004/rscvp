@@ -1,53 +1,28 @@
-from typing import Literal, get_args
+from typing import get_args
 
 import numpy as np
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_selection import SelectionOptions
 
 from argclz import AbstractParser, argument
 from neuralib.plot import plot_figure
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_selection import SelectionOptions
+from rscvp.util.util_trials import TRIAL_CV_TYPE
 from stimpyp import Session, SessionInfo
 
 __all__ = ['PopulationMTXOptions']
-
-CONDITION = Literal[
-    'light',  # vol
-    'light-odd',
-    'light-even',
-    'dark',
-    'dark-odd',
-    'dark-even',
-    'visual',
-    'visual-odd',
-    'visual-even',
-
-    'light-bas',  # ldl
-    'light-bas-odd',
-    'light-bas-even',
-    'light-end',
-    'light-end-odd',
-    'light-end-even',
-    'dark',
-    'dark-odd',
-    'dark-even',
-
-    'all',  # for all prot and grey
-    'all-odd',
-    'all-even'
-]
 
 
 class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
     DESCRIPTION = 'Plot the population (selected neurons) correlation matrix in different behavioral session (trial-averaged)'
 
-    x_cond: CONDITION = argument(
+    x_cond: TRIAL_CV_TYPE = argument(
         '-x',
         default='light',
         help='specify the condition in x-axis of correlation matrix',
     )
 
-    y_cond: CONDITION = argument(
+    y_cond: TRIAL_CV_TYPE = argument(
         '-y',
         default='dark',
         help='specify the condition in y-axis of correlation matrix',
@@ -135,7 +110,7 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
 
 
 def get_trial_mask(session_info: dict[Session, SessionInfo],
-                   cond: CONDITION,
+                   cond: TRIAL_CV_TYPE,
                    lap_time: np.ndarray,
                    is_ldl: bool) -> np.ndarray:
     """Get bool array mask for selected trials in condition"""
@@ -156,7 +131,7 @@ def get_trial_mask(session_info: dict[Session, SessionInfo],
     elif cond.startswith('all'):
         session = session_info['all']
     else:
-        raise ValueError(f'condition: {cond} is not supported. check {get_args(CONDITION)}')
+        raise ValueError(f'condition: {cond} is not supported. check {get_args(TRIAL_CV_TYPE)}')
 
     x = session.time_mask_of(lap_time)
 

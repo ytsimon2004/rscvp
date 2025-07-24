@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Literal, get_args
 
 import attrs
 import numpy as np
@@ -12,10 +12,29 @@ from rscvp.util.position import load_interpolated_position
 from stimpyp import Session, SessionInfo, RiglogData
 
 __all__ = [
+    'TRIAL_CV_TYPE',
     'TrialSelection',
     'TrialSignal',
-    'foreach_session_signals'
+    'foreach_session_signals',
+    'signal_trial_cv_helper',
 ]
+
+# @formatter:off
+TRIAL_CV_TYPE = Literal[
+    # visual exp (vop)
+    'light', 'light-odd', 'light-even',
+    'visual', 'visual-odd', 'visual-even',
+    'dark', 'dark-odd', 'dark-even',
+
+    # light-dark exp (ldl)
+    'light-bas', 'light-bas-odd', 'light-bas-even',
+    'dark', 'dark-odd', 'dark-even',
+    'light-end', 'light-end-odd', 'light-end-even',
+
+    # all
+    'all', 'all-odd', 'all-even'
+]
+# @formatter:on
 
 
 class TrialSelection:
@@ -409,3 +428,41 @@ def foreach_session_signals(s2p: Suite2PResult,
             vstim_pulse=vpulse,
             vstim_time=vtime
         )
+
+
+def signal_trial_cv_helper(rig: RiglogData,
+                           signal: np.ndarray,
+                           use_trial: TRIAL_CV_TYPE | tuple[int, int]) -> np.ndarray:
+    trial_literal = get_args(TRIAL_CV_TYPE)
+
+    if use_trial in trial_literal:
+        parts = use_trial.split('-')
+        if len(parts) == 2:
+            trial_name, cv_name = parts
+        elif len(parts) == 1:
+            trial_name = parts[0]
+            cv_name = None
+        else:
+            raise ValueError(f'Invalid use_trial format: {use_trial}')
+
+        ts = TrialSelection(rig, trial_name)
+
+        match cv_name:
+            case 'odd':
+                ts = ts.select_odd()
+            case 'even':
+                ts = ts.select_even()
+            case None:
+                pass
+            case _:
+                raise ValueError(f'unknown trial cv name: {cv_name}')
+
+        idx = ts.selected_trials
+
+        return signal[:, idx, :]
+
+    elif isinstance(use_trial, tuple):
+        return signal[:, np.arange(*use_trial), :]
+
+    else:
+        raise TypeError(f'use_trial must be a tuple of trial number or {trial_literal}')
