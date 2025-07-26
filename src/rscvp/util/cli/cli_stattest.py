@@ -111,7 +111,7 @@ class StatisticTestOptions(StatisticOptions):
         return pval, pval >= 0.05
 
     def run_ttest(self, dataset: CollectDataSet | np.ndarray,
-                  output: PathLike, **kwargs) -> StatResults:
+                  output: PathLike | None, **kwargs) -> StatResults:
         """
 
         :param dataset: ``CollectDataSet`` or `Array[float, [2, ...]]`
@@ -162,7 +162,8 @@ class StatisticTestOptions(StatisticOptions):
             case _:
                 raise RuntimeError(f'Statistic test not found: ({self.parametric=}, {self.dependent=})')
 
-        save_json(output, res)
+        if output is not None:
+            save_json(output, res)
 
         return res
 

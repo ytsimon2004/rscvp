@@ -88,7 +88,7 @@ class GSPExtractor:
 
     def load_from_gspread(self, primary_key: str = 'Data',
                           auto_cast: bool = True,
-                          verbose: bool = True) -> pl.DataFrame:
+                          verbose: bool = False) -> pl.DataFrame:
         """
         load from the gspread
         ** Note that each columns in spreadsheet used either str/numeric type. other auto-casting problem
