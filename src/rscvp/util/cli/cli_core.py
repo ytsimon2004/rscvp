@@ -50,7 +50,7 @@ class CommonOptions:
         metavar='NAME',
         required=True,
         group=GROUP_PRIMARY,
-        help='animal (mouse) ID',
+        help='animal (mouse) ID or experimental name (if multiple sessions in one day)',
     )
 
     daq_type: DAQ_TYPE = argument(

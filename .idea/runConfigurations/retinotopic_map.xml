@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.retinotopic.main_retinotopic_map" />
-    <option name="PARAMETERS" value="-D 210302 -A YW008 --debug" />
+    <option name="PARAMETERS" value="-D 250814 -A YW101 --mount /Volumes --disk BigDATA --version stimpy-bit --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

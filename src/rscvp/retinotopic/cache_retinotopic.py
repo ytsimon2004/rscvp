@@ -1,15 +1,15 @@
 from pathlib import Path
 
 import numpy as np
-from rscvp.retinotopic.util import compute_wfield_trial_average, combine_cycles_within_trial
-from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
-from rscvp.util.cli.cli_wfield import WFieldOptions
 from tifffile import tifffile
 
 from argclz import AbstractParser
 from neuralib.imglib.io import tif_to_gif
 from neuralib.persistence import persistence
 from neuralib.util.logging import LOGGING_IO_LEVEL
+from rscvp.retinotopic.util import compute_wfield_trial_average, combine_cycles_within_trial
+from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
+from rscvp.util.cli.cli_wfield import WFieldOptions
 from stimpyp import (
     STIMPY_SOURCE_VERSION,
     AbstractStimlog,
@@ -101,7 +101,7 @@ class RetinotopicCacheBuilder(AbstractParser, WFieldOptions, PersistenceRSPOptio
 
     def get_trial_averaged_sequences(self, force_compute: bool = False) -> np.ndarray:
         if not self.trial_averaged_tiff.exists() or force_compute:
-            trial_avg = self._compute_trial_averaged_pyv()
+            trial_avg = self._compute_trial_averaged()
             tifffile.imwrite(self.trial_averaged_tiff, trial_avg)
             self.logger.log(LOGGING_IO_LEVEL, f'SAVE trial averaged resp in {self.trial_averaged_tiff}')
             tif_to_gif(self.trial_averaged_tiff, self.trial_averaged_gif)
@@ -109,16 +109,20 @@ class RetinotopicCacheBuilder(AbstractParser, WFieldOptions, PersistenceRSPOptio
 
         return tifffile.imread(self.trial_averaged_tiff)
 
-    def _compute_trial_averaged_pyv(self) -> np.ndarray:
+    def _compute_trial_averaged(self) -> np.ndarray:
         trial_avg = compute_wfield_trial_average(
             self.load_wfield_result().sequences,
             self.camlog.get_camera_time(self.riglog),
             self.stimlog
         )
 
-        # combine cycle
         if self.stimlog.n_cycles != [1]:
             trial_avg = combine_cycles_within_trial(trial_avg, self.stimlog.n_cycles)
+
+        trial_avg = np.array(trial_avg)
+
+        if trial_avg.shape[0] == 1:
+            trial_avg = np.squeeze(trial_avg, axis=0)
 
         return trial_avg
 

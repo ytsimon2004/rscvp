@@ -11,12 +11,11 @@
 from pathlib import Path
 from typing import ClassVar
 
+from argclz import argument, as_argument
+from neuralib.util.utils import uglob
 from rscvp.util.cli.cli_camera import CameraOptions
 from rscvp.util.cli.cli_stimpy import StimpyOptions
 from rscvp.util.wfield import WfieldResult
-
-from argclz import argument, as_argument
-from neuralib.util.utils import uglob
 from stimpyp import LabCamlog, PyCamlog, STIMPY_SOURCE_VERSION
 
 __all__ = ['WFieldOptions']
@@ -83,7 +82,7 @@ class WFieldOptions(CameraOptions):
         camlog_dir = uglob(self.phys_dir, 'run00*', is_dir=True)
 
         match self.camera_version:
-            case 'labcam':
+            case 'labcams':
                 return LabCamlog.load(camlog_dir)
             case 'pycam':
                 return PyCamlog.load(camlog_dir)
