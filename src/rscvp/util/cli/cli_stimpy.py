@@ -1,5 +1,7 @@
 from typing import ClassVar
 
+import numpy as np
+
 from argclz import argument
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from stimpyp import (
@@ -7,7 +9,7 @@ from stimpyp import (
     Session,
     PyVlog,
     RiglogData,
-    get_protocol_name, ProtocolAlias
+    get_protocol_name, ProtocolAlias, SessionInfo
 )
 from .cli_core import CommonOptions
 
@@ -38,6 +40,18 @@ class StimpyOptions(CommonOptions):
         default='stimpy-bit',
         group=GROUP_STIMPY,
         help='code version'
+    )
+
+    vr_environment: bool = argument(
+        '--vr',
+        group=GROUP_STIMPY,
+        help='if the experiment is performed in VR environment'
+    )
+
+    open_loop: bool = argument(
+        '--open-vr',
+        group=GROUP_STIMPY,
+        help='if the vr experiment is performed in open-loop (visual scene not coupled with animal running)'
     )
 
     @property
@@ -71,6 +85,8 @@ class StimpyOptions(CommonOptions):
             return ['light', 'visual', 'dark']
         elif self.is_ldl_protocol():
             return ['light_bas', 'dark', 'light_end']
+        elif self.vr_environment:
+            return ['vr_open'] if self.open_loop else ['vr_closed']
         else:
             raise RuntimeError('unsupported protocol')
 
@@ -95,3 +111,27 @@ class StimpyOptions(CommonOptions):
     def is_vop_protocol(self) -> bool:
         """if is visual open loop protocol"""
         return self.get_protocol_alias() == 'visual_open_loop'
+
+    def get_session(self, rig: RiglogData, session: Session) -> SessionInfo:
+        if self.vr_environment:
+            return rig.get_pygame_stimlog().session_trials()[session]
+        else:
+            return rig.get_stimlog().session_trials()[session]
+
+    def masking_lap_time(self, rig: RiglogData) -> np.ndarray:
+
+        if self.vr_environment:
+            stim = rig.get_pygame_stimlog()
+            session = stim.session_trials()[self.session]
+            lap = stim.virtual_lap_event
+            t = lap.time
+            v = lap.value.astype(int)
+        else:
+            session = rig.get_stimlog().session_trials()[self.session]
+            t = rig.lap_event.time
+            v = rig.lap_event.value.astype(int)
+
+        lap_index = session.in_slice(t, v)
+        print(f'{lap_index=}')
+
+        return t[lap_index]

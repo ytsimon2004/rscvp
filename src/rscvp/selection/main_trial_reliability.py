@@ -40,7 +40,12 @@ class TrialReliabilityOptions(AbstractParser, Suite2pOptions, StimpyOptions, Tre
         help='standard deviation fold',
     )
 
+    def post_parsing(self):
+        if self.vr_environment:
+            self.session = 'all'
+
     def run(self):
+        self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
         output_info = self.get_data_output('tr', self.session)
@@ -59,16 +64,12 @@ class TrialReliabilityOptions(AbstractParser, Suite2pOptions, StimpyOptions, Tre
         s2p = self.load_suite_2p()
         neuron_list = get_neuron_list(s2p, neuron_ids)
 
-        lap_time = rig.lap_event.time
         image_time = rig.imaging_event.time
         image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
 
         # specify session
-        session = rig.get_stimlog().session_trials()[self.session]
-        lap_index = session.in_range(rig.lap_event.time, rig.lap_event.value.astype(int))
-        lap_index = slice(int(lap_index[0]), int(lap_index[1]))
-        lap_time = lap_time[lap_index]
-
+        session = self.get_session(rig, self.session)
+        lap_time = self.masking_lap_time(rig)
         act_mask = session.time_mask_of(image_time)
 
         with csv_header(output.csv_output, ['neuron_id', f'trial_reliability_{self.session}']) as csv:
