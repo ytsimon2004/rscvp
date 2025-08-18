@@ -18,7 +18,7 @@ from rscvp.util.cli.cli_shuffle import SHUFFLE_METHOD, PositionShuffleOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID, NORMALIZE_TYPE
 from rscvp.util.position import load_interpolated_position, PositionBinnedSig
 from rscvp.util.typing import SIGNAL_TYPE
-from stimpyp import RiglogData
+from stimpyp import RiglogData, RigEvent
 
 __all__ = [
     'SiResult',
@@ -322,7 +322,8 @@ class PositionSignal:
                  bin_range: tuple[int, int] = (0, 150),
                  window_count: int = 100,
                  signal_type: SIGNAL_TYPE = 'df_f',
-                 plane_index: int | None = 0):
+                 plane_index: int | None = 0,
+                 virtual_env: bool = False):
         """
         :param s2p: ``Suite2PResult``
         :param riglog: ``RiglogData``
@@ -333,13 +334,21 @@ class PositionSignal:
         """
         self.s2p = s2p
         self.rig = riglog
-        self.binned_sig = PositionBinnedSig(riglog, bin_range=(*bin_range, window_count))
+        self.virtual_env = virtual_env
+        self.binned_sig = PositionBinnedSig(riglog, bin_range=(*bin_range, window_count), virtual_env=virtual_env)
 
         self._signal_type = signal_type
         self._plane_index = plane_index
 
         # cache
         self.__image_time = None
+
+    @property
+    def lap_event(self) -> RigEvent:
+        if self.virtual_env:
+            return self.rig.get_pygame_stimlog().virtual_lap_event
+        else:
+            return self.rig.lap_event
 
     @property
     def signal_type(self) -> SIGNAL_TYPE:
@@ -396,7 +405,7 @@ class PositionSignal:
         if lap_range is None:
             return imt, sig, bas
 
-        lt = self.rig.lap_event.time
+        lt = self.lap_event.time
         lt0 = lt[lap_range[0]]
         lt1 = lt[lap_range[1] - 1]  # lap_event value start from 1, avoid out of bound 'IndexError'
         ltx = np.logical_and(lt0 <= imt, imt <= lt1)
@@ -420,8 +429,7 @@ class PositionSignal:
         """
         return self._load_binned_data(do_norm, running_epoch, ret_type, smooth)
 
-    def _load_binned_data(self,
-                          do_norm: NORMALIZE_TYPE = 'local',
+    def _load_binned_data(self, do_norm: NORMALIZE_TYPE = 'local',
                           running_epoch: bool = False,
                           calcium_type: CALCIUM_TYPE = 'transient',
                           smooth: bool = False) -> np.ndarray:

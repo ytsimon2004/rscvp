@@ -50,7 +50,7 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
         # trial selection
         lap_time = rig.lap_event.time
         session_info = rig.get_stimlog().session_trials()
-        is_ldl = self.is_ldl_protocol()
+        is_ldl = self.is_ldl_protocol
 
         mx = get_trial_mask(session_info, self.x_cond, lap_time, is_ldl)
         my = get_trial_mask(session_info, self.y_cond, lap_time, is_ldl)

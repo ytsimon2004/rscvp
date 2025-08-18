@@ -2,6 +2,12 @@ from typing import Literal, cast
 
 import numpy as np
 from matplotlib.axes import Axes
+from scipy.ndimage import gaussian_filter1d
+
+from argclz import argument, AbstractParser, float_tuple_type
+from argclz.dispatch import Dispatch, dispatch
+from neuralib.plot import plot_figure
+from neuralib.util.verbose import publish_annotation
 from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions, BayesDecodeData, BayesDecodeCache
 from rscvp.model.bayes_decoding.util_plot import (
     plot_decoding_err_position,
@@ -11,12 +17,6 @@ from rscvp.model.bayes_decoding.util_plot import (
 from rscvp.spatial.util import sort_neuron
 from rscvp.util.cli import CameraOptions, DataOutput, SQLDatabaseOptions, PlotOptions
 from rscvp.util.database import BayesDecodeDB
-from scipy.ndimage import gaussian_filter1d
-
-from argclz import argument, AbstractParser, float_tuple_type
-from argclz.dispatch import Dispatch, dispatch
-from neuralib.plot import plot_figure
-from neuralib.util.verbose import publish_annotation
 
 __all__ = ['DecodeAnalysisOptions']
 
@@ -291,7 +291,7 @@ class DecodeAnalysisOptions(AbstractParser,
         """plot decoding median value"""
         result = cache.load_result()
 
-        if self.is_vop_protocol():
+        if self.is_vop_protocol:
             self.populate_database(result)
 
         output_file = output.summary_figure_output(self.session, 'median_decoding_error', f'#{self.cache_version}')

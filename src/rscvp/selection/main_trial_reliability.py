@@ -41,7 +41,7 @@ class TrialReliabilityOptions(AbstractParser, Suite2pOptions, StimpyOptions, Tre
     )
 
     def post_parsing(self):
-        if self.vr_environment:
+        if self.is_virtual_env:
             self.session = 'all'
 
     def run(self):
@@ -68,7 +68,7 @@ class TrialReliabilityOptions(AbstractParser, Suite2pOptions, StimpyOptions, Tre
         image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
 
         # specify session
-        session = self.get_session(rig, self.session)
+        session = self.get_session_info(rig, self.session)
         lap_time = self.masking_lap_time(rig)
         act_mask = session.time_mask_of(image_time)
 

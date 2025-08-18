@@ -62,10 +62,10 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
         )
 
     def _populate_protocol_database(self) -> GenericDB | DarknessGenericDB:
-        if self.is_ldl_protocol():
+        if self.is_ldl_protocol:
             self.vc_selection = None
             db = self._populate_database_ldl()
-        elif self.is_vop_protocol():
+        elif self.is_vop_protocol:
             self.vc_selection = 0.3
             db = self._populate_database_vop()
         else:
@@ -121,7 +121,7 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
 
     def plot(self):
         output_info = self.get_data_output('cls')
-        if self.is_ldl_protocol():
+        if self.is_ldl_protocol:
             self.plot_lower_bound(output_info)
         else:
             self.plot_cell_type_summary(output_info)

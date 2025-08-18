@@ -34,7 +34,7 @@ class TrialCorrOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         else:
             raise NotImplementedError('')
 
-        indices = TrialSelection.from_rig(rig, self.session).get_time_profile().trial_range
+        indices = TrialSelection.from_rig(rig, self.session).get_selected_profile().trial_range
         act = act[:, slice(*indices), :]
 
         return act

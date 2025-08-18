@@ -1,11 +1,8 @@
 import itertools
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, get_neuron_list, NeuronID
-from rscvp.util.util_trials import TrialSelection
 from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 from typing_extensions import Self
@@ -15,6 +12,9 @@ from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_merge
 from neuralib.util.verbose import fprint
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, get_neuron_list, NeuronID
+from rscvp.util.util_trials import TrialSelection
 
 __all__ = ['PlaceFieldsOptions',
            'split_flatten_lter']
@@ -214,7 +214,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
         sig_base[np.isnan(sig_base)] = 0.0
         signal_all = gaussian_filter1d(sig_all, 3, mode='wrap', axis=2)
 
-        trial = TrialSelection.from_rig(rig, self.session).get_time_profile().trial_slice
+        trial = TrialSelection.from_rig(rig, self.session).get_selected_profile().trial_slice
         signal_all = signal_all[:, trial, :]  # (N, L, B)
         signal_bas = sig_base[:, trial, :]
 

@@ -42,17 +42,12 @@ class StimpyOptions(CommonOptions):
         help='code version'
     )
 
-    vr_environment: bool = argument(
+    virtual_env: bool = argument(
         '--vr',
         group=GROUP_STIMPY,
         help='if the experiment is performed in VR environment'
     )
 
-    open_loop: bool = argument(
-        '--open-vr',
-        group=GROUP_STIMPY,
-        help='if the vr experiment is performed in open-loop (visual scene not coupled with animal running)'
-    )
 
     @property
     def with_diode_offset(self) -> bool:
@@ -81,46 +76,50 @@ class StimpyOptions(CommonOptions):
     @property
     def session_list(self) -> list[Session]:
         """list of sessions based on the protocol type"""
-        if self.is_vop_protocol():
+        if self.is_vop_protocol:
             return ['light', 'visual', 'dark']
-        elif self.is_ldl_protocol():
+        elif self.is_ldl_protocol:
             return ['light_bas', 'dark', 'light_end']
-        elif self.vr_environment:
-            return ['vr_open'] if self.open_loop else ['vr_closed']
         else:
-            raise RuntimeError('unsupported protocol')
+            raise ValueError('unsupported protocol')
 
     @property
     def gspread_reference(self) -> GSPREAD_SHEET_PAGE:
         """get statistic google spreadsheet reference from the protocol type"""
-        if self.is_vop_protocol():
+        if self.is_vop_protocol:
             return 'apcls_tac'
-        elif self.is_ldl_protocol():
+        elif self.is_ldl_protocol:
             return 'ap_ldl'
         else:
             raise ValueError('unsupported protocol')
+
+    @property
+    def is_ldl_protocol(self) -> bool:
+        """if is light dark light protocol"""
+        return self.get_protocol_alias() == 'light_dark_light'
+
+    @property
+    def is_vop_protocol(self) -> bool:
+        """if is visual open loop protocol"""
+        return self.get_protocol_alias() == 'visual_open_loop'
+
+    @property
+    def is_virtual_env(self) -> bool:
+        return 'vr' in self.get_protocol_alias()
 
     def get_protocol_alias(self) -> ProtocolAlias:
         """get the protocol type from the filename"""
         return get_protocol_name(self.load_riglog_data().riglog_file)
 
-    def is_ldl_protocol(self) -> bool:
-        """if is light dark light protocol"""
-        return self.get_protocol_alias() == 'light_dark_light'
-
-    def is_vop_protocol(self) -> bool:
-        """if is visual open loop protocol"""
-        return self.get_protocol_alias() == 'visual_open_loop'
-
-    def get_session(self, rig: RiglogData, session: Session) -> SessionInfo:
-        if self.vr_environment:
+    def get_session_info(self, rig: RiglogData, session: Session) -> SessionInfo:
+        if self.is_virtual_env:
             return rig.get_pygame_stimlog().session_trials()[session]
         else:
             return rig.get_stimlog().session_trials()[session]
 
     def masking_lap_time(self, rig: RiglogData) -> np.ndarray:
 
-        if self.vr_environment:
+        if self.is_virtual_env:
             stim = rig.get_pygame_stimlog()
             session = stim.session_trials()[self.session]
             lap = stim.virtual_lap_event
@@ -132,6 +131,5 @@ class StimpyOptions(CommonOptions):
             v = rig.lap_event.value.astype(int)
 
         lap_index = session.in_slice(t, v)
-        print(f'{lap_index=}')
 
         return t[lap_index]

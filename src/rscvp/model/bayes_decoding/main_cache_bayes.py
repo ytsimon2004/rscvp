@@ -5,14 +5,6 @@ from typing import NamedTuple
 
 import numpy as np
 import scipy
-from rscvp.model.bayes_decoding.util import calc_wrap_distance
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions, AbstractPosBinActOptions
-from rscvp.util.cli.cli_model import ModelOptions, trial_cross_validate
-from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
-from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.cli.cli_treadmill import TreadmillOptions
-from rscvp.util.position import PositionBinnedSig, load_interpolated_position
-from rscvp.util.util_trials import TrialSelection
 from scipy.interpolate import interp1d
 
 from argclz import argument, AbstractParser, int_tuple_type, union_type, as_argument
@@ -22,6 +14,14 @@ from neuralib.model.bayes_decoding import place_bayes
 from neuralib.persistence import *
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.util.verbose import fprint
+from rscvp.model.bayes_decoding.util import calc_wrap_distance
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions, AbstractPosBinActOptions
+from rscvp.util.cli.cli_model import ModelOptions, trial_cross_validate
+from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
+from rscvp.util.cli.cli_selection import SelectionOptions
+from rscvp.util.cli.cli_treadmill import TreadmillOptions
+from rscvp.util.position import PositionBinnedSig, load_interpolated_position
+from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
 
 __all__ = ['BayesDecodeData',
@@ -188,7 +188,7 @@ class BayesDecodeCache(ETLConcatable):
         s2p = opt.load_suite_2p()
 
         #
-        trial = TrialSelection.from_rig(rig, self.session).get_time_profile()
+        trial = TrialSelection.from_rig(rig, self.session).get_selected_profile()
         start_t = trial.start_time
         end_t = trial.end_time
 
@@ -374,7 +374,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
 
     def _prepare_image_time(self):
         # trial selection
-        trial = TrialSelection.from_rig(self.rig, self.session).get_time_profile()
+        trial = TrialSelection.from_rig(self.rig, self.session).get_selected_profile()
 
         start_time = trial.start_time
         end_time = trial.end_time

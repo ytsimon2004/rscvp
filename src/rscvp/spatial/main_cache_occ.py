@@ -28,6 +28,7 @@ class PosBinActCache(ETLConcatable):
     normalized_method: NORMALIZE_TYPE = persistence.field(validator=True, filename=False)
     bins: int = persistence.field(validator=True, filename=True, filename_prefix='bins_')
     run_epoch: bool = persistence.field(validator=True, filename=True, filename_prefix='run_epoch_')
+    virtual_env: bool = persistence.field(validator=True, filename=True, filename_prefix='vr_')
 
     #
     occ_activity: np.ndarray
@@ -61,6 +62,7 @@ class PosBinActCache(ETLConcatable):
             normalized_method=const.normalized_method,
             bins=const.bins,
             run_epoch=const.run_epoch,
+            virtual_env=const.virtual_env,
         )
         ret.occ_activity = np.vstack([it.occ_activity for it in data])
         ret.occ_baseline = np.vstack([it.occ_baseline for it in data])
@@ -126,6 +128,7 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
             normalized_method=self.act_normalized,
             bins=self.pos_bins,
             run_epoch=self.running_epoch,
+            virtual_env=self.virtual_env,
         )
 
     def compute_cache(self, cache: PosBinActCache) -> PosBinActCache:

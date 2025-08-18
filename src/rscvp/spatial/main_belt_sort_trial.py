@@ -45,7 +45,7 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
         lap_time = rig.lap_event.time
 
         if isinstance(self.use_trial, str):
-            indices = TrialSelection(rig, self.use_trial).get_time_profile().trial_range
+            indices = TrialSelection(rig, self.use_trial).get_selected_profile().trial_range
             trial_range = slice(*indices)
             t1 = indices[0]
             t2 = indices[1]

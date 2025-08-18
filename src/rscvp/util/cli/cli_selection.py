@@ -58,7 +58,7 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
     )
 
     vc_selection: float | None = argument(
-        '--visual-reliability', '--vr',
+        '--visual-reliability',
         metavar='VALUE',
         type=float,
         group=GROUP_SELECTION,
@@ -224,12 +224,12 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
             t = self.get_csv_data(f'trial_reliability_{self.used_session}') >= self.DEFAULT_TRIAL_THRES
 
         try:
-            if self.is_vop_protocol():
+            if self.is_vop_protocol:
                 self.logger.info('do the preselection in vop...')
                 n = self.get_csv_data('error_perc', enable_use_session=False) >= self.DEFAULT_NEUROPIL_THRES
                 v = self.get_csv_data('reliability', enable_use_session=False) >= self.DEFAULT_VISUAL_THRES
                 return n & (t | v)
-            elif self.is_ldl_protocol():
+            elif self.is_ldl_protocol:
                 self.logger.info('do the preselection in non-visual prot')
                 n = self.get_csv_data('error_perc', enable_use_session=False) >= self.DEFAULT_NEUROPIL_THRES
                 return n & t

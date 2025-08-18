@@ -3,16 +3,16 @@ from typing import Final
 
 import numpy as np
 import polars as pl
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
-from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.util_trials import TrialSelection
 from scipy.ndimage import gaussian_filter1d
 from typing_extensions import Self
 
 from argclz import AbstractParser, argument, copy_argument
 from neuralib.persistence import *
 from neuralib.persistence.cli_persistence import get_options_and_cache
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
+from rscvp.util.cli.cli_selection import SelectionOptions
+from rscvp.util.util_trials import TrialSelection
 from stimpyp import Session
 
 
@@ -125,7 +125,7 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
             binned_sig = binned_sig[self.si_sorted_index]
 
         # trial selection
-        trial_range = TrialSelection(rig, self.session).get_time_profile().trial_slice
+        trial_range = TrialSelection(rig, self.session).get_selected_profile().trial_slice
         binned_sig = binned_sig[:, trial_range, :]
 
         return circular_pos_shift(binned_sig, smooth=False)

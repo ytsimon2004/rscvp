@@ -22,7 +22,7 @@ class PositionDecodeCacheBuilder(AbstractParser, TreadmillOptions, SelectionOpti
     def post_parsing(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        if not self.is_ldl_protocol():
+        if not self.is_ldl_protocol:
             raise NotImplementedError('VOP protocol')
 
     def run(self):
@@ -50,7 +50,7 @@ class PositionDecodeCacheBuilder(AbstractParser, TreadmillOptions, SelectionOpti
         dark_info = session_trials['dark']
         lights_off_lap = dark_info.in_range(rig.lap_event.time, rig.lap_event.value_index)[0]
 
-        if self.is_ldl_protocol():
+        if self.is_ldl_protocol:
             light_end_info = session_trials['light_end']
             lights_off_time = (dark_info.time[0], light_end_info.time[0])
         else:

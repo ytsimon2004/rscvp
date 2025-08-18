@@ -4,7 +4,7 @@ from scipy.ndimage import gaussian_filter1d
 
 from neuralib.locomotion import running_mask1d, interp_pos1d, CircularPosition
 from neuralib.util.verbose import fprint
-from stimpyp import RiglogData
+from stimpyp import RiglogData, RigEvent
 
 __all__ = [
     'PositionBinnedSig',
@@ -36,13 +36,15 @@ class PositionBinnedSig:
             *,
             bin_range: int | tuple[int, int] | tuple[int, int, int] = (0, 150, 150),
             smooth_kernel: int = 3,
-            position_sample_rate: int = 300
+            position_sample_rate: int = 300,
+            virtual_env: bool = False
     ):
         """
         :param riglog: ``RiglogData``
         :param bin_range: END or tuple of (start, end, number)
         :param smooth_kernel: Smoothing gaussian kernel after binned
         :param position_sample_rate: Position sampling rate for the interpolation
+        :param virtual_env: If run on virtual environment
         """
         self._riglog = riglog
 
@@ -59,6 +61,7 @@ class PositionBinnedSig:
         #
         self.smooth_kernel = smooth_kernel
         self.position_sample_rate = position_sample_rate
+        self.virtual_env = virtual_env
 
         # running epoch
         self._running_velocity_threshold = 5
@@ -78,6 +81,13 @@ class PositionBinnedSig:
         return self._riglog
 
     @property
+    def lap_event(self) -> RigEvent:
+        if self.virtual_env:
+            return self._riglog.get_pygame_stimlog().virtual_lap_event
+        else:
+            return self._riglog.lap_event
+
+    @property
     def bin_range(self) -> tuple[int, int]:
         """Bin range (start, end). in cm"""
         return self._bin_range[0], self._bin_range[1]
@@ -91,7 +101,12 @@ class PositionBinnedSig:
     def position_time(self) -> np.ndarray:
         """Position Time"""
         if self._pos_cache is None:
-            self._pos_cache = load_interpolated_position(self._riglog, sample_rate=self.position_sample_rate)
+            self._pos_cache = load_interpolated_position(
+                self._riglog,
+                sample_rate=self.position_sample_rate,
+                virtual_env=self.virtual_env,
+                norm_length=self.bin_range[1]
+            )
         return self._pos_cache.t
 
     @property
@@ -127,16 +142,14 @@ class PositionBinnedSig:
         """
         if lap not in self._pos_mask_cache:
             t = self.position_time
-            lap_event = self._riglog.lap_event
-
+            lap_event = self.lap_event
             t1 = lap_event.time[lap]
             t2 = lap_event.time[lap + 1]
             self._pos_mask_cache[lap] = np.logical_and(t1 < t, t < t2)
 
         return self._pos_mask_cache[lap]
 
-    def _occupancy_map(self,
-                       lap: int,
+    def _occupancy_map(self, lap: int,
                        bins: np.ndarray,
                        pos: np.ndarray,
                        running_epoch=False) -> np.ndarray:
@@ -191,7 +204,7 @@ class PositionBinnedSig:
         if lap_range is None or isinstance(lap_range, tuple):
 
             if lap_range is None:
-                lap_index = self._riglog.lap_event.value_index
+                lap_index = self.lap_event.value_index
                 lap_range = lap_index[0], lap_index[-1]
 
             n_lap = lap_range[1] - lap_range[0] + 1
@@ -301,7 +314,9 @@ class PositionBinnedSig:
 def load_interpolated_position(rig: RiglogData,
                                sample_rate: int = 1000,
                                force_compute: bool = False,
-                               save_cache: bool = True) -> CircularPosition:
+                               save_cache: bool = True,
+                               virtual_env: bool = False,
+                               norm_length: float = 150) -> CircularPosition:
     """
     get 'CircularPosition' and save as cache
 
@@ -321,8 +336,12 @@ def load_interpolated_position(rig: RiglogData,
         lt = lt[~np.isnan(lt)].astype(int)
         return CircularPosition(d[:, 0], d[:, 1], d[:, 2], d[:, 3], lt)
     else:
-        p = rig.position_event
-        d = interp_pos1d(p.time, p.value, sampling_rate=sample_rate, remove_nan=True)
+        if virtual_env:
+            p = rig.get_pygame_stimlog().virtual_position_event
+        else:
+            p = rig.position_event
+
+        d = interp_pos1d(p.time, p.value, sampling_rate=sample_rate, remove_nan=True, norm_max_value=norm_length)
 
         lt = np.full_like(d.t, np.nan, dtype=np.double)  # make (N,) array
         lt[:len(d.trial_time_index)] = d.trial_time_index

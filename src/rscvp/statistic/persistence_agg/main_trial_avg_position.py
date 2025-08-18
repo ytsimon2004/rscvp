@@ -83,7 +83,7 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, T
             cell_mask = self.get_selected_neurons()
 
             # trial
-            trial = np.arange(*TrialSelection(self.load_riglog_data(), self.session).get_time_profile().trial_range)
+            trial = np.arange(*TrialSelection(self.load_riglog_data(), self.session).get_selected_profile().trial_range)
             ret.append(self.apply_binned_act_cache()
                        .with_mask(cell_mask)
                        .with_trial(trial))

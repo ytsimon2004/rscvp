@@ -2,14 +2,14 @@ from typing import NamedTuple
 
 import attrs
 import numpy as np
-from rscvp.util.cli import BEHAVIOR_COVARIANT, get_neuron_list
-from rscvp.util.position import load_interpolated_position
-from rscvp.util.util_lick import LickTracker
-from rscvp.util.util_trials import TrialSelection
 from scipy.interpolate import interp1d
 from typing_extensions import Self
 
 from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent, SIGNAL_TYPE
+from rscvp.util.cli import BEHAVIOR_COVARIANT, get_neuron_list
+from rscvp.util.position import load_interpolated_position
+from rscvp.util.util_lick import LickTracker
+from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
 
 __all__ = ['GLMInputData']
@@ -150,7 +150,7 @@ class GLMInputData:
         :return:
         """
         trial = TrialSelection.from_rig(rig, session)
-        tprofile = trial.get_time_profile()
+        tprofile = trial.get_selected_profile()
 
         sampling_rate = DEFAULT_DTYPE_PARAMS[dtype].sampling_rate
         start_time = tprofile.start_time

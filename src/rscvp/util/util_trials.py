@@ -9,7 +9,7 @@ from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_
 from neuralib.util.verbose import fprint
 from rscvp.util.cli.cli_suite2p import NeuronID, get_neuron_list
 from rscvp.util.position import load_interpolated_position
-from stimpyp import Session, SessionInfo, RiglogData
+from stimpyp import Session, SessionInfo, RiglogData, RigEvent
 
 __all__ = [
     'TRIAL_CV_TYPE',
@@ -44,7 +44,8 @@ class TrialSelection:
 
     def __init__(self, rig: RiglogData,
                  session: Session = 'all',
-                 selected_trial: np.ndarray | None = None):
+                 selected_trial: np.ndarray | None = None,
+                 virtual_env: bool = False):
         """
 
         :param rig: ``RiglogData``
@@ -52,7 +53,12 @@ class TrialSelection:
         :param selected_trial: trial index, NOT trial number
         """
         self.rig = rig
-        self.session_trial = self.rig.get_stimlog().session_trials()
+        self.virtual_env = virtual_env
+
+        if self.virtual_env:
+            self.session_trial = self.rig.get_pygame_stimlog().session_trials()
+        else:
+            self.session_trial = self.rig.get_stimlog().session_trials()
 
         self._session = None  # reset
 
@@ -64,8 +70,17 @@ class TrialSelection:
             self._session = session  # do not overwrite selected_trial
 
     @classmethod
-    def from_rig(cls, rig: RiglogData, session: Session = 'all') -> Self:
-        return TrialSelection(rig, session)
+    def from_rig(cls, rig: RiglogData,
+                 session: Session = 'all',
+                 virtual_env: bool = False) -> Self:
+        return TrialSelection(rig, session, virtual_env=virtual_env)
+
+    @property
+    def lap_event(self) -> RigEvent:
+        if self.virtual_env:
+            return self.rig.get_pygame_stimlog().virtual_lap_event
+        else:
+            return self.rig.lap_event
 
     @property
     def session_type(self) -> Session:
@@ -178,7 +193,7 @@ class TrialSelection:
         :return: Mask `Array[bool, T]`
         """
 
-        time = self.rig.lap_event.time  # (L+1,)
+        time = self.lap_event.time  # (L+1,)
         index = self.selected_trials  # ranging from 0 to L-1
 
         # time index? find a trial index which interval include t
@@ -224,17 +239,18 @@ class TrialSelection:
 
         return train, test
 
-    def get_time_profile(self, verbose=True) -> 'TrialTimeProfile':
+    def get_selected_profile(self, verbose=True) -> 'SelectedProfile':
         """
         Get the time/trial profile for each session
+
         :param verbose:
         :return:
         """
-        info = self.rig.get_stimlog().session_trials()[self.session_type]
+        info = self.session_trial[self.session_type]
 
         trial_range = info.in_range(
-            self.rig.lap_event.time,
-            self.rig.lap_event.value_index
+            self.lap_event.time,
+            self.lap_event.value_index
         )
 
         start_time = info.time[0]
@@ -244,7 +260,7 @@ class TrialSelection:
             fprint(f'select trials in {self.session_type} session: within {trial_range},'
                    f'from {start_time} to {end_time}')
 
-        return TrialTimeProfile(
+        return SelectedProfile(
             self,
             trial_range,
             start_time,
@@ -254,7 +270,7 @@ class TrialSelection:
 
 # TODO check if simplier way?
 @attrs.define
-class TrialTimeProfile:
+class SelectedProfile:
     selection: TrialSelection
     trial_range: tuple[int, int]
     start_time: float
@@ -267,10 +283,6 @@ class TrialTimeProfile:
     @property
     def trial_slice(self) -> slice:
         return slice(*self.trial_range)
-
-    @property
-    def n_trials(self) -> int:
-        return self.trial_range[1] - self.trial_range[0]
 
     def with_selected_range(self, ranging: tuple[int, int]) -> Self:
         """with only selection trial ranged in this session"""
@@ -296,7 +308,7 @@ class TrialTimeProfile:
 class TrialSignal:
     """Container for selected trial signals"""
 
-    time_profile: TrialTimeProfile
+    time_profile: SelectedProfile
 
     dff: np.ndarray
     """(N, IT)"""
@@ -335,7 +347,7 @@ class TrialSignal:
         image_time = rig.imaging_event.time
         image_time = sync_s2p_rigevent(image_time, s2p, plane_index)
 
-        prf = TrialSelection(rig, session).get_time_profile()
+        prf = TrialSelection(rig, session).get_selected_profile()
         t0 = prf.start_time
         t1 = prf.end_time
 
@@ -395,7 +407,7 @@ def foreach_session_signals(s2p: Suite2PResult,
     sessions = list(session_info.keys())
 
     for s in sessions:
-        prf = TrialSelection(rig, s).get_time_profile()
+        prf = TrialSelection(rig, s).get_selected_profile()
 
         if trial_numbers is not None:
             prf = prf.with_selected_range(trial_numbers)

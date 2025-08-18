@@ -36,7 +36,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         if self.overview:
             self.pre_selection = True
             self.pc_selection = 'slb'
-            self.session = 'light'
+            self.session = 'light' if not self.virtual_env else 'all'
             self.used_session = 'light'
 
     def run(self):
@@ -99,7 +99,11 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         signal = signal[orig_indices]
 
         # trial selection
-        indices = TrialSelection.from_rig(rig, self.session).get_time_profile().trial_range
+        indices = (
+            TrialSelection.from_rig(rig, self.session, virtual_env=self.virtual_env)
+            .get_selected_profile()
+            .trial_range
+        )
         signal = signal[:, slice(*indices), :]
         signal = signal / np.max(signal, axis=(1, 2), keepdims=True)
 
@@ -141,7 +145,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
                                      figsize=(16, 6),
                                      gridspec_kw={'width_ratios': [1.618, 1, 1, 1]}) as ax:
                         self.plot_three_sessions(ax, rig, signal)
-                case 'grey':
+                case 'grey' | 'vr':
                     with plot_figure(output.figure_output(neuron_id)) as ax:
                         self.plot_single_session(ax, signal)
                 case _:
