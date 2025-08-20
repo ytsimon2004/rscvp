@@ -44,7 +44,7 @@ class PlaceFieldResult(NamedTuple):
     @property
     def pf_width(self) -> list[float]:
         """Place field width in cm"""
-        return [self.bin_size * (it[1] - it[0]) for it in self.pf]
+        return [self.bin_size * float((it[1] - it[0])) for it in self.pf]
 
     @property
     def pf_peak(self) -> list[float]:
@@ -55,7 +55,7 @@ class PlaceFieldResult(NamedTuple):
             x = np.argmax(self.act[i])
             p_max = i[x]
 
-            pf_peak_ls.append(self.bin_size * p_max)
+            pf_peak_ls.append(self.bin_size * float(p_max))
 
         return pf_peak_ls
 
@@ -77,7 +77,7 @@ class PlaceFieldResult(NamedTuple):
         """
         Place field reliability filter. place fields must be presented above one-third of all trials
 
-        :param reliability: Reliability across trials
+        :param reliability: Reliability for each place field across trials
         :param at_least: Fraction of the trials
         :return: ``PlaceFieldResult``
         """
@@ -112,10 +112,9 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
         help='fraction of the trials presented the place field activity'
     )
 
-    signal_type: SIGNAL_TYPE = 'spks'  # TODO why df_f has issue?
+    signal_type: SIGNAL_TYPE = 'spks'
 
     def post_parsing(self):
-        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         if not isinstance(self.width_range, tuple) or len(self.width_range) != 2:
             raise ValueError()
 
@@ -124,10 +123,13 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
             self.pc_selection = 'slb'
             self.reuse_output = True
 
+        if self.virtual_env:
+            self.session = 'all'
+
     def run(self):
         self.post_parsing()
-
-        output_info = self.get_data_output('pf', self.session)
+        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
+        output_info = self.get_data_output('pf', self.session, virtual_env=self.virtual_env)
 
         if self.plot_summary:
             self.place_field_summary(output_info)
@@ -214,7 +216,11 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
         sig_base[np.isnan(sig_base)] = 0.0
         signal_all = gaussian_filter1d(sig_all, 3, mode='wrap', axis=2)
 
-        trial = TrialSelection.from_rig(rig, self.session).get_selected_profile().trial_slice
+        trial = (
+            TrialSelection.from_rig(rig, self.session, virtual_env=self.virtual_env)
+            .get_selected_profile()
+            .trial_slice
+        )
         signal_all = signal_all[:, trial, :]  # (N, L, B)
         signal_bas = sig_base[:, trial, :]
 
@@ -246,9 +252,10 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
                 bin_size = self.belt_length / sig.shape[1]
                 peak = [int(p / bin_size) for p in pf_result.pf_peak]  # cm to bin index
                 pf_reliability = [
-                    np.mean([np.any(sig[i, p] > pf_result.threshold) for i in range(n_trials)])
+                    float(np.mean([np.any(sig[i, p] > pf_result.threshold) for i in range(n_trials)]))
                     for p in peak
                 ]
+
                 pf_result = pf_result.with_reliability_filter(pf_reliability, at_least=self.reliability_threshold)
 
                 #

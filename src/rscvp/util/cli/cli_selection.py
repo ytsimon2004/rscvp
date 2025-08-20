@@ -116,6 +116,7 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
                      **kwargs) -> np.ndarray | pl.DataFrame:
         """
         Get data from an output csv pipeline
+        TODO if has same metrics in vr versus physical space?
 
         :param cols: Column names of the csv file
         :param to_numpy: Return as 1D numpy array. `Array[Any, N]`

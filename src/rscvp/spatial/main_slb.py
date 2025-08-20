@@ -58,10 +58,19 @@ class PositionLowerBoundOptions(AbstractParser,
 
     signal_type: SIGNAL_TYPE = 'spks'
 
+    def post_parsing(self):
+        if self.virtual_env:
+            self.session = 'all'
+
     def run(self):
+        self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        output_info = self.get_data_output('slb', self.session)
+        output_info = self.get_data_output(
+            'slb', self.session,
+            running_epoch=self.running_epoch,
+            virtual_env=self.virtual_env
+        )
         self.foreach_lower_bound(output_info, self.neuron_id)
         self.aggregate_output_csv(output_info)
 
@@ -86,10 +95,14 @@ class PositionLowerBoundOptions(AbstractParser,
         """
         s2p = self.load_suite_2p()
         rig = self.load_riglog_data()
-        cp = PositionSignal(s2p, rig,
-                            window_count=self.pos_bins,
-                            signal_type=self.signal_type,
-                            plane_index=self.plane_index)
+
+        cp = PositionSignal(
+            s2p, rig,
+            window_count=self.pos_bins,
+            signal_type=self.signal_type,
+            plane_index=self.plane_index,
+            virtual_env=self.virtual_env
+        )
 
         neuron_list = get_neuron_list(s2p, neuron_ids)
         signal_all = self.apply_binned_act_cache().occ_activity
@@ -98,20 +111,24 @@ class PositionLowerBoundOptions(AbstractParser,
         if self.do_signal_smooth:
             signal_all = gaussian_filter1d(signal_all, 3, mode='wrap', axis=2)
 
-        trials = TrialSelection(rig, self.session).get_selected_profile().trial_range
+        trials = (
+            TrialSelection(rig, self.session, virtual_env=self.virtual_env)
+            .get_selected_profile()
+            .trial_range
+        )
 
         #
         if self.with_place_field_info:
-            pf_info = self.get_data_output('pf', self.session, latest=True).csv_output
-            r = f'pf_reliability_{self.session}'
+            pf_info = self.get_data_output('pf', self.session, virtual_env=self.virtual_env, latest=True).csv_output
+            field = f'pf_reliability_{self.session}'
 
             def _dtype_map(x: str) -> str:
                 return ' '.join(f"{round(float(r), 2)}" for r in x.split())
 
             df = pl.read_csv(pf_info).with_columns(
-                pl.col(r).map_elements(lambda it: _dtype_map(it), return_dtype=pl.Utf8)
+                pl.col(field).map_elements(lambda it: _dtype_map(it), return_dtype=pl.Utf8)
             )
-            reliability = df[r].to_list()
+            reliability = df[field].to_list()
             thres = df['thres'].to_numpy()
         else:
             thres = None
@@ -191,7 +208,7 @@ class PositionLowerBoundOptions(AbstractParser,
         Circularly shifted the neuronal activity for a random time between 20 and a session duration less than 20s.
         Refer to Mao et al., 2020. cur. bio.
 
-        :param cp:
+        :param cp: ``PositionSignal``
         :param neuron: individual neuron
         :param lap_range:
 
