@@ -1,13 +1,14 @@
 import numpy as np
 import polars as pl
 from matplotlib.axes import Axes
-from rscvp.spatial.util import prepare_si_data, SiResult, SiShuffleResult
-from rscvp.util.cli import PlotOptions, PositionShuffleOptions, DataOutput, NeuronID
+from tqdm import tqdm
 
 from argclz import AbstractParser, as_argument
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_merge
 from neuralib.util.verbose import publish_annotation
+from rscvp.spatial.util import prepare_si_data, SiResult, SiShuffleResult
+from rscvp.util.cli import PlotOptions, PositionShuffleOptions, DataOutput, NeuronID
 
 __all__ = ['SiOptions']
 
@@ -21,20 +22,44 @@ class SiOptions(AbstractParser, PositionShuffleOptions, PlotOptions):
     signal_type = 'spks'
 
     def post_parsing(self):
-        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-
         if self.plot_summary:
             self.reuse_output = True
 
+        if self.virtual_env:
+            self.session = 'all'
+
     def run(self):
         self.post_parsing()
-
-        output_info = self.get_data_output('si', self.session, running_epoch=self.running_epoch)
+        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
+        output_info = self.get_data_output('si', self.session,
+                                           running_epoch=self.running_epoch,
+                                           virtual_env=self.virtual_env)
 
         if self.plot_summary:
             self.plot_si_cumulative(output_info)
         else:
             self.foreach_spatial_info(output_info, self.neuron_id)
+
+    def foreach_spatial_info(self, output: DataOutput, neuron_ids: NeuronID):
+
+        data = prepare_si_data(self, neuron_ids, virtual_env=self.virtual_env)
+
+        headers = ['neuron_id', f'si_{self.session}', f'shuffled_si_{self.session}', f'place_cell_si_{self.session}']
+        with csv_header(output.csv_output, headers) as csv:
+            for neuron in tqdm(data.neuron_list, desc='calculate_si', unit='neurons', ncols=80):
+                signal = data.signal(neuron)
+                si_result = data.calc_si(signal)
+                shuffled_result = data.calculate_si_shuffle(signal, self.shuffle_method)
+
+                csv(
+                    neuron,
+                    round(si_result.spatial_info, 4),
+                    round(shuffled_result.spatial_info, 4),
+                    si_result.spatial_info > shuffled_result.spatial_info
+                )
+
+                with plot_figure(output.figure_output(neuron)) as ax:
+                    plot_si(ax, si_result, shuffled_result)
 
     def plot_si_cumulative(self, output: DataOutput,
                            xlim: tuple[float, float] = (0, 2.5)):
@@ -66,34 +91,6 @@ class SiOptions(AbstractParser, PositionShuffleOptions, PlotOptions):
             ax.hist(ss, bins=round(n_neuron / 5), range=xlim, color='grey', label='shuffled_si')
             ax.set(ylabel='Num. cell')
             ax.legend()
-
-    def foreach_spatial_info(self, output: DataOutput, neuron_ids: NeuronID):
-        """
-
-        :param output:
-        :param neuron_ids:
-        :return:
-        """
-        from tqdm import tqdm
-
-        data = prepare_si_data(self, neuron_ids)
-
-        headers = ['neuron_id', f'si_{self.session}', f'shuffled_si_{self.session}', f'place_cell_si_{self.session}']
-        with csv_header(output.csv_output, headers) as csv:
-            for neuron in tqdm(data.neuron_list, desc='calculate_si', unit='neurons', ncols=80):
-                signal = data.signal(neuron)
-                si_result = data.calc_si(signal)
-                shuffled_result = data.calculate_si_shuffle(signal, self.shuffle_method)
-
-                csv(
-                    neuron,
-                    round(si_result.spatial_info, 4),
-                    round(shuffled_result.spatial_info, 4),
-                    si_result.spatial_info > shuffled_result.spatial_info
-                )
-
-                with plot_figure(output.figure_output(neuron)) as ax:
-                    plot_si(ax, si_result, shuffled_result)
 
 
 def plot_si(ax: Axes, result: SiResult, shuffle: SiShuffleResult):

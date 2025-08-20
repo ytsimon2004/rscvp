@@ -324,11 +324,14 @@ def load_interpolated_position(rig: RiglogData,
     :param sample_rate: sampling rate for interpolation
     :param force_compute: force recalculate and save as a new cache
     :param save_cache: save cache in the same directory as riglog file
+    :param virtual_env: if used virtual environment position space
+    :param norm_length: maximal length for normalization for each trial
     :return: ``CircularPosition``
     """
 
     file = rig.riglog_file
-    cache_file = file.with_name(file.stem + '_position_cache.npy')
+    suffix = '_position_cache.npy' if not virtual_env else '_virtual_position_cache.npy'
+    cache_file = file.with_name(file.stem + suffix)
 
     if cache_file.exists() and not force_compute:
         d = np.load(cache_file)

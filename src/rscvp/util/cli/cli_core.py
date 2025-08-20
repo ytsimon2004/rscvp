@@ -300,6 +300,7 @@ class CommonOptions:
     def get_data_output(self, code: CodeAlias,
                         *prefix: str,
                         running_epoch: bool = False,
+                        virtual_env: bool = False,
                         latest: bool = False,
                         output_type: Literal['cellular', 'wfield', 'behavior'] = 'cellular') -> DataOutput:
         """
@@ -308,6 +309,7 @@ class CommonOptions:
         :param code: ``cli_io.CODE``
         :param prefix: Directory prefix for analysis condition. (i.e., session, signal type)
         :param running_epoch: Whether limit analysis in running epoch, If True, add `_run` flag in directory and filename
+        :param virtual_env: Whether data is calculated in based on virtual environment position space
         :param latest: If True, store the new item in latest version file, otherwise create a new version
         :param output_type Output data type
         :return: ``DataOutput``
@@ -343,6 +345,10 @@ class CommonOptions:
         if running_epoch:
             d += '_run'
             x += '_run'
+
+        if virtual_env:
+            d += '_vr'
+            x += '_vr'
 
         filename = f'{self.exp_date}_{self.animal_id}_{x}'
         summary_filename = None if s is None else f'{self.exp_date}_{self.animal_id}_{s}'

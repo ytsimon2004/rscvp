@@ -45,7 +45,7 @@ class StimpyOptions(CommonOptions):
     virtual_env: bool = argument(
         '--vr',
         group=GROUP_STIMPY,
-        help='if the experiment is performed in VR environment'
+        help='if the experiment is performed in VR environment or use virtual position space'
     )
 
 

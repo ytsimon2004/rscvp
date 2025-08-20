@@ -272,7 +272,9 @@ class SiSrcData(NamedTuple):
         )
 
 
-def prepare_si_data(opt: PositionShuffleOptions, neuron_ids: NeuronID) -> SiSrcData:
+def prepare_si_data(opt: PositionShuffleOptions,
+                    neuron_ids: NeuronID,
+                    virtual_env: bool = False) -> SiSrcData:
     s2p = opt.load_suite_2p()
     neuron_list = get_neuron_list(s2p, neuron_ids)
 
@@ -280,17 +282,17 @@ def prepare_si_data(opt: PositionShuffleOptions, neuron_ids: NeuronID) -> SiSrcD
     image_time = rig.imaging_event.time
     image_time = sync_s2p_rigevent(image_time, s2p, opt.plane_index)
 
-    ip = load_interpolated_position(rig)
+    pos = load_interpolated_position(rig, virtual_env=virtual_env)
 
     if opt.running_epoch:
-        run_epoch = running_mask1d(ip.t, ip.v)
+        run_epoch = running_mask1d(pos.t, pos.v)
     else:
         run_epoch = None
 
     session = rig.get_stimlog().session_trials()[opt.session]
-    pos_mask = session.time_mask_of(ip.t)
-    pos_time = ip.t[pos_mask]
-    pos_value = normalize_signal(ip.p)[pos_mask]
+    pos_mask = session.time_mask_of(pos.t)
+    pos_time = pos.t[pos_mask]
+    pos_value = normalize_signal(pos.p)[pos_mask]
     run_epoch = run_epoch[pos_mask] if run_epoch is not None else None
 
     act_mask = session.time_mask_of(image_time)

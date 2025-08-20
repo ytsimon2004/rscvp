@@ -31,17 +31,20 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
     reuse_output = True
 
     def post_parsing(self):
-        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-
         if self.overview:
             self.pre_selection = True
             self.pc_selection = 'slb'
-            self.session = 'light' if not self.virtual_env else 'all'
             self.used_session = 'light'
+
+        if self.virtual_env:
+            self.session = 'all'
 
     def run(self):
         self.post_parsing()
-        output_info = self.get_data_output('ba', self.signal_type, running_epoch=self.running_epoch)
+        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
+        output_info = self.get_data_output('ba', self.signal_type,
+                                           running_epoch=self.running_epoch,
+                                           virtual_env=self.virtual_env)
 
         if self.overview:
             self.plot_overview(output_info)
@@ -145,7 +148,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
                                      figsize=(16, 6),
                                      gridspec_kw={'width_ratios': [1.618, 1, 1, 1]}) as ax:
                         self.plot_three_sessions(ax, rig, signal)
-                case 'grey' | 'vr':
+                case 'grey' | 'vr-close' | 'vr-open':
                     with plot_figure(output.figure_output(neuron_id)) as ax:
                         self.plot_single_session(ax, signal)
                 case _:
