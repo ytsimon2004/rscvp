@@ -13,7 +13,7 @@ from rscvp.util.cli import SelectionOptions
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 from rscvp.util.util_trials import TrialSelection
-from stimpyp import RiglogData, Session
+from stimpyp import Session, SessionInfo, RigEvent
 from .util_plot import plot_tuning_heatmap
 
 __all__ = ['PositionMapOptions']
@@ -129,64 +129,78 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         """
         s2p = self.load_suite_2p()
         neuron_list = get_neuron_list(s2p, neuron_ids)
-
-        rig = self.load_riglog_data()
-        protocol = self.get_protocol_alias()
-
         signal_all = self.apply_binned_act_cache().occ_activity
-
         if self.binned_smooth:
             signal_all = gaussian_filter1d(signal_all, 3, mode='wrap', axis=2)
+
+        #
+        protocol = self.get_protocol_alias
+        n_sessions = len(self.session_list)
+        rig = self.load_riglog_data()
+        if self.virtual_env:
+            session = rig.get_pygame_stimlog().session_trials()
+            lap_event = rig.get_pygame_stimlog().virtual_lap_event
+        else:
+            session = rig.get_stimlog().session_trials()
+            lap_event = rig.lap_event
+
+        del session['all']
 
         for neuron_id in tqdm(neuron_list, desc='plot_calactivity_belt', unit='neurons', ncols=80):
             signal = signal_all[neuron_id]
 
             match protocol:
-                case 'visual_open_loop' | 'light_dark_light':
-                    with plot_figure(output.figure_output(neuron_id, self.signal_type), 2, 4,
+                case 'visual_open_loop' | 'light_dark_light' | 'vr':
+                    with plot_figure(output.figure_output(neuron_id, self.signal_type),
+                                     2, n_sessions + 1,
                                      tight_layout=False,
                                      figsize=(16, 6),
-                                     gridspec_kw={'width_ratios': [1.618, 1, 1, 1]}) as ax:
-                        self.plot_three_sessions(ax, rig, signal)
-                case 'grey' | 'vr-close' | 'vr-open':
+                                     gridspec_kw={'width_ratios': [1.618] + [1] * n_sessions}) as ax:
+                        self.plot_multiple_session(ax, session, lap_event, signal)
+                case 'grey':
                     with plot_figure(output.figure_output(neuron_id)) as ax:
                         self.plot_single_session(ax, signal)
                 case _:
                     raise ValueError(f'plot is not implemented in {protocol}')
 
-    def plot_three_sessions(self, axes: AxesArray,
-                            rig: RiglogData,
-                            signal: np.ndarray):
+    def plot_multiple_session(self, axes: AxesArray,
+                              session: dict[Session, SessionInfo],
+                              lap_event: RigEvent,
+                              signal: np.ndarray):
         """
-        Plot binned_activity across three session, i.e., "LDL" and 'VOL' protocol types
+        Plot binned_activity across multiple session
 
         :param axes: ``Axes``
-        :param rig: ``RiglogData``
+        :param session: session information dict
+        :param lap_event: lap event
         :param signal: binned cal-activity with shape (L, B) where L = diff(lap) - 1, B = spatial bins
         """
+        n_sessions = len(self.session_list)
+        session_sig = {
+            k: signal[v.in_slice(lap_event.time, lap_event.value_index)]
+            for _, (k, v) in zip(range(n_sessions), session.items())
+        }
 
-        session_sig = get_session_sig(rig, signal)
         names = list(session_sig.keys())
-        sig_sep = list(session_sig.values())
+        sig = list(session_sig.values())
         label_color = ['k', 'r', 'gray']
 
-        #
+        # all
         ax = axes[0, 0]
         plot_tuning_heatmap(
             signal,
             belt_length=self.belt_length,
             colorbar=True,
-            session_line=(len(sig_sep[0]), len(sig_sep[1])),
+            session_line=[len(sig[i]) for i in range(n_sessions - 1)],
             ax=ax
         )
         ax.set_ylabel('trial #')
 
-        #
         ax = axes[1, 0]
-        for i in range(3):
+        for i in range(n_sessions):
             plot_trial_avg_curve(
                 ax,
-                sig_sep[i],
+                sig[i],
                 bins=self.pos_bins,
                 belt_length=self.belt_length,
                 label=names[i],
@@ -195,17 +209,17 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         ax.legend()
 
         # normalization per session plot / exclude zero run in particular session
-        norm = [s / np.max(s) if s.size != 0 else s for s in sig_sep]
+        norm = [s / np.nanmax(s) if s.size != 0 else s for s in sig]
 
-        #
-        plot_tuning_heatmap(norm[0], belt_length=self.belt_length, ax=axes[0, 1])
-        plot_tuning_heatmap(norm[1], belt_length=self.belt_length, ax=axes[0, 2])
-        plot_tuning_heatmap(norm[2], belt_length=self.belt_length, colorbar=True, ax=axes[0, 3])
-
-        #
-        for i in range(3):
-            ax = axes[1, i + 1]
-            plot_trial_avg_curve(ax, norm[i], bins=self.pos_bins, belt_length=self.belt_length,
+        for i in range(n_sessions):
+            plot_tuning_heatmap(norm[i],
+                                belt_length=self.belt_length,
+                                colorbar=True if i == n_sessions - 1 else False,
+                                ax=axes[0, i + 1])
+            plot_trial_avg_curve(axes[1, i + 1],
+                                 norm[i],
+                                 bins=self.pos_bins,
+                                 belt_length=self.belt_length,
                                  label=names[i], color=label_color[i])
 
     def plot_single_session(self, ax, signal: np.ndarray):
@@ -226,26 +240,6 @@ def plot_trial_avg_curve(ax: Axes,
     ax.fill_between(x, mean + sem, mean - sem, alpha=0.3, **kwargs)
     ax.set(xlim=(0, belt_length), xlabel='Position (cm)', ylabel='Norm. dF/F')
     ax.set_aspect(1.0 / ax.get_data_ratio(), adjustable='box')
-
-
-def get_session_sig(rig: RiglogData, signal: np.ndarray) -> dict[Session, np.ndarray]:
-    """
-    get session name and activity in different behavioral sessions
-
-    :param rig:
-    :param signal: (L, B)
-    :return:
-        session_sig
-    """
-    session = rig.get_stimlog().session_trials()
-    lap_event = rig.lap_event
-
-    session_sig = {
-        k: signal[v.in_slice(lap_event.time, lap_event.value_index)]
-        for _, (k, v) in zip(range(3), session.items())
-    }
-
-    return session_sig
 
 
 if __name__ == '__main__':

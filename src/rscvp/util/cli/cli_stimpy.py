@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import ClassVar
 
 import numpy as np
@@ -48,7 +49,6 @@ class StimpyOptions(CommonOptions):
         help='if the experiment is performed in VR environment or use virtual position space'
     )
 
-
     @property
     def with_diode_offset(self) -> bool:
         """if do the diode offset synchronization"""
@@ -74,16 +74,6 @@ class StimpyOptions(CommonOptions):
     # ================== #
 
     @property
-    def session_list(self) -> list[Session]:
-        """list of sessions based on the protocol type"""
-        if self.is_vop_protocol:
-            return ['light', 'visual', 'dark']
-        elif self.is_ldl_protocol:
-            return ['light_bas', 'dark', 'light_end']
-        else:
-            raise ValueError('unsupported protocol')
-
-    @property
     def gspread_reference(self) -> GSPREAD_SHEET_PAGE:
         """get statistic google spreadsheet reference from the protocol type"""
         if self.is_vop_protocol:
@@ -93,20 +83,33 @@ class StimpyOptions(CommonOptions):
         else:
             raise ValueError('unsupported protocol')
 
-    @property
+    @cached_property
     def is_ldl_protocol(self) -> bool:
         """if is light dark light protocol"""
-        return self.get_protocol_alias() == 'light_dark_light'
+        return self.get_protocol_alias == 'light_dark_light'
 
-    @property
+    @cached_property
     def is_vop_protocol(self) -> bool:
         """if is visual open loop protocol"""
-        return self.get_protocol_alias() == 'visual_open_loop'
+        return self.get_protocol_alias == 'visual_open_loop'
 
-    @property
+    @cached_property
     def is_virtual_env(self) -> bool:
-        return 'vr' in self.get_protocol_alias()
+        return 'vr' in self.get_protocol_alias
 
+    @cached_property
+    def session_list(self) -> list[Session]:
+        """list of sessions based on the protocol type"""
+        if self.is_vop_protocol:
+            return ['light', 'visual', 'dark']
+        elif self.is_ldl_protocol:
+            return ['light_bas', 'dark', 'light_end']
+        elif self.is_virtual_env:
+            return ['close', 'open']
+        else:
+            raise ValueError('unsupported protocol')
+
+    @cached_property
     def get_protocol_alias(self) -> ProtocolAlias:
         """get the protocol type from the filename"""
         return get_protocol_name(self.load_riglog_data().riglog_file)

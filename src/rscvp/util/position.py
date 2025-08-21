@@ -69,6 +69,8 @@ class PositionBinnedSig:
         self._running_duration_threshold = 1
 
         # cache
+        self._lap_event: RigEvent | None = None
+
         self._bin_range = bin_range
         self._pos_cache: CircularPosition | None = None
         self._run_mask = None
@@ -82,10 +84,13 @@ class PositionBinnedSig:
 
     @property
     def lap_event(self) -> RigEvent:
-        if self.virtual_env:
-            return self._riglog.get_pygame_stimlog().virtual_lap_event
-        else:
-            return self._riglog.lap_event
+        if self._lap_event is None:
+            if self.virtual_env:
+                self._lap_event = self._riglog.get_pygame_stimlog().virtual_lap_event
+            else:
+                self._lap_event = self._riglog.lap_event
+
+        return self._lap_event
 
     @property
     def bin_range(self) -> tuple[int, int]:

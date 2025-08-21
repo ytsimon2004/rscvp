@@ -1,4 +1,4 @@
-from typing import cast
+from typing import cast, Sequence
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -173,7 +173,7 @@ def plot_alignment_map(signal: np.ndarray,
 def plot_tuning_heatmap(signal: np.ndarray, *,
                         belt_length: int = 150,
                         colorbar: bool = False,
-                        session_line: tuple[int, ...] | None = None,
+                        session_line: Sequence[int] | None = None,
                         ax: Axes | None = None):
     """
     Plot the heatmap tuning for x(position bins) and y(trials)

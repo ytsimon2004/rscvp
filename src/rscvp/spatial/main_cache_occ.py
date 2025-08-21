@@ -137,7 +137,8 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
 
         ps = PositionSignal(s2p, rig, window_count=self.pos_bins,
                             signal_type=self.signal_type,
-                            plane_index=self.plane_index)
+                            plane_index=self.plane_index,
+                            virtual_env=self.virtual_env)
 
         cache.occ_activity = ps.load_binned_data(self.act_normalized, self.running_epoch, 'transient', False)
         cache.occ_baseline = ps.load_binned_data(self.act_normalized, self.running_epoch, 'baseline', False)

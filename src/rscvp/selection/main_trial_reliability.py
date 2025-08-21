@@ -42,7 +42,7 @@ class TrialReliabilityOptions(AbstractParser, Suite2pOptions, StimpyOptions, Tre
 
     def post_parsing(self):
         if self.is_virtual_env:
-            self.session = 'all'
+            self.session = 'close'
 
     def run(self):
         self.post_parsing()
