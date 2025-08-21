@@ -37,14 +37,14 @@ class PositionBinnedSig:
             bin_range: int | tuple[int, int] | tuple[int, int, int] = (0, 150, 150),
             smooth_kernel: int = 3,
             position_sample_rate: int = 300,
-            virtual_env: bool = False
+            use_virtual_space: bool = False
     ):
         """
         :param riglog: ``RiglogData``
         :param bin_range: END or tuple of (start, end, number)
         :param smooth_kernel: Smoothing gaussian kernel after binned
         :param position_sample_rate: Position sampling rate for the interpolation
-        :param virtual_env: If run on virtual environment
+        :param use_virtual_space: If run on virtual environment
         """
         self._riglog = riglog
 
@@ -61,7 +61,7 @@ class PositionBinnedSig:
         #
         self.smooth_kernel = smooth_kernel
         self.position_sample_rate = position_sample_rate
-        self.virtual_env = virtual_env
+        self.use_virtual_space = use_virtual_space
 
         # running epoch
         self._running_velocity_threshold = 5
@@ -85,7 +85,7 @@ class PositionBinnedSig:
     @property
     def lap_event(self) -> RigEvent:
         if self._lap_event is None:
-            if self.virtual_env:
+            if self.use_virtual_space:
                 self._lap_event = self._riglog.get_pygame_stimlog().virtual_lap_event
             else:
                 self._lap_event = self._riglog.lap_event
@@ -109,7 +109,7 @@ class PositionBinnedSig:
             self._pos_cache = load_interpolated_position(
                 self._riglog,
                 sample_rate=self.position_sample_rate,
-                virtual_env=self.virtual_env,
+                use_virtual_space=self.use_virtual_space,
                 norm_length=self.bin_range[1]
             )
         return self._pos_cache.t
@@ -320,7 +320,7 @@ def load_interpolated_position(rig: RiglogData,
                                sample_rate: int = 1000,
                                force_compute: bool = False,
                                save_cache: bool = True,
-                               virtual_env: bool = False,
+                               use_virtual_space: bool = False,
                                norm_length: float = 150) -> CircularPosition:
     """
     get 'CircularPosition' and save as cache
@@ -329,13 +329,13 @@ def load_interpolated_position(rig: RiglogData,
     :param sample_rate: sampling rate for interpolation
     :param force_compute: force recalculate and save as a new cache
     :param save_cache: save cache in the same directory as riglog file
-    :param virtual_env: if used virtual environment position space
+    :param use_virtual_space: if used virtual environment position space
     :param norm_length: maximal length for normalization for each trial
     :return: ``CircularPosition``
     """
 
     file = rig.riglog_file
-    suffix = '_position_cache.npy' if not virtual_env else '_virtual_position_cache.npy'
+    suffix = '_position_cache.npy' if not use_virtual_space else '_virtual_position_cache.npy'
     cache_file = file.with_name(file.stem + suffix)
 
     if cache_file.exists() and not force_compute:
@@ -344,7 +344,7 @@ def load_interpolated_position(rig: RiglogData,
         lt = lt[~np.isnan(lt)].astype(int)
         return CircularPosition(d[:, 0], d[:, 1], d[:, 2], d[:, 3], lt)
     else:
-        if virtual_env:
+        if use_virtual_space:
             p = rig.get_pygame_stimlog().virtual_position_event
         else:
             p = rig.position_event

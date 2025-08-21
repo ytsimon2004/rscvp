@@ -25,15 +25,15 @@ class SiOptions(AbstractParser, PositionShuffleOptions, PlotOptions):
         if self.plot_summary:
             self.reuse_output = True
 
-        if self.virtual_env:
-            self.session = 'all'
+        if self.is_virtual_env:
+            self.session = 'close'
 
     def run(self):
         self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         output_info = self.get_data_output('si', self.session,
                                            running_epoch=self.running_epoch,
-                                           virtual_env=self.virtual_env)
+                                           use_virtual_space=self.use_virtual_space)
 
         if self.plot_summary:
             self.plot_si_cumulative(output_info)
@@ -42,7 +42,7 @@ class SiOptions(AbstractParser, PositionShuffleOptions, PlotOptions):
 
     def foreach_spatial_info(self, output: DataOutput, neuron_ids: NeuronID):
 
-        data = prepare_si_data(self, neuron_ids, virtual_env=self.virtual_env)
+        data = prepare_si_data(self, neuron_ids, use_virtual_space=self.use_virtual_space)
 
         headers = ['neuron_id', f'si_{self.session}', f'shuffled_si_{self.session}', f'place_cell_si_{self.session}']
         with csv_header(output.csv_output, headers) as csv:

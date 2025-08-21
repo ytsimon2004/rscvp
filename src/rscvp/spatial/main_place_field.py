@@ -123,13 +123,13 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
             self.pc_selection = 'slb'
             self.reuse_output = True
 
-        if self.virtual_env:
-            self.session = 'all'
+        if self.is_virtual_env:
+            self.session = 'close'
 
     def run(self):
         self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-        output_info = self.get_data_output('pf', self.session, virtual_env=self.virtual_env)
+        output_info = self.get_data_output('pf', self.session, use_virtual_space=self.use_virtual_space)
 
         if self.plot_summary:
             self.place_field_summary(output_info)
@@ -217,7 +217,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
         signal_all = gaussian_filter1d(sig_all, 3, mode='wrap', axis=2)
 
         trial = (
-            TrialSelection.from_rig(rig, self.session, virtual_env=self.virtual_env)
+            TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
             .get_selected_profile()
             .trial_slice
         )

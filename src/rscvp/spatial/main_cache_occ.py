@@ -28,7 +28,7 @@ class PosBinActCache(ETLConcatable):
     normalized_method: NORMALIZE_TYPE = persistence.field(validator=True, filename=False)
     bins: int = persistence.field(validator=True, filename=True, filename_prefix='bins_')
     run_epoch: bool = persistence.field(validator=True, filename=True, filename_prefix='run_epoch_')
-    virtual_env: bool = persistence.field(validator=True, filename=True, filename_prefix='vr_')
+    use_virtual_space: bool = persistence.field(validator=True, filename=True, filename_prefix='vr_')
 
     #
     occ_activity: np.ndarray
@@ -62,7 +62,7 @@ class PosBinActCache(ETLConcatable):
             normalized_method=const.normalized_method,
             bins=const.bins,
             run_epoch=const.run_epoch,
-            virtual_env=const.virtual_env,
+            use_virtual_space=const.use_virtual_space,
         )
         ret.occ_activity = np.vstack([it.occ_activity for it in data])
         ret.occ_baseline = np.vstack([it.occ_baseline for it in data])
@@ -128,7 +128,7 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
             normalized_method=self.act_normalized,
             bins=self.pos_bins,
             run_epoch=self.running_epoch,
-            virtual_env=self.virtual_env,
+            use_virtual_space=self.use_virtual_space,
         )
 
     def compute_cache(self, cache: PosBinActCache) -> PosBinActCache:
@@ -138,7 +138,7 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
         ps = PositionSignal(s2p, rig, window_count=self.pos_bins,
                             signal_type=self.signal_type,
                             plane_index=self.plane_index,
-                            virtual_env=self.virtual_env)
+                            use_virtual_space=self.use_virtual_space)
 
         cache.occ_activity = ps.load_binned_data(self.act_normalized, self.running_epoch, 'transient', False)
         cache.occ_baseline = ps.load_binned_data(self.act_normalized, self.running_epoch, 'baseline', False)

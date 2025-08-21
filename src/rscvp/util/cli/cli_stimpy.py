@@ -43,10 +43,10 @@ class StimpyOptions(CommonOptions):
         help='code version'
     )
 
-    virtual_env: bool = argument(
-        '--vr',
+    use_virtual_space: bool = argument(
+        '--vr-space',
         group=GROUP_STIMPY,
-        help='if the experiment is performed in VR environment or use virtual position space'
+        help='use virtual position space & lap event if vr protocol'
     )
 
     @property
@@ -114,11 +114,16 @@ class StimpyOptions(CommonOptions):
         """get the protocol type from the filename"""
         return get_protocol_name(self.load_riglog_data().riglog_file)
 
-    def get_session_info(self, rig: RiglogData, session: Session) -> SessionInfo:
-        if self.is_virtual_env:
-            return rig.get_pygame_stimlog().session_trials()[session]
-        else:
-            return rig.get_stimlog().session_trials()[session]
+    def get_session_info(self, rig: RiglogData,
+                         session: Session | None = None,
+                         ignore_all: bool = True) -> SessionInfo | dict[str, SessionInfo]:
+        stimlog = rig.get_pygame_stimlog() if self.is_virtual_env else rig.get_stimlog()
+        dy = stimlog.session_trials()
+
+        if ignore_all and 'all' in dy:
+            del dy['all']
+
+        return dy[session] if session is not None else dy
 
     def masking_lap_time(self, rig: RiglogData) -> np.ndarray:
 

@@ -45,7 +45,7 @@ class TrialSelection:
     def __init__(self, rig: RiglogData,
                  session: Session = 'all',
                  selected_trial: np.ndarray | None = None,
-                 virtual_env: bool = False):
+                 use_virtual_space: bool = False):
         """
 
         :param rig: ``RiglogData``
@@ -53,9 +53,9 @@ class TrialSelection:
         :param selected_trial: trial index, NOT trial number
         """
         self.rig = rig
-        self.virtual_env = virtual_env
+        self.use_virtual_space = use_virtual_space
 
-        if self.virtual_env:
+        if self.use_virtual_space:
             self.session_trial = self.rig.get_pygame_stimlog().session_trials()
         else:
             self.session_trial = self.rig.get_stimlog().session_trials()
@@ -72,12 +72,12 @@ class TrialSelection:
     @classmethod
     def from_rig(cls, rig: RiglogData,
                  session: Session = 'all',
-                 virtual_env: bool = False) -> Self:
-        return TrialSelection(rig, session, virtual_env=virtual_env)
+                 use_virtual_space: bool = False) -> Self:
+        return TrialSelection(rig, session, use_virtual_space=use_virtual_space)
 
     @property
     def lap_event(self) -> RigEvent:
-        if self.virtual_env:
+        if self.use_virtual_space:
             return self.rig.get_pygame_stimlog().virtual_lap_event
         else:
             return self.rig.lap_event

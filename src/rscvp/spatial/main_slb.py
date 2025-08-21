@@ -59,7 +59,7 @@ class PositionLowerBoundOptions(AbstractParser,
     signal_type: SIGNAL_TYPE = 'spks'
 
     def post_parsing(self):
-        if self.virtual_env:
+        if self.is_virtual_env:
             self.session = 'all'
 
     def run(self):
@@ -69,7 +69,7 @@ class PositionLowerBoundOptions(AbstractParser,
         output_info = self.get_data_output(
             'slb', self.session,
             running_epoch=self.running_epoch,
-            virtual_env=self.virtual_env
+            use_virtual_space=self.use_virtual_space
         )
         self.foreach_lower_bound(output_info, self.neuron_id)
         self.aggregate_output_csv(output_info)
@@ -101,7 +101,7 @@ class PositionLowerBoundOptions(AbstractParser,
             window_count=self.pos_bins,
             signal_type=self.signal_type,
             plane_index=self.plane_index,
-            virtual_env=self.virtual_env
+            use_virtual_space=self.use_virtual_space
         )
 
         neuron_list = get_neuron_list(s2p, neuron_ids)
@@ -112,14 +112,19 @@ class PositionLowerBoundOptions(AbstractParser,
             signal_all = gaussian_filter1d(signal_all, 3, mode='wrap', axis=2)
 
         trials = (
-            TrialSelection(rig, self.session, virtual_env=self.virtual_env)
+            TrialSelection(rig, self.session, use_virtual_space=self.use_virtual_space)
             .get_selected_profile()
             .trial_range
         )
 
         #
         if self.with_place_field_info:
-            pf_info = self.get_data_output('pf', self.session, virtual_env=self.virtual_env, latest=True).csv_output
+            pf_info = self.get_data_output(
+                'pf', self.session,
+                use_virtual_space=self.use_virtual_space,
+                latest=True
+            ).csv_output
+
             field = f'pf_reliability_{self.session}'
 
             def _dtype_map(x: str) -> str:

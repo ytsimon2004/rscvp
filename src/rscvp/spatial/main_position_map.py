@@ -36,7 +36,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
             self.pc_selection = 'slb'
             self.used_session = 'light'
 
-        if self.virtual_env:
+        if self.is_virtual_env:
             self.session = 'all'
 
     def run(self):
@@ -44,7 +44,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         output_info = self.get_data_output('ba', self.signal_type,
                                            running_epoch=self.running_epoch,
-                                           virtual_env=self.virtual_env)
+                                           use_virtual_space=self.use_virtual_space)
 
         if self.overview:
             self.plot_overview(output_info)
@@ -103,7 +103,8 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
 
         # trial selection
         indices = (
-            TrialSelection.from_rig(rig, self.session, virtual_env=self.virtual_env)
+            TrialSelection
+            .from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
             .get_selected_profile()
             .trial_range
         )
@@ -137,14 +138,14 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         protocol = self.get_protocol_alias
         n_sessions = len(self.session_list)
         rig = self.load_riglog_data()
-        if self.virtual_env:
-            session = rig.get_pygame_stimlog().session_trials()
+
+        session = self.get_session_info(rig, ignore_all=True)
+
+        if self.use_virtual_space:
             lap_event = rig.get_pygame_stimlog().virtual_lap_event
         else:
-            session = rig.get_stimlog().session_trials()
             lap_event = rig.lap_event
 
-        del session['all']
 
         for neuron_id in tqdm(neuron_list, desc='plot_calactivity_belt', unit='neurons', ncols=80):
             signal = signal_all[neuron_id]

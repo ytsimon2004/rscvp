@@ -274,7 +274,7 @@ class SiSrcData(NamedTuple):
 
 def prepare_si_data(opt: PositionShuffleOptions,
                     neuron_ids: NeuronID,
-                    virtual_env: bool = False) -> SiSrcData:
+                    use_virtual_space: bool = False) -> SiSrcData:
     s2p = opt.load_suite_2p()
     neuron_list = get_neuron_list(s2p, neuron_ids)
 
@@ -282,14 +282,15 @@ def prepare_si_data(opt: PositionShuffleOptions,
     image_time = rig.imaging_event.time
     image_time = sync_s2p_rigevent(image_time, s2p, opt.plane_index)
 
-    pos = load_interpolated_position(rig, virtual_env=virtual_env)
+    pos = load_interpolated_position(rig, use_virtual_space=use_virtual_space)
 
     if opt.running_epoch:
         run_epoch = running_mask1d(pos.t, pos.v)
     else:
         run_epoch = None
 
-    session = rig.get_stimlog().session_trials()[opt.session]
+    # session = rig.get_stimlog().session_trials()[opt.session]
+    session = opt.get_session_info(rig, session=opt.session)
     pos_mask = session.time_mask_of(pos.t)
     pos_time = pos.t[pos_mask]
     pos_value = normalize_signal(pos.p)[pos_mask]
@@ -325,7 +326,7 @@ class PositionSignal:
                  window_count: int = 100,
                  signal_type: SIGNAL_TYPE = 'df_f',
                  plane_index: int | None = 0,
-                 virtual_env: bool = False):
+                 use_virtual_space: bool = False):
         """
         :param s2p: ``Suite2PResult``
         :param riglog: ``RiglogData``
@@ -336,8 +337,9 @@ class PositionSignal:
         """
         self.s2p = s2p
         self.rig = riglog
-        self.virtual_env = virtual_env
-        self.binned_sig = PositionBinnedSig(riglog, bin_range=(*bin_range, window_count), virtual_env=virtual_env)
+        self.use_virtual_space = use_virtual_space
+        self.binned_sig = PositionBinnedSig(riglog, bin_range=(*bin_range, window_count),
+                                            use_virtual_space=use_virtual_space)
 
         self._signal_type = signal_type
         self._plane_index = plane_index
@@ -347,7 +349,7 @@ class PositionSignal:
 
     @property
     def lap_event(self) -> RigEvent:
-        if self.virtual_env:
+        if self.use_virtual_space:
             return self.rig.get_pygame_stimlog().virtual_lap_event
         else:
             return self.rig.lap_event
