@@ -1,15 +1,17 @@
 import numpy as np
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 
 from argclz import AbstractParser
 from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent, SIGNAL_TYPE
 from neuralib.io import csv_header
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_selection import SelectionOptions
+from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 
 __all__ = ['EVOptions']
+
+from stimpyp import RigEvent, RiglogData
 
 
 class EVOptions(AbstractParser, SelectionOptions):
@@ -19,8 +21,14 @@ class EVOptions(AbstractParser, SelectionOptions):
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-        output_info = self.get_data_output('ev', self.session)
+        output_info = self.get_data_output('ev', self.session, use_virtual_space=self.use_virtual_space)
         self.foreach_explained_variance(output_info, self.neuron_id)
+
+    def get_lap_event(self, rig: RiglogData) -> RigEvent:
+        if self.use_virtual_space:
+            return rig.get_pygame_stimlog().virtual_lap_event
+        else:
+            return rig.lap_event
 
     def foreach_explained_variance(self, output: DataOutput, neuron_ids: NeuronID):
         """
@@ -33,15 +41,15 @@ class EVOptions(AbstractParser, SelectionOptions):
         s2p = self.load_suite_2p()
         neuron_list = get_neuron_list(s2p, neuron_ids)
 
-        lap_time = rig.lap_event.time
         image_time = rig.imaging_event.time
         image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
 
         # specify session
-        session = rig.get_stimlog().session_trials()[self.session]
-        lap_index = session.in_range(rig.lap_event.time, rig.lap_event.value.astype(int))
-        lap_index = slice(int(lap_index[0]), int(lap_index[1]))
-        lap_time = lap_time[lap_index]
+        lap_event = self.get_lap_event(rig)
+        lap_time = lap_event.time
+        session = self.get_session_info(rig, self.session)
+        lap_slice = session.in_slice(lap_event.time, lap_event.value.astype(int))
+        lap_time = lap_time[lap_slice]
 
         act_mask = session.time_mask_of(image_time)
 

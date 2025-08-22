@@ -23,7 +23,7 @@ class TrialCorrOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
         dat = self.select_trials_activity()
-        output_info = self.get_data_output('tcc', self.session)
+        output_info = self.get_data_output('tcc', self.session, use_virtual_space=self.use_virtual_space)
         self.foreach_trial_cc(dat, output_info)
 
     def select_trials_activity(self) -> np.ndarray:
@@ -34,7 +34,11 @@ class TrialCorrOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         else:
             raise NotImplementedError('')
 
-        indices = TrialSelection.from_rig(rig, self.session).get_selected_profile().trial_range
+        indices = (
+            TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
+            .get_selected_profile()
+            .trial_range
+        )
         act = act[:, slice(*indices), :]
 
         return act

@@ -25,9 +25,6 @@ class SiOptions(AbstractParser, PositionShuffleOptions, PlotOptions):
         if self.plot_summary:
             self.reuse_output = True
 
-        if self.is_virtual_env:
-            self.session = 'close'
-
     def run(self):
         self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)

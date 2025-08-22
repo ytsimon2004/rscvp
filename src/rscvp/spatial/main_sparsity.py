@@ -16,7 +16,9 @@ class SparsityOptions(AbstractParser, PositionShuffleOptions, SelectionOptions):
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-        output_info = self.get_data_output('spr', self.session, running_epoch=self.running_epoch)
+        output_info = self.get_data_output('spr', self.session,
+                                           running_epoch=self.running_epoch,
+                                           use_virtual_space=self.use_virtual_space)
         self.foreach_spatial_sparsity(output_info, self.neuron_id)
 
     def foreach_spatial_sparsity(self,
@@ -29,7 +31,7 @@ class SparsityOptions(AbstractParser, PositionShuffleOptions, SelectionOptions):
        :label: math-sample
 
         """
-        data = prepare_si_data(self, neuron_ids)
+        data = prepare_si_data(self, neuron_ids, use_virtual_space=self.use_virtual_space)
         with csv_header(output.csv_output, ['neuron_id', f'sparsity_{self.session}']) as csv:
             for neuron in tqdm(data.neuron_list, desc='sparsity', unit='neuron', ncols=80):
                 signal = data.signal(neuron, 'spks')

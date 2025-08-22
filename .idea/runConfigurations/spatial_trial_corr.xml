@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_trial_corr" />
-    <option name="PARAMETERS" value="-D 210315 -A YW006 -s light -P 0 --re --disk BigDATA --debug" />
+    <option name="PARAMETERS" value="-D 250820 -A YW102 -s close -P 0 --re --debug --vr" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

@@ -9,6 +9,7 @@ from matplotlib.axes import Axes
 from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 
+import stimpyp
 from argclz import AbstractParser, argument
 from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.io import csv_header
@@ -58,12 +59,7 @@ class PositionLowerBoundOptions(AbstractParser,
 
     signal_type: SIGNAL_TYPE = 'spks'
 
-    def post_parsing(self):
-        if self.is_virtual_env:
-            self.session = 'all'
-
     def run(self):
-        self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
         output_info = self.get_data_output(
@@ -156,6 +152,7 @@ class PositionLowerBoundOptions(AbstractParser,
 
     def _foreach_spatial_lower_bound(self, cp, signal_all, neuron, trials, pf_thres, pf_rel, output: DataOutput):
         """pure (independent) function for parallel computing"""
+        stimpyp.set_log_level('WARNING')
         output_file = output.data_output(f'slb-tmp-{neuron}', ext='.csv')
         signal = signal_all[neuron, slice(*trials), :]  # shape (L', B)
 

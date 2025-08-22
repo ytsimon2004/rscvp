@@ -66,7 +66,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
         image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
 
         dff = get_neuron_signal(s2p, signal_type=self.signal_type)[0]
-        pos = load_interpolated_position(rig).interp_time(image_time)
+        pos = load_interpolated_position(rig, use_virtual_space=self.use_virtual_space).interp_time(image_time)
 
         if self.running_epoch:
             mx = running_mask1d(pos.t, pos.v)
@@ -77,7 +77,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
         speed = pos.v
         position_time = pos.t
 
-        trial = TrialSelection.from_rig(rig, self.session)
+        trial = TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
         mx = trial.masking_time(image_time)
         dff = dff[:, mx]
         image_time = image_time[mx]
@@ -110,6 +110,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
                                 title=title, xlabel='∆F/F', ylabel='speed (cm/s)'
                             )
                         case 'pos_binned':
+                            self.load_binned_data(rig, pos)
                             self.plot_corr_trial_averaged(ax, x, self.binned_dff[n], self.binned_speed, title=title)
 
                 csv(n, score)
@@ -121,12 +122,17 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
         """Load trial-averaged activity and speed signals"""
 
         if self.binned_dff is None or self.binned_speed is None:
-            indices = TrialSelection.from_rig(rig, self.session).get_selected_profile().trial_range
+            indices = (
+                TrialSelection
+                .from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
+                .get_selected_profile().trial_range
+            )
             trial_range = np.arange(*indices)
 
             dff = self.apply_binned_act_cache().with_trial(trial_range).occ_activity  # shape (N, L, B)
 
-            pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.pos_bins))
+            pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.pos_bins),
+                                    use_virtual_space=self.use_virtual_space)
             speed = pbs.calc_binned_signal(pos.t, pos.v, desc='calculate binned speed')
             speed = speed[slice(*indices), :]  # shape (L, B)
 

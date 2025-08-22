@@ -307,7 +307,7 @@ class PositionBinnedSig:
         r, _ = np.histogram(pos, bins, weights=act)
 
         if occ is not None:
-            r = r / occ
+            r = np.divide(r, occ, out=np.zeros_like(r), where=occ != 0)
 
         if smooth:
             r[np.isnan(r)] = 0.0

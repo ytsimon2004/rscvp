@@ -36,9 +36,6 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
             self.pc_selection = 'slb'
             self.used_session = 'light'
 
-        if self.is_virtual_env:
-            self.session = 'all'
-
     def run(self):
         self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
@@ -145,7 +142,6 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
             lap_event = rig.get_pygame_stimlog().virtual_lap_event
         else:
             lap_event = rig.lap_event
-
 
         for neuron_id in tqdm(neuron_list, desc='plot_calactivity_belt', unit='neurons', ncols=80):
             signal = signal_all[neuron_id]
