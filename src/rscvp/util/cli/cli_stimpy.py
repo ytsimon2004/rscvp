@@ -10,7 +10,7 @@ from stimpyp import (
     Session,
     PyVlog,
     RiglogData,
-    get_protocol_name, ProtocolAlias, SessionInfo
+    get_protocol_name, ProtocolAlias, SessionInfo, RigEvent
 )
 from .cli_core import CommonOptions
 
@@ -113,6 +113,12 @@ class StimpyOptions(CommonOptions):
     def get_protocol_alias(self) -> ProtocolAlias:
         """get the protocol type from the filename"""
         return get_protocol_name(self.load_riglog_data().riglog_file)
+
+    def get_lap_event(self, rig: RiglogData) -> RigEvent:
+        if self.use_virtual_space:
+            return rig.get_pygame_stimlog().virtual_lap_event
+        else:
+            return rig.lap_event
 
     def get_session_info(self, rig: RiglogData,
                          session: Session | None = None,

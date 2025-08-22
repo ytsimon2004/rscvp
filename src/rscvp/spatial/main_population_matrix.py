@@ -30,14 +30,10 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-        output_info = self.get_data_output('cm')
-        self.population_corr_mtx(output_info)
+        output_info = self.get_data_output('cm', use_virtual_space=self.use_virtual_space)
+        self.plot_population_matrix(output_info)
 
-    def population_corr_mtx(self, output: DataOutput, diverging_color: bool = False):
-        """
-        :param output: ``DataOutput``
-        :param diverging_color: whether using diverging color map
-        """
+    def compute_matrix(self) -> np.ndarray:
         from scipy.stats import pearsonr
         rig = self.load_riglog_data()
 
@@ -48,8 +44,9 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
         signal_all = signal_all[cell_mask]  # (N', L, B)
 
         # trial selection
-        lap_time = rig.lap_event.time
-        session_info = rig.get_stimlog().session_trials()
+        lap_time = self.get_lap_event(rig).time
+        session_info = self.get_session_info(rig)
+
         is_ldl = self.is_ldl_protocol
 
         mx = get_trial_mask(session_info, self.x_cond, lap_time, is_ldl)
@@ -68,7 +65,15 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
                 corr_coef = pearsonr(a, b)[0]
                 matrix[y, x] = corr_coef
 
-        #
+        return matrix
+
+    def plot_population_matrix(self, output: DataOutput, diverging_color: bool = False):
+        """
+        :param output: ``DataOutput``
+        :param diverging_color: whether using diverging color map
+        """
+        matrix = self.compute_matrix()
+
         output_file = output.summary_figure_output(
             'pre' if self.pre_selection else None,
             self.pc_selection if self.pc_selection is not None else None,
@@ -115,24 +120,29 @@ def get_trial_mask(session_info: dict[Session, SessionInfo],
                    is_ldl: bool) -> np.ndarray:
     """Get bool array mask for selected trials in condition"""
     # order sensitive
+    info = session_info
     if cond.startswith('light-bas') and is_ldl:
-        session = session_info['light_bas']
+        session = info['light_bas']
     elif cond.startswith('light-end') and is_ldl:
-        session = session_info['light_end']
+        session = info['light_end']
     elif cond.startswith('light') and is_ldl:
-        session = session_info['light_bas']
+        session = info['light_bas']
     #
     elif cond.startswith('light') and not is_ldl:
-        session = session_info['light']
+        session = info['light']
     elif cond.startswith('dark'):  # used in both vol and ldl prot
-        session = session_info['dark']
+        session = info['dark']
     elif cond.startswith('visual'):
-        session = session_info['visual']
-    elif cond.startswith('all'):
-        session = session_info['all']
+        session = info['visual']
+    #
+    elif cond.startswith('open') and not is_ldl:
+        session = info['open']
+    elif cond.startswith('close') and not is_ldl:
+        session = info['close']
     else:
         raise ValueError(f'condition: {cond} is not supported. check {get_args(TRIAL_CV_TYPE)}')
 
+    # 2-fold cv usage
     x = session.time_mask_of(lap_time)
 
     if cond.endswith('-odd'):
