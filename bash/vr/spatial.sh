@@ -112,14 +112,16 @@ run_python spatial ss \
 
 run_python spatial sa \
   -t close \
+  -T df_f \
   -c slb \
   --used_session close
 
 run_python spatial sa \
-  -t dark \
-  --sort light \
+  -t close \
+  -T spks \
   -c slb \
-  --used_session light
+  --used_session close
+
 
 #run_python spatial cm \
 #  -x light-odd \

@@ -4,7 +4,6 @@ from typing import Any
 import numpy as np
 
 from argclz import AbstractParser, argument, int_tuple_type
-from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.plot import plot_figure, ax_merge
 from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
 from rscvp.spatial.main_cache_sortidx import ApplySortIdxOptions
@@ -32,7 +31,6 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
         help='trial(lap) numbers for plotting, if None, do the trial average',
     )
 
-    signal_type: SIGNAL_TYPE = 'df_f'
     pre_selection = True
     reuse_output = True
 
@@ -77,7 +75,8 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
             total_length=self.belt_length,
             cue_loc=self.cue_loc,
             n_selected_neurons=self.n_selected_neurons,
-            n_total_neurons=self.n_total_neurons
+            n_total_neurons=self.n_total_neurons,
+            signal_type=self.signal_type
         )
 
     def calactivity_belt_sorted(self, output: DataOutput):

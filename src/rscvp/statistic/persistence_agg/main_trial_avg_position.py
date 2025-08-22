@@ -41,7 +41,6 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, T
 
     field: Final = dict(plane_index=try_int_type, region=str)
 
-    signal_type = 'df_f'
     act_normalized = 'local'
     pre_selection = True
     pc_selection = 'slb'
@@ -121,6 +120,7 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, T
         with plot_figure(None, tight_layout=False) as ax:
             plot_sorted_trial_averaged_heatmap(
                 data,
+                signal_type=self.signal_type,
                 cmap='cividis',
                 interpolation='antialiased',
                 total_length=self.belt_length,

@@ -1,13 +1,14 @@
 from typing import cast, Sequence
 
 import numpy as np
+import scipy
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from scipy.stats import sem
 
-from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.plot.colormap import insert_colorbar
 from neuralib.typing import AxesArray
+from rscvp.util.typing import SIGNAL_TYPE
 
 __all__ = [
     'plot_sorted_trial_averaged_heatmap',
@@ -17,7 +18,10 @@ __all__ = [
 ]
 
 
-def plot_sorted_trial_averaged_heatmap(signal: np.ndarray, *,
+def plot_sorted_trial_averaged_heatmap(signal: np.ndarray,
+                                       signal_type: SIGNAL_TYPE,
+                                       *,
+                                       smooth_sigma: float | None = None,
                                        cmap: str = 'Greys',
                                        interpolation: str = 'none',
                                        total_length: int = 150,
@@ -35,6 +39,8 @@ def plot_sorted_trial_averaged_heatmap(signal: np.ndarray, *,
         B = Number of position bins
 
     :param signal: calcium signal. `Array[float, [N, B]]`
+    :param signal_type: {"df_f", "spks", 'cascade_spks'}
+    :param smooth_sigma: Gaussian smoothing sigma
     :param cmap: ``plt.imshow()`` cmap
     :param interpolation: ``plt.imshow()`` interpolation
     :param total_length: Total length of the 1D environment (in cm)
@@ -45,6 +51,9 @@ def plot_sorted_trial_averaged_heatmap(signal: np.ndarray, *,
     """
     if ax is None:
         _, ax = plt.subplots()
+
+    if smooth_sigma is not None:
+        signal = scipy.ndimage.gaussian_filter1d(signal, sigma=3, axis=1)
 
     im = ax.imshow(
         signal,
@@ -61,7 +70,13 @@ def plot_sorted_trial_averaged_heatmap(signal: np.ndarray, *,
 
     ax.set(xlabel='Position (cm)', ylabel='Neurons #')
     cbar = insert_colorbar(ax, im)
-    cbar.ax.set_ylabel('Norm. deconv')
+
+    if signal_type == 'spks':
+        cbar.ax.set_ylabel('Norm. deconv')
+    elif signal_type == 'df_f':
+        cbar.ax.set_ylabel('Norm. ∆F/F')
+    else:
+        raise ValueError(f'unknown signal type:{signal_type}')
 
     if n_selected_neurons and n_total_neurons:
         ax.set_title(f'num of neurons used: {n_selected_neurons} / {n_total_neurons}')
