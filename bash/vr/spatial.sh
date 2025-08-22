@@ -110,17 +110,17 @@ run_python spatial ss \
 # Population Level #
 # ================ #
 
-#run_python spatial sa \
-#  -t light \
-#  -c slb \
-#  --used_session light
-#
-#run_python spatial sa \
-#  -t dark \
-#  --sort light \
-#  -c slb \
-#  --used_session light
-#
+run_python spatial sa \
+  -t close \
+  -c slb \
+  --used_session close
+
+run_python spatial sa \
+  -t dark \
+  --sort light \
+  -c slb \
+  --used_session light
+
 #run_python spatial cm \
 #  -x light-odd \
 #  -y light-even \

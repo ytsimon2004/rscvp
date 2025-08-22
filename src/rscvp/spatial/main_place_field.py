@@ -123,7 +123,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
             self.pc_selection = 'slb'
             self.reuse_output = True
 
-        if self.is_virtual_env:
+        if self.is_virtual_protocol:
             self.session = 'close'
 
     def run(self):

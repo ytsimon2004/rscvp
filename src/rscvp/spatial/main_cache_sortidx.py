@@ -87,7 +87,7 @@ class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
         mx = self.get_selected_neurons()
         signal_all = self.apply_binned_act_cache().occ_activity[mx]
 
-        return signal_trial_cv_helper(rig, signal_all, self.use_trial)
+        return signal_trial_cv_helper(rig, signal_all, self.use_trial, use_virtual_space=self.use_virtual_space)
 
     # ============= #
     # Cache methods #

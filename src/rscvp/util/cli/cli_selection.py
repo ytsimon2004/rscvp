@@ -26,7 +26,7 @@ PC_CLASSIFIER = Literal['si', 'slb', 'intersec']
 
 class SelectionOptions(Suite2pOptions, StimpyOptions):
     """Neuronal selection and masking options"""
-    
+
     GROUP_SELECTION: ClassVar[str] = 'selection of neuron options'
     """selection of neuron options"""
 
@@ -218,25 +218,27 @@ class SelectionOptions(Suite2pOptions, StimpyOptions):
 
         :return: mask array. `Array[bool, N]`
         """
-        #
-        if self.not_circular_env:
-            t = False
-        else:
-            t = self.get_csv_data(f'trial_reliability_{self.used_session}') >= self.DEFAULT_TRIAL_THRES
-
         try:
+            n = self.get_csv_data('error_perc', enable_use_session=False) >= self.DEFAULT_NEUROPIL_THRES
+
+            if self.not_circular_env:
+                t = False
+            else:
+                t = self.get_csv_data(f'trial_reliability_{self.used_session}') >= self.DEFAULT_TRIAL_THRES
+
             if self.is_vop_protocol:
                 self.logger.info('do the preselection in vop...')
-                n = self.get_csv_data('error_perc', enable_use_session=False) >= self.DEFAULT_NEUROPIL_THRES
                 v = self.get_csv_data('reliability', enable_use_session=False) >= self.DEFAULT_VISUAL_THRES
                 return n & (t | v)
             elif self.is_ldl_protocol:
                 self.logger.info('do the preselection in non-visual prot')
-                n = self.get_csv_data('error_perc', enable_use_session=False) >= self.DEFAULT_NEUROPIL_THRES
+                return n & t
+            elif self.is_virtual_protocol:
+                self.logger.info('do the preselection in virtual prot')
                 return n & t
 
         except FileNotFoundError as e:
-            raise RuntimeError(f'{e} -> unknown protocol')
+            raise RuntimeError(f'data incomplete to do preselection: {repr(e)}')
 
         raise ValueError('')
 

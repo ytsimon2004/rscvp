@@ -41,14 +41,14 @@ class TrialReliabilityOptions(AbstractParser, Suite2pOptions, StimpyOptions, Tre
     )
 
     def post_parsing(self):
-        if self.is_virtual_env:
+        if self.is_virtual_protocol:
             self.session = 'close'
 
     def run(self):
         self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        output_info = self.get_data_output('tr', self.session)
+        output_info = self.get_data_output('tr', self.session, use_virtual_space=self.use_virtual_space)
         self.foreach_trial_reliability(output_info, self.neuron_id)
 
     def foreach_trial_reliability(self, output: DataOutput,

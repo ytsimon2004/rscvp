@@ -309,7 +309,8 @@ class CommonOptions:
         :param code: ``cli_io.CODE``
         :param prefix: Directory prefix for analysis condition. (i.e., session, signal type)
         :param running_epoch: Whether limit analysis in running epoch, If True, add `_run` flag in directory and filename
-        :param use_virtual_space: Whether data is calculated in based on virtual environment position space
+        :param use_virtual_space: Whether data is calculated in based on virtual environment position space.
+            It does not matter if the data is unrelated to position.
         :param latest: If True, store the new item in latest version file, otherwise create a new version
         :param output_type Output data type
         :return: ``DataOutput``
@@ -348,7 +349,8 @@ class CommonOptions:
 
         if use_virtual_space:
             d += '_pygame'
-            x += '_pygame'
+            if x is not None:
+                x += '_pygame'  # use in population
 
         filename = f'{self.exp_date}_{self.animal_id}_{x}'
         summary_filename = None if s is None else f'{self.exp_date}_{self.animal_id}_{s}'

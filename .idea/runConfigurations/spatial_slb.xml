@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_slb" />
-    <option name="PARAMETERS" value="-D 250820 -A YW102 --shuffle-times 100 -P 0 --pre --us light --heatmap --pf --do-smooth --vr --re" />
+    <option name="PARAMETERS" value="-D 250820 -A YW102 --shuffle-times 100 -P 0 --pre -s close --us close --heatmap --pf --do-smooth --vr --re" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

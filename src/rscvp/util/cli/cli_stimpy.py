@@ -94,7 +94,7 @@ class StimpyOptions(CommonOptions):
         return self.get_protocol_alias == 'visual_open_loop'
 
     @cached_property
-    def is_virtual_env(self) -> bool:
+    def is_virtual_protocol(self) -> bool:
         return 'vr' in self.get_protocol_alias
 
     @cached_property
@@ -104,7 +104,7 @@ class StimpyOptions(CommonOptions):
             return ['light', 'visual', 'dark']
         elif self.is_ldl_protocol:
             return ['light_bas', 'dark', 'light_end']
-        elif self.is_virtual_env:
+        elif self.is_virtual_protocol:
             return ['close', 'open']
         else:
             raise ValueError('unsupported protocol')
@@ -117,7 +117,7 @@ class StimpyOptions(CommonOptions):
     def get_session_info(self, rig: RiglogData,
                          session: Session | None = None,
                          ignore_all: bool = True) -> SessionInfo | dict[str, SessionInfo]:
-        stimlog = rig.get_pygame_stimlog() if self.is_virtual_env else rig.get_stimlog()
+        stimlog = rig.get_pygame_stimlog() if self.is_virtual_protocol else rig.get_stimlog()
         dy = stimlog.session_trials()
 
         if ignore_all and 'all' in dy:
@@ -127,7 +127,7 @@ class StimpyOptions(CommonOptions):
 
     def masking_lap_time(self, rig: RiglogData) -> np.ndarray:
 
-        if self.is_virtual_env:
+        if self.is_virtual_protocol:
             stim = rig.get_pygame_stimlog()
             session = stim.session_trials()[self.session]
             lap = stim.virtual_lap_event

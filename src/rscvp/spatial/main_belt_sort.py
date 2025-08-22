@@ -1,5 +1,4 @@
 from functools import cached_property
-from functools import cached_property
 from typing import Any
 
 import numpy as np
@@ -51,17 +50,12 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
                 if not all([isinstance(it, int) for it in self.use_trial]):
                     raise TypeError(f'illegal use-trial, not int : {self.use_trial}')
 
-        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-
     def run(self):
         self.post_parsing()
+        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        output_info = self.get_data_output('sa')
+        output_info = self.get_data_output('sa', use_virtual_space=self.use_virtual_space)
         self.calactivity_belt_sorted(output_info)
-
-    # ========================= #
-    # Signal processing methods #
-    # ========================= #
 
     @cached_property
     def selected_signal(self) -> np.ndarray:
@@ -71,7 +65,7 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
         mx = self.get_selected_neurons()
         signal_all = self.apply_binned_act_cache().occ_activity[mx]
 
-        return signal_trial_cv_helper(rig, signal_all, self.use_trial)
+        return signal_trial_cv_helper(rig, signal_all, self.use_trial, use_virtual_space=self.use_virtual_space)
 
     # ================ #
     # Plotting methods #

@@ -31,6 +31,10 @@ TRIAL_CV_TYPE = Literal[
     'dark', 'dark-odd', 'dark-even',
     'light-end', 'light-end-odd', 'light-end-even',
 
+    # vr
+    'close', 'close-odd', 'close-even',
+    'open', 'open-odd', 'open-even',
+
     # all
     'all', 'all-odd', 'all-even'
 ]
@@ -135,15 +139,15 @@ class TrialSelection:
     def invert(self) -> Self:
         whole = np.arange(*self.trial_range_in_session)
         ret = np.setdiff1d(whole, self.selected_trials)
-        return TrialSelection(self.rig, self.session_type, ret)
+        return TrialSelection(self.rig, self.session_type, ret, use_virtual_space=self.use_virtual_space)
 
     def select_odd(self) -> Self:
         odd_trials = np.arange(self.trial_range_in_session[0] + 1, self.trial_range_in_session[1], 2)
-        return TrialSelection(self.rig, self.session_type, odd_trials)
+        return TrialSelection(self.rig, self.session_type, odd_trials, use_virtual_space=self.use_virtual_space)
 
     def select_even(self) -> Self:
         even_trials = np.arange(*self.trial_range_in_session, 2)
-        return TrialSelection(self.rig, self.session_type, even_trials)
+        return TrialSelection(self.rig, self.session_type, even_trials, use_virtual_space=self.use_virtual_space)
 
     def select_range(self, trial_range: tuple[int, int],
                      session: Session | None = None) -> Self:
@@ -151,10 +155,10 @@ class TrialSelection:
         select_trials = np.arange(*trial_range)
         if session is None:
             session = self.session_type
-        return TrialSelection(self.rig, session, select_trials)
+        return TrialSelection(self.rig, session, select_trials, use_virtual_space=self.use_virtual_space)
 
     def select_odd_in_range(self, trial_range: tuple[int, int],
-                            session: Session | None = None):
+                            session: Session | None = None) -> Self:
         """select odd trials within a range of trials"""
         if session is None:
             session = self.session_type
@@ -162,10 +166,10 @@ class TrialSelection:
         t = self.select_range(trial_range, session=session)
         start, end = t.selected_trials[0], t.selected_trials[-1]
         odd_trials = np.arange(start + 1, end, 2)
-        return TrialSelection(self.rig, self.session_type, odd_trials)
+        return TrialSelection(self.rig, self.session_type, odd_trials, use_virtual_space=self.use_virtual_space)
 
     def select_even_in_range(self, trial_range: tuple[int, int],
-                             session: Session | None = None):
+                             session: Session | None = None) -> Self:
         """select even trials within a range of trials"""
         if session is None:
             session = self.session_type
@@ -173,7 +177,7 @@ class TrialSelection:
         t = self.select_range(trial_range, session=session)
         start, end = t.selected_trials[0], t.selected_trials[-1]
         even_trials = np.arange(start, end, 2)
-        return TrialSelection(self.rig, self.session_type, even_trials)
+        return TrialSelection(self.rig, self.session_type, even_trials, use_virtual_space=self.use_virtual_space)
 
     def masking_trial_matrix(self, data: np.ndarray, axis: int = 1) -> np.ndarray:
         """
@@ -444,7 +448,8 @@ def foreach_session_signals(s2p: Suite2PResult,
 
 def signal_trial_cv_helper(rig: RiglogData,
                            signal: np.ndarray,
-                           use_trial: TRIAL_CV_TYPE | tuple[int, int]) -> np.ndarray:
+                           use_trial: TRIAL_CV_TYPE | tuple[int, int],
+                           use_virtual_space: bool = False) -> np.ndarray:
     trial_literal = get_args(TRIAL_CV_TYPE)
 
     if use_trial in trial_literal:
@@ -457,7 +462,7 @@ def signal_trial_cv_helper(rig: RiglogData,
         else:
             raise ValueError(f'Invalid use_trial format: {use_trial}')
 
-        ts = TrialSelection(rig, trial_name)
+        ts = TrialSelection(rig, trial_name, use_virtual_space=use_virtual_space)
 
         match cv_name:
             case 'odd':
