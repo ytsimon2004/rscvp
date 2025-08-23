@@ -25,6 +25,7 @@ class SISortAlignPeakCache(ETLConcatable):
     selection: str = persistence.field(validator=True, filename=True)
     session_type: Session = persistence.field(validator=True, filename=True)
     act_normalized: bool = persistence.field(validator=True, filename=False)
+    use_virtual_space: bool = persistence.field(validator=True, filename=True, filename_prefix='vr_')
 
     neuron_idx: np.ndarray
     """neuronal index. `Array[float, N]`"""
@@ -48,6 +49,7 @@ class SISortAlignPeakCache(ETLConcatable):
             selection=const.selection,
             session_type=const.session_type,
             act_normalized=const.act_normalized,
+            use_virtual_space=const.use_virtual_space,
         )
 
         ret.neuron_idx = np.concatenate([it.neuron_idx for it in data])
@@ -102,7 +104,8 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
             signal_type=self.signal_type,
             selection=self.selection_prefix(),
             session_type=self.session,
-            act_normalized=self.act_normalized
+            act_normalized=self.act_normalized,
+            use_virtual_space=self.use_virtual_space,
         )
 
     def compute_cache(self, cache: SISortAlignPeakCache) -> SISortAlignPeakCache:
@@ -125,7 +128,11 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
             binned_sig = binned_sig[self.si_sorted_index]
 
         # trial selection
-        trial_range = TrialSelection(rig, self.session).get_selected_profile().trial_slice
+        trial_range = (
+            TrialSelection(rig, self.session, use_virtual_space=self.use_virtual_space)
+            .get_selected_profile()
+            .trial_slice
+        )
         binned_sig = binned_sig[:, trial_range, :]
 
         return circular_pos_shift(binned_sig, smooth=False)
@@ -136,8 +143,11 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
     def si(self) -> np.ndarray:
         """spatial information after selection"""
         if self.plane_index is not None:
-            f = pl.read_csv(self.get_data_output('si', self.used_session, latest=True).csv_output)
-            si = f[f'si_{self.used_session}'].to_numpy()
+            file = self.get_data_output('si', self.used_session,
+                                        use_virtual_space=self.use_virtual_space,
+                                        latest=True).csv_output
+            df = pl.read_csv(file)
+            si = df[f'si_{self.used_session}'].to_numpy()
         else:
             si = self.get_csv_data(f'si_{self.used_session}')
 

@@ -1,10 +1,9 @@
+from argclz import AbstractParser
+from neuralib.plot import plot_figure
 from rscvp.spatial.main_cache_align_peak import ApplyAlignPeakOptions
 from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
 from rscvp.spatial.util_plot import plot_alignment_map
 from rscvp.util.cli.cli_output import DataOutput
-
-from argclz import AbstractParser
-from neuralib.plot import plot_figure
 
 __all__ = ['AlignPeakMapOptions']
 
@@ -14,7 +13,7 @@ class AlignPeakMapOptions(AbstractParser, ApplyPosBinActOptions, ApplyAlignPeakO
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-        output_info = self.get_data_output('am')
+        output_info = self.get_data_output('am', use_virtual_space=self.use_virtual_space)
         self.plot_align_map(output_info)
 
     def plot_align_map(self, output: DataOutput):
