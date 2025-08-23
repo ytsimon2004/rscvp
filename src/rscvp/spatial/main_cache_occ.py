@@ -6,7 +6,6 @@ from neuralib.persistence import ETLConcatable, persistence
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from rscvp.spatial.util import PositionSignal, normalized_trial_avg
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
-from rscvp.util.cli.cli_stimpy import StimpyOptions
 from rscvp.util.cli.cli_suite2p import NORMALIZE_TYPE, Suite2pOptions
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.typing import SIGNAL_TYPE
@@ -102,7 +101,7 @@ class PosBinActCache(ETLConcatable):
         return normalized_trial_avg(self.occ_activity)
 
 
-class AbstractPosBinActOptions(TreadmillOptions, Suite2pOptions, StimpyOptions):
+class AbstractPosBinActOptions(Suite2pOptions, TreadmillOptions):
     binned_smooth: bool = argument(
         '--smooth',
         help='whether do the smoothing of binned signal'
@@ -135,7 +134,9 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
         s2p = self.load_suite_2p()
         rig = self.load_riglog_data()
 
-        ps = PositionSignal(s2p, rig, window_count=self.pos_bins,
+        ps = PositionSignal(s2p, rig,
+                            bin_range=(0, self.track_length),
+                            window_count=self.pos_bins,
                             signal_type=self.signal_type,
                             plane_index=self.plane_index,
                             use_virtual_space=self.use_virtual_space)

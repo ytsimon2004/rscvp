@@ -10,7 +10,7 @@ from rscvp.spatial.main_cache_occ import PosBinActCache, ApplyPosBinActOptions
 from rscvp.spatial.util import sort_neuron
 from rscvp.spatial.util_plot import plot_sorted_trial_averaged_heatmap
 from rscvp.statistic.persistence_agg.core import AbstractPersistenceAgg, data_region_dict
-from rscvp.util.cli import Region, SelectionOptions, TreadmillOptions
+from rscvp.util.cli import Region, SelectionOptions
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import Session
@@ -19,7 +19,7 @@ __all__ = ['PositionBinPersistenceAgg']
 
 
 @publish_annotation('main', project='rscvp', figure=['fig.2B', 'fig.S2E'], as_doc=True)
-class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, TreadmillOptions, SelectionOptions):
+class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, SelectionOptions):
     DESCRIPTION = 'Plot the sorted position-binned trial averaged activity heatmap for batch dataset'
 
     sort_session: Session | None = argument(

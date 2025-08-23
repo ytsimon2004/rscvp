@@ -1,7 +1,6 @@
 from typing import ClassVar, Literal
 
 from argclz import argument
-from .cli_stimpy import StimpyOptions
 from .cli_suite2p import Suite2pOptions
 from .cli_treadmill import TreadmillOptions
 
@@ -44,5 +43,5 @@ class ShuffleBaseOptions:
     )
 
 
-class PositionShuffleOptions(ShuffleBaseOptions, Suite2pOptions, StimpyOptions, TreadmillOptions):
+class PositionShuffleOptions(ShuffleBaseOptions, Suite2pOptions, TreadmillOptions):
     pass

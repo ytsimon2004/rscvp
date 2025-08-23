@@ -1,11 +1,12 @@
 from typing import ClassVar
 
 from argclz import argument, int_tuple_type
+from .cli_stimpy import StimpyOptions
 
 __all__ = ['TreadmillOptions']
 
 
-class TreadmillOptions:
+class TreadmillOptions(StimpyOptions):
     """Options for linear treadmill task"""
 
     GROUP_TREADMILL: ClassVar = 'Belt Options'
@@ -70,3 +71,13 @@ class TreadmillOptions:
         default=3,
         help='one side limit for peri-event raster(s)',
     )
+
+    @property
+    def track_length(self) -> int:
+        """get track length depending on either physical or virtual track"""
+        if self.use_virtual_space:
+            if self._riglog is None:
+                self.load_riglog_data()
+            return int(self._riglog.get_pygame_stimlog().get_virtual_length())
+        else:
+            return self.belt_length

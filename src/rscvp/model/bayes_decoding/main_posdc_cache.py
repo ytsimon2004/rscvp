@@ -65,7 +65,7 @@ class PositionDecodeCacheBuilder(AbstractParser, TreadmillOptions, SelectionOpti
                  lap_time=lap_time,
                  lights_off_lap=lights_off_lap,
                  lights_off_time=lights_off_time,
-                 trial_length=self.belt_length)
+                 trial_length=self.track_length)
 
         print_save(output_file)
 

@@ -122,7 +122,7 @@ def plot_fraction_active(ax: Axes,
 def plot_alignment_map(signal: np.ndarray,
                        signal_type: SIGNAL_TYPE,
                        *,
-                       total_length: int = 150,
+                       track_length: int = 150,
                        select_top: int | None = None,
                        neuron_norm: bool = True,
                        interpolation: str = 'none',
@@ -132,7 +132,7 @@ def plot_alignment_map(signal: np.ndarray,
 
     :param signal: `Array[float, [N, B]]`
     :param signal_type: {"df_f", "spks"}
-    :param total_length: Total length of the 1D environment (in cm)
+    :param track_length: Total track length (in cm)
     :param select_top: Only pick up the top cells for plotting, used if the neuron is sorted by spatial information
     :param neuron_norm: Trial averaged activity per neuron 01 normalization
     :param interpolation: Method for ``cmap`` interpolation
@@ -152,7 +152,7 @@ def plot_alignment_map(signal: np.ndarray,
         signal = signal[:select_top]
 
     # heatmap
-    half_lag = total_length / 2
+    half_lag = track_length / 2
 
     if neuron_norm:
         kw = dict(axis=1, keepdims=True)
@@ -186,7 +186,7 @@ def plot_alignment_map(signal: np.ndarray,
 
 
 def plot_tuning_heatmap(signal: np.ndarray, *,
-                        belt_length: int = 150,
+                        track_length: int = 150,
                         colorbar: bool = False,
                         session_line: Sequence[int] | None = None,
                         ax: Axes | None = None):
@@ -200,7 +200,7 @@ def plot_tuning_heatmap(signal: np.ndarray, *,
         B = Number of position bins
 
     :param signal: Binned calcium activity. `Array[float, [L, B]]`
-    :param belt_length: Belt length in cm
+    :param track_length: Track length in cm
     :param colorbar: If show colorbar
     :param session_line: Lines for separate different behavioral sessions
     :param ax: ``Axes``
@@ -209,7 +209,7 @@ def plot_tuning_heatmap(signal: np.ndarray, *,
         _, ax = plt.subplots()
 
     im = ax.imshow(signal,
-                   extent=(0, belt_length, 0, len(signal)),
+                   extent=(0, track_length, 0, len(signal)),
                    cmap='viridis',
                    interpolation='none',
                    aspect='auto',

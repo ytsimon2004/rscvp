@@ -12,14 +12,14 @@ from neuralib.typing import AxesArray
 from neuralib.typing.func import flatten_arraylike
 from neuralib.util.verbose import publish_annotation
 from rscvp.selection.utils import image_time_per_trial
-from rscvp.util.cli import DataOutput, PlotOptions, FIG_MODE, StimpyOptions, Suite2pOptions, get_neuron_list, NeuronID, \
+from rscvp.util.cli import DataOutput, PlotOptions, FIG_MODE, Suite2pOptions, get_neuron_list, NeuronID, \
     TreadmillOptions
 
 __all__ = ['TrialReliabilityOptions']
 
 
 @publish_annotation('main', project='rscvp', caption='lap (trial) reliability', as_doc=True)
-class TrialReliabilityOptions(AbstractParser, Suite2pOptions, StimpyOptions, TreadmillOptions, PlotOptions):
+class TrialReliabilityOptions(AbstractParser, Suite2pOptions, TreadmillOptions, PlotOptions):
     DESCRIPTION = 'See fraction of active trials in the linear treadmill task'
 
     filter: bool = argument(

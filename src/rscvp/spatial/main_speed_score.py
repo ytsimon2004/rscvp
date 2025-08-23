@@ -84,7 +84,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
         speed = speed[mx]
         position_time = position_time[mx]
 
-        x = np.linspace(0, self.belt_length, num=self.pos_bins)
+        x = np.linspace(0, self.track_length, num=self.pos_bins)
 
         # csv + plot
         header = 'speed_score'
@@ -131,7 +131,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
 
             dff = self.apply_binned_act_cache().with_trial(trial_range).occ_activity  # shape (N, L, B)
 
-            pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.pos_bins),
+            pbs = PositionBinnedSig(rig, bin_range=(0, self.track_length, self.pos_bins),
                                     use_virtual_space=self.use_virtual_space)
             speed = pbs.calc_binned_signal(pos.t, pos.v, desc='calculate binned speed')
             speed = speed[slice(*indices), :]  # shape (L, B)

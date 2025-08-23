@@ -93,7 +93,7 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
         with plot_figure(output_file, set_square=True) as ax:
             im = ax.imshow(
                 matrix,
-                extent=[0, self.belt_length, 0, self.belt_length],
+                extent=[0, self.track_length, 0, self.track_length],
                 cmap=cmap,
                 interpolation='none',
                 aspect='auto',

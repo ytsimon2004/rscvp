@@ -30,6 +30,7 @@ __all__ = ['BayesDecodeData',
            'ApplyBayesDecodeOptions']
 
 
+# TODO check
 class BayesDecodeData(NamedTuple):
     """
     `Dimension parameters`:

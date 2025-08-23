@@ -14,7 +14,7 @@ from stimpyp import Session
 __all__ = ['BehaviorSumOptions']
 
 
-class BehaviorSumOptions(AbstractParser, StimpyOptions, Suite2pOptions, TreadmillOptions):
+class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
     DESCRIPTION = 'Plot single animal in treadmill behavioral overview'
 
     session: Session | tuple[Session, ...] | None = as_argument(StimpyOptions.session).with_options(
@@ -56,7 +56,7 @@ class BehaviorSumOptions(AbstractParser, StimpyOptions, Suite2pOptions, Treadmil
         sep = check_treadmill_trials(riglog)
 
         # running speed heatmap
-        m = get_velocity_per_trial(lap_event.time, interp_pos, self.belt_length, self.smooth_vel)
+        m = get_velocity_per_trial(lap_event.time, interp_pos, self.track_length, self.smooth_vel)
 
         output_file = output.summary_figure_output(
             self.session if self.session is not None else None

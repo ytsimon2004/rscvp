@@ -33,7 +33,7 @@ class AlignPeakMapOptions(AbstractParser, ApplyPosBinActOptions, ApplyAlignPeakO
         with plot_figure(output_file, 2, 1, tight_layout=False) as axes:
             plot_alignment_map(sig,
                                self.signal_type,
-                               total_length=self.belt_length,
+                               track_length=self.track_length,
                                select_top=self.with_top,
                                axes=axes)
 

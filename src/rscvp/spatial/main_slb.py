@@ -143,6 +143,7 @@ class PositionLowerBoundOptions(AbstractParser,
                     signal_all,
                     n,
                     trials,
+                    self.track_length,
                     thres[n] if self.with_place_field_info else None,
                     reliability[n] if self.with_place_field_info else None,
                     output
@@ -150,7 +151,8 @@ class PositionLowerBoundOptions(AbstractParser,
                 for n in neuron_list
             )
 
-    def _foreach_spatial_lower_bound(self, cp, signal_all, neuron, trials, pf_thres, pf_rel, output: DataOutput):
+    def _foreach_spatial_lower_bound(self, cp, signal_all, neuron, trials, track_length,
+                                     pf_thres, pf_rel, output: DataOutput):
         """pure (independent) function for parallel computing"""
         stimpyp.set_log_level('WARNING')
         output_file = output.data_output(f'slb-tmp-{neuron}', ext='.csv')
@@ -178,7 +180,7 @@ class PositionLowerBoundOptions(AbstractParser,
             "threshold": thres,
             "bottom_shuffle": bottom_shuffle,
             "nbin_exceed": nbin_exceed,
-            "belt_length": self.belt_length,
+            "track_length": track_length,
             "window": self.pos_bins,
             "percentile": self.percentage,
             "pf_threshold": pf_thres,
@@ -188,7 +190,7 @@ class PositionLowerBoundOptions(AbstractParser,
         #
         if self.with_heatmap:
             with plot_figure(output.figure_output(neuron), 2, 1, sharex=True) as ax:
-                plot_tuning_heatmap(signal, ax=ax[0])
+                plot_tuning_heatmap(signal, track_length=track_length, ax=ax[0])
                 plot_spatial_lower_bound(ax=ax[1], **plot_args)
         else:
             with plot_figure(output.figure_output(neuron)) as ax:
@@ -241,7 +243,7 @@ def plot_spatial_lower_bound(mean_act: np.ndarray,
                              bottom_shuffle: np.ndarray,
                              nbin_exceed: int,
                              *,
-                             belt_length: int = 150,
+                             track_length: int = 150,
                              window: int = 100,
                              percentile: float = 97.5,
                              pf_threshold: float | None = None,
@@ -262,7 +264,7 @@ def plot_spatial_lower_bound(mean_act: np.ndarray,
     :param threshold: Upper percentile of shuffled distribution. `Array[float, B]`
     :param bottom_shuffle: Lower percentile of shuffled distribution. `Array[float, B]`
     :param nbin_exceed: Number of bins exceed the threshold
-    :param belt_length: Linear track length
+    :param track_length: Linear track length
     :param window: Number of position bins
     :param percentile: Criteria percentage
     :param pf_threshold: Place field Threshold
@@ -271,7 +273,7 @@ def plot_spatial_lower_bound(mean_act: np.ndarray,
     :param ax: ``Axes``
     :return:
     """
-    x = np.linspace(0, belt_length, num=window)
+    x = np.linspace(0, track_length, num=window)
 
     if mode == 'presentation':
         for act in shuffled_act:

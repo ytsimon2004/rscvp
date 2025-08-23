@@ -49,6 +49,9 @@ class StimpyOptions(CommonOptions):
         help='use virtual position space & lap event if vr protocol'
     )
 
+    _riglog: RiglogData | PyVlog | None = None
+    """cached riglog data"""
+
     @property
     def with_diode_offset(self) -> bool:
         """if do the diode offset synchronization"""
@@ -57,6 +60,13 @@ class StimpyOptions(CommonOptions):
     def load_riglog_data(self, **kwargs) -> RiglogData | PyVlog:
         """Load :class:`~stimpyp.stimpy_core.RiglogData` or :class:`~stimpyp.pyvstim.PyVlog`
          object based on the source version"""
+        if self._riglog is None:
+            self._riglog = self._load_riglog_data(**kwargs)
+
+        return self._riglog
+
+    def _load_riglog_data(self, **kwargs) -> RiglogData | PyVlog:
+        """load riglog data"""
         log_directory = self.get_src_path('stimpy')
 
         match self.source_version:

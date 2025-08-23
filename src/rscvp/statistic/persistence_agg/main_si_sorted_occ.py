@@ -77,7 +77,7 @@ class SISortAlignPersistenceAgg(AbstractPersistenceAgg, ApplyAlignPeakOptions, T
             plot_alignment_map(
                 data.sig,
                 self.signal_type,
-                total_length=self.belt_length,
+                track_length=self.track_length,
                 select_top=self.with_top,
                 interpolation='antialiased',
                 axes=axes

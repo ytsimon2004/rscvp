@@ -1,14 +1,14 @@
 from typing import Literal
 
 import numpy as np
-from rscvp.util.cli import TreadmillOptions
-from rscvp.util.cli.cli_camera import CameraOptions
-from rscvp.util.position import PositionBinnedSig
 
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
+from rscvp.util.cli import TreadmillOptions
+from rscvp.util.cli.cli_camera import CameraOptions
+from rscvp.util.position import PositionBinnedSig
 from stimpyp import RiglogData
 
 __all__ = ['LickProbOptions']
@@ -48,7 +48,7 @@ class LickProbOptions(AbstractParser, TreadmillOptions, CameraOptions, Dispatch)
         n_trials = dat.shape[0]
         with plot_figure(None, tight_layout=False) as ax:
             im = ax.imshow(dat,
-                           extent=[0, self.belt_length, 0, n_trials],
+                           extent=[0, self.track_length, 0, n_trials],
                            cmap='cividis',
                            aspect='auto',
                            origin='lower')

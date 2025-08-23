@@ -3,10 +3,6 @@ from typing import Literal
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import Normalize
-from rscvp.util.cli import TreadmillOptions
-from rscvp.util.cli.cli_camera import CameraOptions
-from rscvp.util.position import PositionBinnedSig
-from rscvp.util.util_camera import truncate_video_to_pulse
 
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
@@ -16,6 +12,10 @@ from neuralib.plot.plot import grid_subplots
 from neuralib.tracking.facemap import FaceMapResult
 from neuralib.tracking.facemap.plot import plot_cmap_time_series
 from neuralib.util.interp import interp1d_nan
+from rscvp.util.cli import TreadmillOptions
+from rscvp.util.cli.cli_camera import CameraOptions
+from rscvp.util.position import PositionBinnedSig
+from rscvp.util.util_camera import truncate_video_to_pulse
 from stimpyp import RiglogData
 
 __all__ = ['PupilTrackOptions']
@@ -64,7 +64,7 @@ class PupilTrackOptions(AbstractParser, TreadmillOptions, CameraOptions, Dispatc
         n_trials = dat.shape[0]
         with plot_figure(None, tight_layout=False) as ax:
             im = ax.imshow(dat,
-                           extent=[0, self.belt_length, 0, n_trials],
+                           extent=[0, self.track_length, 0, n_trials],
                            cmap='cividis',
                            aspect='auto',
                            origin='lower')

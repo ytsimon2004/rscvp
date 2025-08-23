@@ -13,12 +13,12 @@ from rscvp.util.cli import SelectionOptions
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 from rscvp.util.util_trials import TrialSelection
-from stimpyp import Session, SessionInfo, RigEvent
 from .util_plot import plot_tuning_heatmap
 
 __all__ = ['PositionMapOptions']
 
 
+# TODO check virtual position readout?
 @publish_annotation('main', project='rscvp', figure='fig.2A & fig.S5B-C', as_doc=True)
 class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions):
     DESCRIPTION = 'Plot normalized position binned calcium activity across trials'
@@ -143,6 +143,14 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         else:
             lap_event = rig.lap_event
 
+        # pre-compute session slices once
+        session_slices = None
+        if protocol in ['visual_open_loop', 'light_dark_light', 'vr']:
+            session_slices = {
+                k: v.in_slice(lap_event.time, lap_event.value_index)
+                for _, (k, v) in zip(range(n_sessions), session.items())
+            }
+
         for neuron_id in tqdm(neuron_list, desc='plot_calactivity_belt', unit='neurons', ncols=80):
             signal = signal_all[neuron_id]
 
@@ -153,7 +161,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
                                      tight_layout=False,
                                      figsize=(16, 6),
                                      gridspec_kw={'width_ratios': [1.618] + [1] * n_sessions}) as ax:
-                        self.plot_multiple_session(ax, session, lap_event, signal)
+                        self.plot_multiple_session(ax, session_slices, signal)
                 case 'grey':
                     with plot_figure(output.figure_output(neuron_id)) as ax:
                         self.plot_single_session(ax, signal)
@@ -161,21 +169,19 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
                     raise ValueError(f'plot is not implemented in {protocol}')
 
     def plot_multiple_session(self, axes: AxesArray,
-                              session: dict[Session, SessionInfo],
-                              lap_event: RigEvent,
+                              session_slices: dict,
                               signal: np.ndarray):
         """
         Plot binned_activity across multiple session
 
         :param axes: ``Axes``
-        :param session: session information dict
-        :param lap_event: lap event
+        :param session_slices: pre-computed session slices dict
         :param signal: binned cal-activity with shape (L, B) where L = diff(lap) - 1, B = spatial bins
         """
         n_sessions = len(self.session_list)
         session_sig = {
-            k: signal[v.in_slice(lap_event.time, lap_event.value_index)]
-            for _, (k, v) in zip(range(n_sessions), session.items())
+            k: signal[v]
+            for k, v in session_slices.items()
         }
 
         names = list(session_sig.keys())
@@ -186,7 +192,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         ax = axes[0, 0]
         plot_tuning_heatmap(
             signal,
-            belt_length=self.belt_length,
+            track_length=self.track_length,
             colorbar=True,
             session_line=[len(sig[i]) for i in range(n_sessions - 1)],
             ax=ax
@@ -199,7 +205,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
                 ax,
                 sig[i],
                 bins=self.pos_bins,
-                belt_length=self.belt_length,
+                track_length=self.track_length,
                 label=names[i],
                 color=label_color[i]
             )
@@ -210,32 +216,32 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
 
         for i in range(n_sessions):
             plot_tuning_heatmap(norm[i],
-                                belt_length=self.belt_length,
+                                track_length=self.track_length,
                                 colorbar=True if i == n_sessions - 1 else False,
                                 ax=axes[0, i + 1])
             plot_trial_avg_curve(axes[1, i + 1],
                                  norm[i],
                                  bins=self.pos_bins,
-                                 belt_length=self.belt_length,
+                                 track_length=self.track_length,
                                  label=names[i], color=label_color[i])
 
     def plot_single_session(self, ax, signal: np.ndarray):
         """plot binned_activity in single session, used in 'grey' protocol"""
-        plot_tuning_heatmap(signal, belt_length=self.belt_length, ax=ax)
+        plot_tuning_heatmap(signal, track_length=self.track_length, ax=ax)
         ax.set(xlabel='Position (cm)', ylabel='Neuron #')
 
 
 def plot_trial_avg_curve(ax: Axes,
                          signal: np.ndarray, *,
                          bins: int = 100,
-                         belt_length: int = 150,
+                         track_length: int = 150,
                          **kwargs):
     mean = np.nanmean(signal, axis=0)
     sem = stats.sem(signal, axis=0, nan_policy='omit')
-    x = np.arange(bins) * (belt_length / bins)
+    x = np.arange(bins) * (track_length / bins)
     ax.plot(x, mean, **kwargs)
     ax.fill_between(x, mean + sem, mean - sem, alpha=0.3, **kwargs)
-    ax.set(xlim=(0, belt_length), xlabel='Position (cm)', ylabel='Norm. dF/F')
+    ax.set(xlim=(0, track_length), xlabel='Position (cm)', ylabel='Norm. dF/F')
     ax.set_aspect(1.0 / ax.get_data_ratio(), adjustable='box')
 
 

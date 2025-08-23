@@ -134,7 +134,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
             if self.cutoff_vel is not None:
                 v[(v < self.cutoff_vel)] = 0
 
-            m = get_velocity_per_trial(lap_time, pars, self.belt_length, self.smooth_vel)
+            m = get_velocity_per_trial(lap_time, pars, self.track_length, self.smooth_vel)
             dataset.append(m)
 
             #

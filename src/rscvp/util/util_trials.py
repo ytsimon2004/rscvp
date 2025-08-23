@@ -261,7 +261,7 @@ class TrialSelection:
         end_time = info.time[1]
 
         if verbose:
-            fprint(f'select trials in {self.session_type} session: within {trial_range},'
+            fprint(f'select trials in {self.session_type} session: within {tuple(map(int, trial_range))},'
                    f'from {start_time} to {end_time}')
 
         return SelectedProfile(

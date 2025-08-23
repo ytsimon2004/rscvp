@@ -12,11 +12,6 @@ from typing import cast
 
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.selection.utils import image_time_per_trial
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import find_peaks
 from tqdm import tqdm
@@ -27,6 +22,11 @@ from neuralib.io import csv_header
 from neuralib.plot import plot_figure
 from neuralib.typing import ArrayLike, array2str
 from neuralib.util.unstable import unstable
+from rscvp.selection.utils import image_time_per_trial
+from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_selection import SelectionOptions
+from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
 
 __all__ = ['CueCLSOptions']
 
@@ -59,7 +59,7 @@ class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         signal, baseline = get_neuron_signal(s2p, neuron_list, signal_type='df_f', normalize=False)
         signal = gaussian_filter1d(signal, 5)
 
-        bin_size = self.belt_length / self.pos_bins
+        bin_size = self.track_length / self.pos_bins
         binned_sig = self.apply_binned_act_cache().occ_activity  # (N,L,B)
         binned_sig[np.isnan(binned_sig)] = 0
         binned_sig = gaussian_filter1d(binned_sig, 2, axis=2, mode='wrap')
@@ -85,7 +85,7 @@ class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
                         ['neuron_id', f'cue_points_{self.session}', f'cue_reliability_{self.session}',
                          f'n_cue_{self.session}', f'cue_diff_{self.session}',
                          'is_cue_cell']) as csv:
-            pos = np.arange(0, self.belt_length, bin_size)
+            pos = np.arange(0, self.track_length, bin_size)
             for neuron in tqdm(neuron_list, desc='cue', unit='neurons', ncols=80):
                 s = signal[neuron] if signal.shape[0] > 1 else signal[0]  # s.dim should be 1
                 sig_trial = image_time_per_trial(image_time, lap_time, s, act_mask)
@@ -126,7 +126,7 @@ class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         rb = np.zeros(len(points))  # reliability of each points
         ret = np.zeros(len(points))
         trial = np.zeros(len(sig_trial))
-        bin_size = self.belt_length / self.pos_bins
+        bin_size = self.track_length / self.pos_bins
 
         for i, p in enumerate(points):
 

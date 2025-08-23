@@ -241,7 +241,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
                                                  signal_bas[neuron],
                                                  self.peak_baseline_thres,
                                                  self.pos_bins,
-                                                 self.belt_length)
+                                                 self.track_length)
 
                 # width filter
                 pf_width_raw = ' '.join(map(str, pf_result_raw.pf_width))  # for .csv storage
@@ -249,7 +249,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
 
                 # reliability filter
                 n_trials = sig.shape[0]
-                bin_size = self.belt_length / sig.shape[1]
+                bin_size = self.track_length / sig.shape[1]
                 peak = [int(p / bin_size) for p in pf_result.pf_peak]  # cm to bin index
                 pf_reliability = [
                     float(np.mean([np.any(sig[i, p] > pf_result.threshold) for i in range(n_trials)]))
@@ -277,7 +277,7 @@ def calc_place_field(signal: np.ndarray,
                      baseline: np.ndarray,
                      threshold: float,
                      window: int = 100,
-                     belt_length: int = 150) -> PlaceFieldResult:
+                     track_length: int = 150) -> PlaceFieldResult:
     """
     Calculate place field information.
     Position bins in which the activity exceeded 20% of the difference between peak and baseline activity.
@@ -288,8 +288,8 @@ def calc_place_field(signal: np.ndarray,
     :param signal: 2D position-binned transient activity. `Array[float, [L,B]]`
     :param baseline: 2D position-binned baseline activity. `Array[float, [L,B]]`
     :param threshold: Threshold for the difference between peak and baseline activity
-    :param window: Bin number for the belt
-    :param belt_length: Length of the belt
+    :param window: Bin number for the track
+    :param track_length: Length of the track
     :return: ``PlaceFieldResult``
     """
     act = np.nanmean(signal, axis=0)  # trial avg (B, )
@@ -298,7 +298,7 @@ def calc_place_field(signal: np.ndarray,
 
     act_threshold = (np.max(act) - baseline) * threshold + baseline
 
-    bin_size = belt_length / window  # cm
+    bin_size = track_length / window  # cm
 
     intersect = np.nonzero(np.diff((act > act_threshold).astype(int)) != 0)[0]
     left = (act - act_threshold)[0]
