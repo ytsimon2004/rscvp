@@ -54,7 +54,7 @@ class RoisViewOptions(AbstractParser, ROIOptions, Dispatch, PlotOptions):
 
             coord = iter_source_coordinates(
                 ccf_dir.parse_csv,
-                only_areas=self.area,
+                area=self.area,
                 hemisphere=self.hemisphere,
                 to_brainrender=False,
                 source_order=('aRSC', 'pRSC')

@@ -14,11 +14,19 @@ from neuralib.plot.colormap import DiscreteColorMapper
 from neuralib.typing import DataFrame
 from rscvp.util.util_plot import REGION_COLORS_HIST
 
-__all__ = ['plot_categorical_region',
+__all__ = ['DEFAULT_AREA_SORT',
+           'plot_categorical_region',
            'plot_rois_bar',
            'plot_foreach_channel_pie',
            'prepare_venn_data',
            'get_acronym_fullname']
+
+DEFAULT_AREA_SORT: dict[Area, list[Area]] = {
+    'VIS': ['VISp', 'VISam', 'VISpm', 'VISl', 'VISal', 'VISpor', 'VISli', 'VISpl', 'VISC'],
+    'RHP': ['ENT', 'SUB', 'PRE', 'POST', 'Pros', 'PAR', 'HATA', 'APr'],
+    'ATN': ['AM', 'AV', 'AD', 'IAD', 'IAM', 'LD']
+}
+"""Dict of area:list of subarea, used for sorting to make plot consistent"""
 
 
 def plot_categorical_region(df: pd.DataFrame,

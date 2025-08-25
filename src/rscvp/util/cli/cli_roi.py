@@ -12,8 +12,7 @@ from neuralib.util.verbose import fprint
 from rscvp.atlas.dir import AbstractCCFDir
 from rscvp.util.cli import HistOptions
 
-__all__ = ['ROIOptions',
-           'RSCRoiClassifierDataFrame']
+__all__ = ['ROIOptions', 'RSCRoiClassifierDataFrame']
 
 
 class ROIOptions(HistOptions):

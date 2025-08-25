@@ -1,16 +1,15 @@
 from pathlib import Path
-from typing import Literal, ClassVar
+from typing import Literal
 
 import numpy as np
 
 from argclz import AbstractParser, as_argument, argument
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.atlas.ccf.dataframe import RoiSubregionDataFrame
-from neuralib.atlas.typing import Area
 from neuralib.plot import dotplot
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
-from rscvp.atlas.util_plot import plot_rois_bar
+from rscvp.atlas.util_plot import plot_rois_bar, DEFAULT_AREA_SORT
 from rscvp.util.cli.cli_hist import HistOptions
 from rscvp.util.cli.cli_roi import ROIOptions, RSCRoiClassifierDataFrame
 from rscvp.util.util_plot import REGION_COLORS_HIST
@@ -23,13 +22,6 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
     """Plot the fraction of subregions in a queried region"""
 
     DESCRIPTION = 'Plot the fraction of subregions in a queried region'
-
-    DEFAULT_AREA_SORT: ClassVar[dict[Area, list[Area]]] = {
-        'VIS': ['VISp', 'VISam', 'VISpm', 'VISl', 'VISal', 'VISpor', 'VISli', 'VISpl', 'VISC'],
-        'RHP': ['ENT', 'SUB', 'PRE', 'POST', 'Pros', 'PAR', 'HATA', 'APr'],
-        'ATN': ['AM', 'AV', 'AD', 'IAD', 'IAM', 'LD']
-    }
-    """Dict of area:list of subarea, used for sorting to make plot consistent"""
 
     area = as_argument(HistOptions.area).with_options(
         metavar='BRAIN_AREA',
@@ -114,7 +106,7 @@ class RoiQueryOptions(AbstractParser, ROIOptions, Dispatch):
         """
         dy = result.to_dict(as_series=False)
         # sort
-        sort_list = self.DEFAULT_AREA_SORT.get(self.area[0], None)
+        sort_list = DEFAULT_AREA_SORT.get(self.area[0], None)
         if sort_list is not None:
             dy = {area: dy[area] for area in sort_list if area in dy}
 
