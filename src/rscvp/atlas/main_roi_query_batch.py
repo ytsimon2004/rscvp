@@ -41,11 +41,15 @@ class RoiQueryBatchOptions(AbstractParser, ROIOptions, Dispatch):
         help='graph type options',
     )
 
+    total_fraction: bool = argument(
+        '--total-fraction',
+        help='use total fraction instead of fraction from each area'
+    )
+
     roi_norm: Final[ROIS_NORM_TYPE] = 'channel'
 
     def run(self):
         df = self.get_batch_subregion_data()
-        print(df)
         self.invoke_command(self.dispatch_plot, df)
         self.print_var(df)
 
@@ -54,9 +58,11 @@ class RoiQueryBatchOptions(AbstractParser, ROIOptions, Dispatch):
         for ccf_dir in self.foreach_ccf_dir():
             subregion = (
                 self.load_roi_dataframe(ccf_dir)
-                .to_subregion(self.area, source_order=('aRSC', 'pRSC', 'overlap'),
+                .to_subregion(self.area,
+                              source_order=('aRSC', 'pRSC', 'overlap'),
                               show_col=self.force_set_show_col,
-                              animal=ccf_dir.animal)
+                              animal=ccf_dir.animal,
+                              normalize=not self.total_fraction)
             )
 
             ret.append(subregion.dataframe())

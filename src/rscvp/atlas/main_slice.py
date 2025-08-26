@@ -10,9 +10,9 @@ class SliceViewOptions(AbstractParser):
 
     resolution: Final = 10
 
-    region: Literal['inj', 'SS', 'MO', 'ACA', 'PTLp'] = argument(
+    region: Literal['inj', 'SS', 'MO', 'ACA', 'PTLp', 'ATN'] = argument(
         '--region',
-        default='PTLp',
+        default='ATN',
         help='region to plot',
     )
 
@@ -33,6 +33,9 @@ class SliceViewOptions(AbstractParser):
             case 'PTLp':
                 index = 726
                 self.plot_coronal(self.region, index)
+            case 'ATN':
+                index = 615
+                self.plot_coronal(['AD', 'AM', 'AV', 'IAD', 'IAM', 'LD'], index)
 
     def plot_injection(self):
 
@@ -54,9 +57,11 @@ class SliceViewOptions(AbstractParser):
             view.plane_at(slice_index=posterior_index).plot(ax=ax[1], **kwargs)
             ax[1].plot(x, y, 'ro')
 
-    def plot_coronal(self, region: str, index: int):
+    def plot_coronal(self, region: str | list[str], index: int):
         with plot_figure(None) as ax:
-            kwargs = dict(boundaries=True, annotation_region=[region], annotation_cmap='copper')
+            if isinstance(region, str):
+                region = [region]
+            kwargs = dict(boundaries=True, annotation_region=region, annotation_cmap='copper')
 
             view = get_slice_view('reference', plane_type='coronal', resolution=self.resolution)
             view.plane_at(slice_index=index).plot(ax=ax, reference_bg_value=10, **kwargs)
