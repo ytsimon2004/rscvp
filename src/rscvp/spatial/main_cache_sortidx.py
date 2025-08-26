@@ -7,7 +7,6 @@ from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
 from rscvp.spatial.util import sort_neuron, normalized_trial_avg
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.typing import SIGNAL_TYPE
 from rscvp.util.util_trials import TRIAL_CV_TYPE, signal_trial_cv_helper
 
@@ -39,7 +38,7 @@ class SortIdxCache:
         return self.neuron_idx[self.sort_idx]
 
 
-class AbstractSortIdxOptions(TreadmillOptions, SelectionOptions):
+class AbstractSortIdxOptions(SelectionOptions):
     use_trial: TRIAL_CV_TYPE | tuple[int, int] = argument(
         '-t', '--use-trial',
         type=union_type(int_tuple_type, str),
@@ -56,8 +55,8 @@ class AbstractSortIdxOptions(TreadmillOptions, SelectionOptions):
     )
 
 
-class SortIdxCacheBuilder(AbstractParser, AbstractSortIdxOptions,
-                          ApplyPosBinActOptions, PersistenceRSPOptions[SortIdxCache]):
+class SortIdxCacheBuilder(AbstractParser, ApplyPosBinActOptions, AbstractSortIdxOptions,
+                          PersistenceRSPOptions[SortIdxCache]):
     DESCRIPTION = 'compute the trial average activity sorting idx along position bins'
 
     def post_parsing(self):

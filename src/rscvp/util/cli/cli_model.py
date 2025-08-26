@@ -3,7 +3,7 @@ from typing import ClassVar, Literal, TYPE_CHECKING
 from argclz import argument, union_type
 
 if TYPE_CHECKING:
-    from rscvp.util.util_trials import TrialSelection
+    from rscvp.util.util_trials import TrialSelection  # noqa: F401
 
 __all__ = [
     'CrossValidateType',
@@ -85,15 +85,3 @@ def trial_cross_validate(trial: 'TrialSelection',
 
         case _:
             raise TypeError('')
-
-# def _random_split(trial_select: 'TrialSelection',
-#                   train_fraction: float = 0.8) -> tuple['TrialSelection', 'TrialSelection']:
-#     """randomized train test split based on the trial range"""
-#     total = trial_select.selected_numbers
-#     n_test = int(total * (1 - train_fraction))
-#     trial_start = np.random.randint(total - n_test) + trial_select.trial_range_in_session[0]
-#     trial_range = (trial_start, trial_start + n_test)
-#
-#     test = trial_select.select_range(trial_range)
-#     train = test.invert()
-#     return train, test

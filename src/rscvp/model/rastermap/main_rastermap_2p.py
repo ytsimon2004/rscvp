@@ -16,7 +16,7 @@ from neuralib.util.gpu import check_mps_available
 from neuralib.util.unstable import unstable
 from neuralib.util.verbose import fprint
 from rscvp.model.rastermap.rastermap_2p_cache import RasterMap2PCacheBuilder, RasterInput2P
-from rscvp.util.cli import CameraOptions, DataOutput, RasterMapOptions, SBXOptions, SelectionOptions, TreadmillOptions
+from rscvp.util.cli import CameraOptions, DataOutput, RasterMapOptions, SBXOptions, SelectionOptions
 
 if TYPE_CHECKING:
     from neuropop.nn_prediction import PredictionNetwork
@@ -61,7 +61,6 @@ class NeuralNetworkTrainResult:
 
 
 class RunRasterMap2POptions(AbstractParser,
-                            TreadmillOptions,
                             SelectionOptions,
                             SBXOptions,
                             CameraOptions,

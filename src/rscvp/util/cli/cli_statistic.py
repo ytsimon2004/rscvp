@@ -5,12 +5,11 @@ from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from .cli_core import CommonOptions
 from .cli_io import HEADER
 from .cli_selection import SelectionOptions
-from .cli_treadmill import TreadmillOptions
 
 __all__ = ['StatisticOptions']
 
 
-class StatisticOptions(SelectionOptions, TreadmillOptions):
+class StatisticOptions(SelectionOptions):
     GROUP_STAT: ClassVar[str] = 'statistical options'
 
     exp_date = as_argument(CommonOptions.exp_date).with_options(required=False)

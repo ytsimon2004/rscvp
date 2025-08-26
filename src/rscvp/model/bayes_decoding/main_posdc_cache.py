@@ -6,7 +6,7 @@ from argclz import AbstractParser
 from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.utils import ensure_dir
 from neuralib.util.verbose import publish_annotation, print_save
-from rscvp.util.cli import TreadmillOptions, SelectionOptions
+from rscvp.util.cli import SelectionOptions
 from rscvp.util.position import load_interpolated_position
 from stimpyp import RiglogData
 
@@ -14,7 +14,7 @@ __all__ = ['PositionDecodeCacheBuilder']
 
 
 @publish_annotation('sup', project='rscvp', figure='fig.S2', caption='alternative way to run bayes decoder (posdc side project)')
-class PositionDecodeCacheBuilder(AbstractParser, TreadmillOptions, SelectionOptions):
+class PositionDecodeCacheBuilder(AbstractParser, SelectionOptions):
     DESCRIPTION = """
     Build the cache for Bayes decoding, which used on posdc pipeline, for more comprehensive cross-validation
     """

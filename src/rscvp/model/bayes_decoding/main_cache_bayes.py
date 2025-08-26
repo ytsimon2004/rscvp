@@ -19,7 +19,6 @@ from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions, AbstractPosBinAc
 from rscvp.util.cli.cli_model import ModelOptions, trial_cross_validate
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.position import PositionBinnedSig, load_interpolated_position
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
@@ -30,7 +29,6 @@ __all__ = ['BayesDecodeData',
            'ApplyBayesDecodeOptions']
 
 
-# TODO check
 class BayesDecodeData(NamedTuple):
     """
     `Dimension parameters`:
@@ -266,7 +264,7 @@ class BayesDecodeCache(ETLConcatable):
         return ret
 
 
-class AbstractBayesDecodeOptions(TreadmillOptions, SelectionOptions, ModelOptions):
+class AbstractBayesDecodeOptions(SelectionOptions, ModelOptions):
     spatial_bin_size: float | None = argument(
         '--spatial-bin',
         metavar='VALUE',
@@ -326,11 +324,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
     _current_train_test_index: int = 0
     number_iter: int | None = None
 
-    def post_parsing(self):
-        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-
     def setattr(self):
-        #
         self.rig = self.load_riglog_data()
         self.s2p = self.load_suite_2p()
 
@@ -350,10 +344,12 @@ class BayesDecodeCacheBuilder(AbstractParser,
         self._prepare_pos()
 
         #
-        self.trial_selection = TrialSelection.from_rig(self.rig, self.session)
+        self.trial_selection = TrialSelection.from_rig(self.rig, self.session, use_virtual_space=self.use_virtual_space)
         self.train_test_list = trial_cross_validate(self.trial_selection, self.cross_validation, self.train_fraction)
 
     def run(self):
+        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
+
         match self.cross_validation:
             case int(cv) if cv > 0:
                 self.number_iter = cv
@@ -386,7 +382,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
         self.image_time = image_time[self.image_mask]
 
     def _prepare_pos(self):
-        self.pos = load_interpolated_position(self.rig)
+        self.pos = load_interpolated_position(self.rig, use_virtual_space=self.use_virtual_space)
 
     def empty_cache(self) -> BayesDecodeCache:
         self.setattr()

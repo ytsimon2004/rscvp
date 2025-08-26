@@ -12,8 +12,8 @@ from argclz import argument, try_int_type
 from neuralib.util.verbose import fprint
 from stimpyp import Session
 from .cli_io import CELLULAR_IO
-from .cli_stimpy import StimpyOptions
 from .cli_suite2p import Suite2pOptions
+from .cli_treadmill import TreadmillOptions
 
 __all__ = [
     'SelectionOptions',
@@ -24,7 +24,7 @@ PC_CLASSIFIER = Literal['si', 'slb', 'intersec']
 """place(spatial)-tuned selection classifier type"""
 
 
-class SelectionOptions(Suite2pOptions, StimpyOptions):
+class SelectionOptions(Suite2pOptions, TreadmillOptions):
     """Neuronal selection and masking options"""
 
     GROUP_SELECTION: ClassVar[str] = 'selection of neuron options'
