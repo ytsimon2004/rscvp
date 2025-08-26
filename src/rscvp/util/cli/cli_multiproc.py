@@ -2,9 +2,9 @@ from typing import ClassVar
 
 import joblib
 import polars as pl
-from neuralib.util.verbose import fprint
 
 from argclz import argument, validator
+from neuralib.util.verbose import fprint
 from .cli_output import DataOutput
 
 __all__ = ['MultiProcOptions']
@@ -18,7 +18,7 @@ class MultiProcOptions:
 
     f_jobs: float = argument(
         '-J', '--job',
-        validator.float.in_range(0, 1),
+        validator.float.in_range_closed(0, 1),
         type=float,
         default=0.5,
         group=GROUP_MP,
