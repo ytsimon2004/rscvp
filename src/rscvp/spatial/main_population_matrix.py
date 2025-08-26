@@ -62,7 +62,11 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
             for y in range(self.pos_bins):
                 a = mean_x[:, x]  # population neural act in position x
                 b = mean_y[:, y]
-                corr_coef = pearsonr(a, b)[0]
+
+                if np.var(a) == 0 or np.var(b) == 0:  # constant arrays (no variance)
+                    corr_coef = 1.0 if np.array_equal(a, b) else 0.0
+                else:
+                    corr_coef = pearsonr(a, b)[0]
                 matrix[y, x] = corr_coef
 
         return matrix

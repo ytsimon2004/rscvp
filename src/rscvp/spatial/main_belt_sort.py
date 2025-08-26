@@ -72,7 +72,7 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
     @property
     def fig_kwargs(self) -> dict[str, Any]:
         return dict(
-            total_length=self.belt_length,
+            total_length=self.track_length,
             cue_loc=self.cue_loc,
             n_selected_neurons=self.n_selected_neurons,
             n_total_neurons=self.n_total_neurons,
@@ -167,7 +167,7 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
                 #
                 ax = ax_merge(_ax)[2:, i]
-                plot_fraction_active(ax, signal[:, i, :], belt_length=self.belt_length, cue_loc=self.cue_loc)
+                plot_fraction_active(ax, signal[:, i, :], belt_length=self.track_length, cue_loc=self.cue_loc)
 
                 if not first_panel:
                     ax.axes.yaxis.set_visible(False)

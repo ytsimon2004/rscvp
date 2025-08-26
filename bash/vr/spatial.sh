@@ -123,43 +123,38 @@ run_python spatial sa \
   --used_session close
 
 
-#run_python spatial cm \
-#  -x light-odd \
-#  -y light-even \
-#  -T df_f \
-#  -c slb \
-#  --pre \
-#  --used_session light \
-#  --re
-#
-#run_python spatial cm \
-#  -x light-odd \
-#  -y light-even \
-#  -T spks \
-#  -c slb \
-#  --pre \
-#  --used_session light \
-#  --re
-#
-#run_python spatial cm \
-#  -x light \
-#  -y dark \
-#  -T spks \
-#  -c slb \
-#  --pre \
-#  --used_session light \
-#  --re
-#
-#
-#run_python spatial am \
-#  -s light \
-#  --pre \
-#  --used_session light \
-#  -c slb
-#
-#run_python spatial am \
-#  -s dark \
-#  --pre \
-#  --used_session light \
-#  -c slb \
-#  --re
+run_python spatial cm \
+  -x close-odd \
+  -y close-even \
+  -T df_f \
+  -c slb \
+  --pre \
+  --used_session close \
+  --re
+
+run_python spatial cm \
+  -x close-odd \
+  -y close-even \
+  -T spks \
+  -c slb \
+  --pre \
+  --used_session close \
+  --re
+
+run_python spatial cm \
+  -x open-odd \
+  -y open-even \
+  -T df_f \
+  -c slb \
+  --pre \
+  --used_session close \
+  --re
+
+run_python spatial cm \
+  -x open-odd \
+  -y open-even \
+  -T spks \
+  -c slb \
+  --pre \
+  --used_session close \
+  --re
