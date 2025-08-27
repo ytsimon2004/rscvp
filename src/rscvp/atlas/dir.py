@@ -3,10 +3,10 @@ import shutil
 from pathlib import Path
 from typing import get_args, Final, Literal, Iterable
 
-from neuralib.atlas.ccf.matrix import CCFTransMatrix, load_transform_matrix
+from neuralib.atlas.ccf.matrix import load_transform_matrix
 from neuralib.atlas.typing import HEMISPHERE_TYPE, PLANE_TYPE
 from neuralib.typing import PathLike
-from neuralib.util.utils import joinn, uglob
+from neuralib.util.utils import joinn, uglob, ensure_dir
 from neuralib.util.verbose import fprint
 
 __all__ = ['AbstractCCFDir']
@@ -255,11 +255,7 @@ class AbstractCCFDir(metaclass=abc.ABCMeta):
 
     @property
     def roi_atlas_output(self) -> Path:
-        return self.output_folder / 'roiatlas'
-
-    @property
-    def roi_atlas_ibl_output(self) -> Path:
-        return self.output_folder / 'roiatlas_ibl'
+        return ensure_dir(self.output_folder / 'roiatlas')
 
     # ========= #
     # File Glob #

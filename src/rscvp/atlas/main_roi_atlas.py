@@ -15,7 +15,6 @@ from neuralib.util.utils import uglob
 from neuralib.util.verbose import publish_annotation
 from rscvp.atlas.dir import AbstractCCFDir
 from rscvp.util.cli import HistOptions
-from rscvp.util.util_plot import ROIS_COLORS
 
 __all__ = ['RoiAtlasOptions']
 
@@ -123,8 +122,8 @@ class RoiAtlas:
         return '\n'.join(v)
 
     def plot(self, ax: Axes, *,
-             s: float = 8,
-             a: float = 0.9,
+             s: float = 20,
+             a: float = 0.8,
              with_overlap: bool = True,
              set_axis_visible: bool = True,
              boundaries: bool = True,
@@ -138,13 +137,13 @@ class RoiAtlas:
             t = ax.transData
 
         plane = self.transform.get_slice_plane()
-        plane.plot(ax, to_um=True, boundaries=boundaries, reference_bg_value=10, alpha=a, transform=t)
+        plane.plot(ax, to_um=True, boundaries=boundaries, reference_bg_value=10, transform=t)
 
-        self._plot_rois_scatter(ax, self.red_coordinates, ROIS_COLORS['rfp'], s, a, t)
-        self._plot_rois_scatter(ax, self.green_coordinates, ROIS_COLORS['gfp'], s, a, t)
+        self._plot_rois_scatter(ax, self.red_coordinates, 'violet', s, a, t)
+        self._plot_rois_scatter(ax, self.green_coordinates, 'palegreen', s, a, t)
 
         if with_overlap and self.overlap_channel is not None:
-            self._plot_rois_scatter(ax, self.overlap_coordinates, ROIS_COLORS['overlap'], s, a, t)
+            self._plot_rois_scatter(ax, self.overlap_coordinates, 'gold', s, a, t)
 
         ax.set_title(self.title)
         ax.axes.yaxis.set_visible(set_axis_visible)
@@ -152,7 +151,7 @@ class RoiAtlas:
 
     @staticmethod
     def _plot_rois_scatter(ax, xy, c, s, a, t):
-        kwargs = dict(color=c, s=s, alpha=a, edgecolor='none', transform=t)
+        kwargs = dict(color=c, s=s, alpha=a, edgecolor='black', linewidth=0.4, transform=t)
         ax.scatter(xy[1, :], xy[0, :], **kwargs)
 
 
