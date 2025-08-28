@@ -2,7 +2,6 @@ from typing import NamedTuple, Callable
 
 import numpy as np
 import scipy
-from matplotlib import pyplot as plt
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
 from tqdm import trange
@@ -78,9 +77,6 @@ def calculate_si(t: np.ndarray,
     occupancy = gaussian_filter1d(np.histogram(x, bins, weights=dt)[0], 3, mode='wrap')
     # map.z
     activity = gaussian_filter1d(np.histogram(x, bins, weights=at)[0], 3, mode='wrap') / count
-
-    plt.plot(bins[:-1], activity)
-    plt.show()
 
     si = _spatial_info(occupancy, activity)
 
