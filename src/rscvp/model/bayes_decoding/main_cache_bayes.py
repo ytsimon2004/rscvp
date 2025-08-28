@@ -198,7 +198,11 @@ class BayesDecodeCache(ETLConcatable):
         image_time = image_time[image_mask]
 
         #
-        pos = load_interpolated_position(rig)
+        pos = load_interpolated_position(
+            rig,
+            use_virtual_space=opt.use_virtual_space,
+            norm_length=opt.track_length
+        )
 
         match self.run_epoch, position_down_sampling:
             case (True, True):
@@ -382,7 +386,11 @@ class BayesDecodeCacheBuilder(AbstractParser,
         self.image_time = image_time[self.image_mask]
 
     def _prepare_pos(self):
-        self.pos = load_interpolated_position(self.rig, use_virtual_space=self.use_virtual_space)
+        self.pos = load_interpolated_position(
+            self.rig,
+            use_virtual_space=self.use_virtual_space,
+            norm_length=self.track_length
+        )
 
     def empty_cache(self) -> BayesDecodeCache:
         self.setattr()

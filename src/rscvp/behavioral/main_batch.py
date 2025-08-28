@@ -99,7 +99,11 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
             riglog = self.load_riglog_data()
             reward_time = riglog.reward_event.time
 
-            pars = load_interpolated_position(riglog)
+            pars = load_interpolated_position(
+                riglog,
+                use_virtual_space=self.use_virtual_space,
+                norm_length=self.track_length
+            )
             pt, p, v = pars.t, pars.p, pars.v
 
             if self.cutoff_vel is not None:
@@ -128,7 +132,11 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
             riglog = self.load_riglog_data()
             lap_time = riglog.lap_event.time
 
-            pars = load_interpolated_position(riglog)
+            pars = load_interpolated_position(
+                riglog,
+                use_virtual_space=self.use_virtual_space,
+                norm_length=self.track_length
+            )
             pt, p, v = pars.t, pars.p, pars.v
 
             if self.cutoff_vel is not None:

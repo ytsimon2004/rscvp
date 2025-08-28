@@ -34,7 +34,11 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
     def behavior_sum_plot(self, output: DataOutput):
         """plot for behavioral overview, including running speed, licking information"""
         riglog = self.load_riglog_data()
-        interp_pos = load_interpolated_position(riglog)
+        interp_pos = load_interpolated_position(
+            riglog,
+            use_virtual_space=self.use_virtual_space,
+            norm_length=self.track_length
+        )
 
         if self.session is not None:
             riglog = riglog.with_sessions(self.session)
@@ -53,7 +57,7 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
         if self.cutoff_vel is not None:
             vel[(vel < self.cutoff_vel)] = 0
 
-        sep = check_treadmill_trials(riglog)
+        sep = check_treadmill_trials(riglog, use_virtual_space=self.use_virtual_space, track_length=self.track_length)
 
         # running speed heatmap
         m = get_velocity_per_trial(lap_event.time, interp_pos, self.track_length, self.smooth_vel)

@@ -13,7 +13,8 @@ from stimpyp import RiglogData
 __all__ = ['PositionDecodeCacheBuilder']
 
 
-@publish_annotation('sup', project='rscvp', figure='fig.S2', caption='alternative way to run bayes decoder (posdc side project)')
+@publish_annotation('sup', project='rscvp', figure='fig.S2',
+                    caption='alternative way to run bayes decoder (posdc side project)')
 class PositionDecodeCacheBuilder(AbstractParser, SelectionOptions):
     DESCRIPTION = """
     Build the cache for Bayes decoding, which used on posdc pipeline, for more comprehensive cross-validation
@@ -40,7 +41,11 @@ class PositionDecodeCacheBuilder(AbstractParser, SelectionOptions):
         act_time = sync_s2p_rigevent(rig.imaging_event.time, s2p, self.plane_index)
 
         #
-        pos = load_interpolated_position(rig)
+        pos = load_interpolated_position(
+            rig,
+            use_virtual_space=self.use_virtual_space,
+            norm_length=self.track_length
+        )
         position = pos.p
         position_time = pos.t
         lap_time = rig.lap_event.time

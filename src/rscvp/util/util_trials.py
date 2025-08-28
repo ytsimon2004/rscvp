@@ -290,7 +290,7 @@ class SelectedProfile:
 
     def with_selected_range(self, ranging: tuple[int, int]) -> Self:
         """with only selection trial ranged in this session"""
-        lap_time = self.selection.rig.lap_event.time
+        lap_time = self.selection.lap_event.time
 
         n1 = self.trial_range[0] + ranging[0]
         n2 = self.trial_range[0] + ranging[1]
@@ -314,20 +314,20 @@ class TrialSignal:
 
     time_profile: SelectedProfile
 
+    time: np.ndarray
+    """(T,)"""
+
     dff: np.ndarray
-    """(N, IT)"""
+    """(N, T)"""
     spks: np.ndarray
-    """(N, IT)"""
-    image_time: np.ndarray
-    """(IT,)"""
+    """(N, T)"""
 
     # optional
     position: np.ndarray = field(default=None, kw_only=True)
-    """(PT,)"""
+    """(T,)"""
     velocity: np.ndarray = field(default=None, kw_only=True)
-    """(PT,)"""
-    position_time: np.ndarray = field(default=None, kw_only=True)
-    """(PT,)"""
+    """(T,)"""
+
     vstim_pulse: np.ndarray = field(default=None, kw_only=True)
     """(VT,)"""
     vstim_time: np.ndarray = field(default=None, kw_only=True)
@@ -360,7 +360,7 @@ class TrialSignal:
         dff = dff[:, it_mask]
         spks = spks[:, it_mask]
 
-        return TrialSignal(prf, dff, spks, image_time)
+        return TrialSignal(prf, image_time, dff, spks)
 
     @property
     def n_neurons(self) -> int:
@@ -373,7 +373,10 @@ def foreach_session_signals(s2p: Suite2PResult,
                             plane_index: int,
                             normalize: bool = True,
                             do_smooth: bool = False,
-                            trial_numbers: tuple[int, int] | None = None) -> Iterable[TrialSignal]:
+                            trial_numbers: tuple[int, int] | None = None,
+                            use_virtual_space: bool = False,
+                            track_length: int = 150,
+                            visual_protocol: bool = True) -> Iterable[TrialSignal]:
     """
 
     :param s2p:
@@ -396,14 +399,17 @@ def foreach_session_signals(s2p: Suite2PResult,
         spks = gaussian_filter1d(spks, 3, axis=1)
 
     #
-    pos = load_interpolated_position(rig)
-
-    #
-    stim = rig.get_stimlog().stim_square_pulse_event()
+    stim = rig.get_stimlog().stim_square_pulse_event() if visual_protocol else None
 
     #
     image_time = rig.imaging_event.time
     image_time = sync_s2p_rigevent(image_time, s2p, plane_index)
+
+    #
+    pos = (
+        load_interpolated_position(rig, use_virtual_space=use_virtual_space, norm_length=track_length)
+        .interp_time(image_time)
+    )
 
     #
     session_info = rig.get_stimlog().session_trials()
@@ -411,7 +417,7 @@ def foreach_session_signals(s2p: Suite2PResult,
     sessions = list(session_info.keys())
 
     for s in sessions:
-        prf = TrialSelection(rig, s).get_selected_profile()
+        prf = TrialSelection(rig, s, use_virtual_space=use_virtual_space).get_selected_profile()
 
         if trial_numbers is not None:
             prf = prf.with_selected_range(trial_numbers)
@@ -420,27 +426,27 @@ def foreach_session_signals(s2p: Suite2PResult,
         t1 = prf.end_time
 
         # neural activity
-        it_mask = np.logical_and(t0 < image_time, image_time < t1)
-        _image_time = image_time[it_mask]
-        _dff = dff[:, it_mask]
-        _spks = spks[:, it_mask]
+        mx = np.logical_and(t0 < image_time, image_time < t1)
+        time = image_time[mx]
+        _dff = dff[:, mx]
+        _spks = spks[:, mx]
 
-        # position
-        pt_mask = np.logical_and(t0 < pos.t, pos.t < t1)
-        position_time = pos.t[pt_mask]
-        position = pos.p[pt_mask]
-        velocity = pos.v[pt_mask]
+        position = pos.p[mx]
+        velocity = pos.v[mx]
 
         # visual
-        vt_mask = np.logical_and(t0 < stim.time, stim.time < t1)
-        vtime = stim.time[vt_mask]
-        vpulse = stim.value[vt_mask]
+        if visual_protocol:
+            vt_mask = np.logical_and(t0 < stim.time, stim.time < t1)
+            vtime = stim.time[vt_mask]
+            vpulse = stim.value[vt_mask]
+        else:
+            vpulse = None
+            vtime = None
 
         yield TrialSignal(
-            prf, _dff, _spks, _image_time,
+            prf, time, _dff, _spks,
             position=position,
             velocity=velocity,
-            position_time=position_time,
             vstim_pulse=vpulse,
             vstim_time=vtime
         )

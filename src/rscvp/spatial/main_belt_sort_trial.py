@@ -32,9 +32,9 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
         output_info = self.get_data_output('spv')
-        self.calactivity_belt_trial(output_info)
+        self.plot_sort_activity(output_info)
 
-    def calactivity_belt_trial(self, output: DataOutput):
+    def plot_sort_activity(self, output: DataOutput):
         """plot the sorting calcium activity per lap, and corresponding position and running speed"""
 
         s2p = self.load_suite_2p()
@@ -42,20 +42,26 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
 
         image_time = rig.imaging_event.time
         image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
-        lap_time = rig.lap_event.time
+        lap_time = self.get_lap_event(rig).time
 
         if isinstance(self.use_trial, str):
-            indices = TrialSelection(rig, self.use_trial).get_selected_profile().trial_range
-            trial_range = slice(*indices)
-            t1 = indices[0]
-            t2 = indices[1]
+            trial_range = (
+                TrialSelection(rig, self.use_trial, use_virtual_space=self.use_virtual_space)
+                .get_selected_profile()
+                .trial_slice
+            )
+            t1, t2 = trial_range.start, trial_range.stop
         elif isinstance(self.use_trial, tuple):
             trial_range = slice(*self.use_trial)
             t1, t2 = self.use_trial
         else:
             raise ValueError('')
 
-        p_result = load_interpolated_position(rig)
+        p_result = load_interpolated_position(
+            rig,
+            use_virtual_space=self.use_virtual_space,
+            norm_length=self.track_length
+        )
         pt = p_result.t
         p = p_result.p
         v = p_result.v
@@ -111,7 +117,7 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
             self.use_trial,
         )
 
-        with plot_figure(output_file, 3, 1, figsize=(16, 6), tight_layout=False) as _ax:
+        with plot_figure(output_file, 3, 1, figsize=(16, 6), tight_layout=False, sharex=True) as _ax:
             #
             ax = _ax[0]
             im = ax.imshow(
@@ -123,7 +129,7 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
                 extent=[0 + t0, (s.shape[1] / s2p.fs) + t0, 0, s.shape[0]]
             )
 
-            insert_colorbar(ax, im)
+            insert_colorbar(ax, im, inset=True)
             ax.set(ylabel='neuron no.')
             ax.axes.xaxis.set_visible(False)
 

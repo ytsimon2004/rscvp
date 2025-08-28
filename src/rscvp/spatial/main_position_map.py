@@ -18,7 +18,6 @@ from .util_plot import plot_tuning_heatmap
 __all__ = ['PositionMapOptions']
 
 
-# TODO check virtual position readout?
 @publish_annotation('main', project='rscvp', figure='fig.2A & fig.S5B-C', as_doc=True)
 class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions):
     DESCRIPTION = 'Plot normalized position binned calcium activity across trials'

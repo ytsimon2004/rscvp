@@ -93,9 +93,11 @@ class GLMInputData:
                rig: RiglogData,
                signal_type: SIGNAL_TYPE,
                plane_index: int,
-               session: str) -> Self:
+               session: str,
+               use_virtual_space: bool = False,
+               track_length: int = 150) -> Self:
         """position covariates"""
-        return cls.of_var('pos', s2p, rig, signal_type, plane_index, session)
+        return cls.of_var('pos', s2p, rig, signal_type, plane_index, session, None, use_virtual_space, track_length)
 
     @classmethod
     def of_speed(cls,
@@ -103,9 +105,11 @@ class GLMInputData:
                  rig: RiglogData,
                  signal_type: SIGNAL_TYPE,
                  plane_index: int,
-                 session: str) -> Self:
+                 session: str,
+                 use_virtual_space: bool = False,
+                 track_length: int = 150) -> Self:
         """speed covariates"""
-        return cls.of_var('speed', s2p, rig, signal_type, plane_index, session)
+        return cls.of_var('speed', s2p, rig, signal_type, plane_index, session, None, use_virtual_space, track_length)
 
     @classmethod
     def of_lick(cls,
@@ -114,8 +118,11 @@ class GLMInputData:
                 signal_type: SIGNAL_TYPE,
                 plane_index: int,
                 session: str,
-                lick_tracker: LickTracker | None = None) -> Self:
-        return cls.of_var('lick_rate', s2p, rig, signal_type, plane_index, session, lick_tracker)
+                lick_tracker: LickTracker | None = None,
+                use_virtual_space: bool = False,
+                track_length: int = 150) -> Self:
+        return cls.of_var('lick_rate', s2p, rig, signal_type, plane_index, session, lick_tracker, use_virtual_space,
+                          track_length)
 
     @classmethod
     def of_acceleration(cls,
@@ -123,8 +130,11 @@ class GLMInputData:
                         rig: RiglogData,
                         signal_type: SIGNAL_TYPE,
                         plane_index: int,
-                        session: str) -> Self:
-        return cls.of_var('acceleration', s2p, rig, signal_type, plane_index, session)
+                        session: str,
+                        use_virtual_space: bool = False,
+                        track_length: int = 150) -> Self:
+        return cls.of_var('acceleration', s2p, rig, signal_type, plane_index, session, None, use_virtual_space,
+                          track_length)
 
     @classmethod
     def of_var(
@@ -136,6 +146,8 @@ class GLMInputData:
             plane_index: int,
             session: str,
             lick_tracker: LickTracker | None = None,
+            use_virtual_space: bool = False,
+            track_length: int = 150
     ) -> Self:
         """
         Create inputs for Linear-nonlinear Poisson GLM model
@@ -181,7 +193,11 @@ class GLMInputData:
 
         #
         if dtype in ('pos', 'speed', 'acceleration'):
-            pos = load_interpolated_position(rig)
+            pos = load_interpolated_position(
+                rig,
+                use_virtual_space=use_virtual_space,
+                norm_length=track_length
+            )
             pmask = trial.masking_time(pos.t)
             ptime = pos.t[pmask]
 

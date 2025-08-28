@@ -5,13 +5,13 @@ from tqdm import tqdm
 from argclz import int_tuple_type, AbstractParser, argument
 from neuralib.plot import plot_figure
 from neuralib.typing import AxesArray
-from rscvp.util.cli import DataOutput, StimpyOptions, Suite2pOptions
+from rscvp.util.cli import DataOutput, Suite2pOptions, TreadmillOptions
 from rscvp.util.util_trials import foreach_session_signals, TrialSignal
 
 __all__ = ['TrialActProfile']
 
 
-class TrialActProfile(AbstractParser, Suite2pOptions, StimpyOptions):
+class TrialActProfile(AbstractParser, Suite2pOptions, TreadmillOptions):
     DESCRIPTION = 'Plot the activities (dff/spks) versus position/velocity/visual stim profiles in range of laps'
 
     filter: bool = argument(
@@ -44,7 +44,10 @@ class TrialActProfile(AbstractParser, Suite2pOptions, StimpyOptions):
             self.plane_index,
             normalize=False,
             do_smooth=False,
-            trial_numbers=self.trial_numbers
+            trial_numbers=self.trial_numbers,
+            use_virtual_space=self.use_virtual_space,
+            track_length=self.track_length,
+            visual_protocol=self.is_vop_protocol
         ))
 
         try:
@@ -54,9 +57,9 @@ class TrialActProfile(AbstractParser, Suite2pOptions, StimpyOptions):
 
         #
         for n in tqdm(range(s2p.n_neurons)):
-            with plot_figure(output.figure_output(n), 5, 3,
-                             figsize=(10, 4),
-                             gridspec_kw={'height_ratios': [1.5, 1, 1.5, 1.5, 1.5]}) as _ax:
+            nrows = 5 if self.is_vop_protocol else 4
+            ncols = len(self.session_list)
+            with plot_figure(output.figure_output(n), nrows, ncols, figsize=(10, 4), sharex='col') as _ax:
 
                 for i, ts in enumerate(iter_session):
                     ax = _ax[:, i]
@@ -75,8 +78,7 @@ class TrialActProfile(AbstractParser, Suite2pOptions, StimpyOptions):
 
         return np.vstack(ret)
 
-    @staticmethod
-    def _plot_session_signals(axes: AxesArray,
+    def _plot_session_signals(self, axes: AxesArray,
                               trial_sig: TrialSignal,
                               neuron_id: int,
                               show_axis=True):
@@ -84,13 +86,15 @@ class TrialActProfile(AbstractParser, Suite2pOptions, StimpyOptions):
         dff = trial_sig.dff[neuron_id]
         spks = trial_sig.spks[neuron_id]
 
-        axes[0].plot(trial_sig.image_time, dff, c='g', lw=0.5)
+        axes[0].plot(trial_sig.time, dff, c='g', lw=0.5)
 
-        axes[1].plot(trial_sig.image_time, spks, c='r', lw=0.5)
+        axes[1].plot(trial_sig.time, spks, c='r', lw=0.5)
 
-        axes[2].plot(trial_sig.position_time, trial_sig.position, c='k', lw=0.8)
-        axes[3].plot(trial_sig.position_time, trial_sig.velocity, c='k', lw=0.8)
-        axes[4].plot(trial_sig.vstim_time, trial_sig.vstim_pulse, c='r', lw=0.8)
+        axes[2].plot(trial_sig.time, trial_sig.position, c='k', lw=0.8)
+        axes[3].plot(trial_sig.time, trial_sig.velocity, c='k', lw=0.8)
+
+        if self.is_vop_protocol:
+            axes[4].plot(trial_sig.vstim_time, trial_sig.vstim_pulse, c='r', lw=0.8)
 
         for i in range(axes.shape[0]):
             if not show_axis:

@@ -4,13 +4,13 @@ import numpy as np
 import seaborn as sns
 from matplotlib.axes import Axes
 from numpy import median
+
+from argclz import AbstractParser
+from neuralib.plot import plot_figure, ax_merge
 from rscvp.util.cli import TreadmillOptions, Suite2pOptions, DataOutput
 from rscvp.util.cli.cli_camera import CameraOptions
 from rscvp.util.position import load_interpolated_position
 from rscvp.util.util_lick import calc_lick_pos_trial, peri_reward_transformation, LickingPosition
-
-from argclz import AbstractParser
-from neuralib.plot import plot_figure, ax_merge
 
 __all__ = ['LickScoreOptions']
 
@@ -37,7 +37,11 @@ class LickScoreOptions(AbstractParser, CameraOptions, Suite2pOptions, TreadmillO
             raise ValueError('specify correct lick event signal source')
 
         #
-        interp_pos = load_interpolated_position(riglog)
+        interp_pos = load_interpolated_position(
+            riglog,
+            use_virtual_space=self.use_virtual_space,
+            norm_length=self.track_length
+        )
 
         lickscore = calc_lick_pos_trial(interp_pos, riglog.lap_event.time, lick_time)
 

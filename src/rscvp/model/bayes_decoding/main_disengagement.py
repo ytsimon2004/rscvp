@@ -1,12 +1,12 @@
 import numpy as np
+
+from argclz import AbstractParser
+from neuralib.plot.plot import scatter_histplot
 from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions
 from rscvp.model.bayes_decoding.util import calc_wrap_distance
 from rscvp.util.cli import CameraOptions
 from rscvp.util.position import load_interpolated_position
 from rscvp.util.util_lick import calc_lick_pos_trial
-
-from argclz import AbstractParser
-from neuralib.plot.plot import scatter_histplot
 
 __all__ = ['DecodeDisengageOptions']
 
@@ -40,7 +40,11 @@ class DecodeDisengageOptions(AbstractParser, ApplyBayesDecodeOptions, CameraOpti
         rig = self.load_riglog_data()
         trial_time = rig.lap_event.time
         lick_time = rig.lick_event.time
-        interp_pos = load_interpolated_position(rig)
+        interp_pos = load_interpolated_position(
+            rig,
+            use_virtual_space=self.use_virtual_space,
+            norm_length=self.track_length
+        )
 
         lick_pos = []
         iter_lick_pos = (

@@ -3,7 +3,7 @@ from matplotlib.axes import Axes
 
 from argclz import AbstractParser
 from neuralib.plot import plot_figure
-from rscvp.util.cli import PersistenceRSPOptions
+from rscvp.util.cli import PersistenceRSPOptions, TreadmillOptions
 from rscvp.util.position import load_interpolated_position
 from rscvp.visual.util_cache import AbstractVisualTuningOptions, VisualTuningCache, plot_visual_pattern_trace
 from stimpyp import GratingPattern
@@ -11,7 +11,10 @@ from stimpyp import GratingPattern
 __all__ = ['RunningVisualOptions']
 
 
-class RunningVisualOptions(AbstractParser, AbstractVisualTuningOptions, PersistenceRSPOptions[VisualTuningCache]):
+class RunningVisualOptions(AbstractParser,
+                           AbstractVisualTuningOptions,
+                           TreadmillOptions,
+                           PersistenceRSPOptions[VisualTuningCache]):
     DESCRIPTION = 'Calculate binned running speed during different sftf stimulation'
 
     def run(self):
@@ -39,7 +42,7 @@ class RunningVisualOptions(AbstractParser, AbstractVisualTuningOptions, Persiste
     def plot_speed_trace(self, cache: VisualTuningCache):
         s2p = self.load_suite_2p()
         rig = self.load_riglog_data()
-        pos = load_interpolated_position(rig)
+        pos = load_interpolated_position(rig, use_virtual_space=self.use_virtual_space, norm_length=self.track_length)
         pattern = GratingPattern.of(rig)
 
         with plot_figure(None, 1, 3) as ax:

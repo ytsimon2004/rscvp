@@ -2,6 +2,7 @@ from typing import NamedTuple, Callable
 
 import numpy as np
 import scipy
+from matplotlib import pyplot as plt
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
 from tqdm import trange
@@ -77,6 +78,9 @@ def calculate_si(t: np.ndarray,
     occupancy = gaussian_filter1d(np.histogram(x, bins, weights=dt)[0], 3, mode='wrap')
     # map.z
     activity = gaussian_filter1d(np.histogram(x, bins, weights=at)[0], 3, mode='wrap') / count
+
+    plt.plot(bins[:-1], activity)
+    plt.show()
 
     si = _spatial_info(occupancy, activity)
 
@@ -225,8 +229,7 @@ class SiSrcData(NamedTuple):
             signal_type = self.opt.signal_type
         return get_neuron_signal(self.s2p, neuron, signal_type=signal_type, normalize=True, dff=True)[0][self.act_mask]
 
-    def calc_si(self, neuron: int | np.ndarray,
-                window: int = None) -> SiResult:
+    def calc_si(self, neuron: int | np.ndarray, window: int = None) -> SiResult:
         """
 
         :param neuron: `neuron id` or `neuron activity signal`
@@ -282,7 +285,7 @@ def prepare_si_data(opt: PositionShuffleOptions,
     image_time = rig.imaging_event.time
     image_time = sync_s2p_rigevent(image_time, s2p, opt.plane_index)
 
-    pos = load_interpolated_position(rig, use_virtual_space=use_virtual_space)
+    pos = load_interpolated_position(rig, use_virtual_space=use_virtual_space, norm_length=opt.track_length)
 
     if opt.running_epoch:
         run_epoch = running_mask1d(pos.t, pos.v)

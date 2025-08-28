@@ -248,7 +248,11 @@ class RasterMap2PCacheBuilder(AbstractParser,
         self.trial = TrialSelection.from_rig(self.rig, self.session)
         self.start_time = self.trial.session_info.time[0]
         self.end_time = self.trial.session_info.time[1]
-        self.pos = load_interpolated_position(self.rig)
+        self.pos = load_interpolated_position(
+            self.rig,
+            use_virtual_space=self.use_virtual_space,
+            norm_length=self.track_length
+        )
 
         self._prepare_image_time()
 

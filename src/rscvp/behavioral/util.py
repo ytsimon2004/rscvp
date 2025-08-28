@@ -56,7 +56,10 @@ def get_velocity_per_trial(lap_time: np.ndarray,
     return np.array(ret)
 
 
-def check_treadmill_trials(rig: RiglogData, error_when_abnormal: bool = False) -> list[int] | None:
+def check_treadmill_trials(rig: RiglogData,
+                           error_when_abnormal: bool = False,
+                           use_virtual_space: bool = False,
+                           track_length: int = 150) -> list[int] | None:
     """
     Warning verbose of the abnormal behaviors in the linear treadmill setup,
     and get the list of trial number for each behavioral session
@@ -65,7 +68,11 @@ def check_treadmill_trials(rig: RiglogData, error_when_abnormal: bool = False) -
     :param error_when_abnormal: Raise error when rig hardware problem, otherwise, give warning
     :return: behavior sessions lap separation (trial numbers)
     """
-    vel = load_interpolated_position(rig).v
+    vel = load_interpolated_position(
+        rig,
+        use_virtual_space=use_virtual_space,
+        norm_length=track_length
+    ).v
 
     # printout warning msg for the abnormal animal's behavior
     if np.any(vel < -10):
