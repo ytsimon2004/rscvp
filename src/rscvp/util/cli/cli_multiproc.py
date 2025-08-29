@@ -1,3 +1,4 @@
+import sys
 from typing import ClassVar
 
 import joblib
@@ -16,8 +17,8 @@ class MultiProcOptions:
     GROUP_MP: ClassVar[str] = 'Multiprocessing CPU Option'
     """Multiprocessing CPU Option"""
 
-    f_jobs: float = argument(
-        '-J', '--job',
+    _f_cpu: float = argument(
+        '--cpu-fraction',
         validator.float.in_range_closed(0, 1),
         type=float,
         default=0.5,
@@ -27,16 +28,16 @@ class MultiProcOptions:
 
     @property
     def parallel_jobs(self) -> int:
-        if self.f_jobs == 0:
-            n_jobs = 1
+        if self._f_cpu == 0:
+            n_cpu = 1
         else:
-            if not 0 < self.f_jobs <= 1:
-                raise ValueError('')
-            else:
-                n_jobs = int(joblib.cpu_count() * self.f_jobs)
-        fprint(f'MultiProcess on {n_jobs} CPUs!', vtype='io', flush=True)
+            n_cpu = int(joblib.cpu_count() * self._f_cpu)
 
-        return n_jobs
+        if sys.platform == 'linux':
+            import os
+            os.environ.setdefault('JOBLIB_START_METHOD', 'spawn')
+
+        return n_cpu
 
     @staticmethod
     def aggregate_output_csv(output: DataOutput, pattern: str = 'tmp'):
