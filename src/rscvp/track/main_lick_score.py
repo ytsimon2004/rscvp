@@ -61,8 +61,8 @@ class LickScoreOptions(AbstractParser, CameraOptions, Suite2pOptions, TreadmillO
                               data: list[np.ndarray],
                               limit: float):
         """plot lick raster and histogram as a function of location"""
-        if self.cue_loc is not None:
-            for i, c in enumerate(self.cue_loc):
+        if self.track_landmarks is not None:
+            for i, c in enumerate(self.track_landmarks):
                 cc = peri_reward_transformation(c, limit)
                 ax.axvspan(cc - 2.5, cc + 2.5, facecolor='y', alpha=0.6, label=f'tac. cue_{i}')
 

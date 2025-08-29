@@ -25,7 +25,7 @@ def plot_sorted_trial_averaged_heatmap(signal: np.ndarray,
                                        cmap: str = 'Greys',
                                        interpolation: str = 'none',
                                        total_length: int = 150,
-                                       cue_loc: tuple[float, ...] | None = None,
+                                       landmarks: tuple[float, ...] | None = None,
                                        n_selected_neurons: int | None = None,
                                        n_total_neurons: int | None = None,
                                        ax: Axes | None = None):
@@ -44,7 +44,7 @@ def plot_sorted_trial_averaged_heatmap(signal: np.ndarray,
     :param cmap: ``plt.imshow()`` cmap
     :param interpolation: ``plt.imshow()`` interpolation
     :param total_length: Total length of the 1D environment (in cm)
-    :param cue_loc: Cue location in the environment (in cm)
+    :param landmarks: Cue location in the environment (in cm)
     :param n_selected_neurons: Number of selected neurons for title label
     :param n_total_neurons: Number of total neurons for title label
     :param ax: ``Axes``
@@ -64,8 +64,8 @@ def plot_sorted_trial_averaged_heatmap(signal: np.ndarray,
         origin='lower',
     )
 
-    if cue_loc is not None:
-        for i in cue_loc:
+    if landmarks is not None:
+        for i in landmarks:
             ax.axvline(i, ls='--', color='r', alpha=0.5)
 
     ax.set(xlabel='Position (cm)', ylabel='Neurons #')
@@ -87,7 +87,7 @@ def plot_fraction_active(ax: Axes,
                          *,
                          n_bins: int = 15,
                          belt_length: int = 150,
-                         cue_loc: tuple[float, ...] | None = None) -> None:
+                         landmarks: tuple[float, ...] | None = None) -> None:
     """
     Plot fraction of active cell along the belt
 
@@ -95,7 +95,7 @@ def plot_fraction_active(ax: Axes,
     :param signal: calcium signal. (N'(sorted selected neuron idx), B)
     :param n_bins: sample points (bin numbers) from histogram
     :param belt_length
-    :param cue_loc
+    :param landmarks
     """
     n_neurons = signal.shape[0]
     n_spatial_bin = signal.shape[1]
@@ -110,8 +110,8 @@ def plot_fraction_active(ax: Axes,
 
     ax.plot(x, y, color='k', lw=3)
 
-    if cue_loc is not None:
-        for i in cue_loc:
+    if landmarks is not None:
+        for i in landmarks:
             ax.axvline(i, ls='--', color='r', alpha=0.5)
 
     ax.set_xlim(0, belt_length)

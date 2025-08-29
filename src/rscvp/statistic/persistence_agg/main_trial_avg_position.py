@@ -124,7 +124,7 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, S
                 cmap='cividis',
                 interpolation='antialiased',
                 total_length=self.belt_length,
-                cue_loc=self.cue_loc,
+                landmarks=self.track_landmarks,
                 ax=ax
             )
 

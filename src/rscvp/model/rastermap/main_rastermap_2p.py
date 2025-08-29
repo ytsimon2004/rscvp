@@ -210,7 +210,7 @@ class RunRasterMap2POptions(AbstractParser,
 
             # cue
             if self.with_cue:
-                for c in self.dat.find_cues_loc(tmask, cue_loc=self.cue_loc):
+                for c in self.dat.get_landmarks_index(tmask, cue_loc=self.track_landmarks):
                     ax4.axvline(time[c], color='g', linestyle='--', alpha=0.4)
 
             # visual stim

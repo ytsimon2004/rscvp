@@ -1,13 +1,6 @@
 from typing import Final, Literal
 
 import numpy as np
-from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions, BayesDecodeCache
-from rscvp.model.bayes_decoding.util_plot import (
-    plot_decoding_err_position,
-    plot_confusion_scatter,
-    plot_confusion_heatmap
-)
-from rscvp.statistic.persistence_agg.core import AbstractPersistenceAgg, GroupInt, GroupName
 from scipy.stats import sem
 
 from argclz import try_int_type, argument
@@ -15,6 +8,13 @@ from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure, grid_subplots
 from neuralib.typing import flatten_arraylike
 from neuralib.util.verbose import publish_annotation
+from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions, BayesDecodeCache
+from rscvp.model.bayes_decoding.util_plot import (
+    plot_decoding_err_position,
+    plot_confusion_scatter,
+    plot_confusion_heatmap
+)
+from rscvp.statistic.persistence_agg.core import AbstractPersistenceAgg, GroupInt, GroupName
 
 __all__ = ['BayesDecodePersistenceAgg']
 
@@ -180,7 +180,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
                 plot_confusion_heatmap(dat[0], dat[1],
                                        nbins=30,
                                        total_length=self.belt_length,
-                                       cue_loc=self.cue_loc,
+                                       landmarks=self.track_landmarks,
                                        ax=ax[group])
                 ax[group].set_title(self.get_label(group))
 
@@ -193,7 +193,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
             hide_axis=False,
             figsize=(6, 6),
             total_length=self.belt_length,
-            cue_loc=self.cue_loc,
+            landmarks=self.track_landmarks,
             title=[f'{self.exp_list[i]}_{self.animal_list[i]}' for i in range(len(data))]
         )
 

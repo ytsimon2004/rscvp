@@ -54,16 +54,16 @@ run_python selection tr \
   -s close \
   --stdf 3
 
+run_python spatial ba \
+  -T spks
+
 run_python spatial si \
-  --shuffle-times 200 \
+  --shuffle-times 100 \
   -s close
 
 run_python spatial si \
-  --shuffle-times 200 \
+  --shuffle-times 100 \
   -s open
-
-run_python spatial ba \
-  -T spks
 
 run_python spatial slb \
   --shuffle-times 100 \

@@ -9,7 +9,8 @@ from argclz import AbstractParser
 from neuralib.imaging.suite2p import SIGNAL_TYPE, Suite2PResult, get_neuron_signal, sync_s2p_rigevent, get_s2p_coords
 from neuralib.locomotion import CircularPosition
 from neuralib.persistence import persistence
-from rscvp.util.cli import RasterMapOptions, SBXOptions, SelectionOptions, CameraOptions, PersistenceRSPOptions
+from rscvp.util.cli import RasterMapOptions, SBXOptions, SelectionOptions, CameraOptions, PersistenceRSPOptions, \
+    TreadmillOptions
 from rscvp.util.position import load_interpolated_position
 from rscvp.util.util_camera import truncate_video_to_pulse
 from rscvp.util.util_trials import TrialSelection
@@ -65,10 +66,10 @@ class RasterInput2P:
     def y_pos(self) -> np.ndarray:
         return self.xy_pos[1]
 
-    def find_cues_loc(self, time_mask: np.ndarray | None = None,
-                      *,
-                      tolerance: float = 0.5,
-                      cue_loc: tuple[float, ...] = (50, 100)) -> np.ndarray:
+    def get_landmarks_index(self, time_mask: np.ndarray | None = None,
+                            *,
+                            tolerance: float = 0.5,
+                            cue_loc: tuple[float, ...] = (50, 100)) -> np.ndarray:
         """
         Find cue(s) location indices.
         **Note that the return is relative value to the ``time_mask`` (start from zero)**
@@ -154,9 +155,9 @@ class RasterMapCache:
     """1D animal velocity. `Array[float, T]`"""
     lap_index: np.ndarray
     """1D trial index (laps in circular env). `Array[float, T]`"""
-    pupil_area: Optional[np.ndarray]
+    pupil_area: np.ndarray | None
     """1D animal pupil area. `Array[float, T]`"""
-    visual_stim_time: np.ndarray
+    visual_stim_time: np.ndarray | None
     """2D on-off visual stimulation time. `Array[float, [S,2]]`"""
 
     def load_result(self) -> RasterInput2P:
@@ -177,6 +178,7 @@ class RasterMap2PCacheBuilder(AbstractParser,
                               SBXOptions,
                               RasterMapOptions,
                               CameraOptions,
+                              TreadmillOptions,
                               PersistenceRSPOptions[RasterMapCache]):
     """Building the rastermap cache for 2p dataset"""
 
@@ -229,7 +231,11 @@ class RasterMap2PCacheBuilder(AbstractParser,
         cache.velocity = vel
         cache.position = pos
         cache.lap_index = idx
-        cache.visual_stim_time = self.rig.get_stimlog().get_stim_pattern().time
+
+        if self.is_vop_protocol:
+            cache.visual_stim_time = self.rig.get_stimlog().get_stim_pattern().time
+        else:
+            cache.visual_stim_time = None
 
         if self.with_pupil:
             cache.pupil_area = self._prepare_pupil_area()
@@ -245,7 +251,7 @@ class RasterMap2PCacheBuilder(AbstractParser,
     def _set_attrs(self) -> None:
         self.rig = self.load_riglog_data()
         self.s2p = self.load_suite_2p()
-        self.trial = TrialSelection.from_rig(self.rig, self.session)
+        self.trial = TrialSelection.from_rig(self.rig, self.session, use_virtual_space=self.use_virtual_space)
         self.start_time = self.trial.session_info.time[0]
         self.end_time = self.trial.session_info.time[1]
         self.pos = load_interpolated_position(

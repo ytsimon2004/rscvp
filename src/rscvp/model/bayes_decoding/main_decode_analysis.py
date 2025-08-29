@@ -344,7 +344,7 @@ class DecodeAnalysisOptions(AbstractParser,
                 'actual_position': act,
                 'predicted_position': pred,
                 'total_length': self.belt_length,
-                'cue_loc': self.cue_loc
+                'landmarks': self.track_landmarks
             }
             plot_confusion_heatmap(ax=ax[0], **plot_args)
             plot_confusion_scatter(ax=ax[1], **plot_args)

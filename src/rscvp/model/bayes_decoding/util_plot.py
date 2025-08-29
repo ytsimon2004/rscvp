@@ -47,7 +47,7 @@ def plot_confusion_scatter(actual_position: np.ndarray,
                            predicted_position: np.ndarray,
                            *,
                            total_length: float = 150,
-                           cue_loc: tuple[float, ...] | None = None,
+                           landmarks: tuple[int, ...] | None = None,
                            ax: Axes | None = None):
     """
     Plot `scatter confusion matrix` of the decoding results
@@ -57,7 +57,7 @@ def plot_confusion_scatter(actual_position: np.ndarray,
     :param actual_position: Animal actual position. `Array[float, T]`
     :param predicted_position: Position by model prediction. `Array[float, T]`
     :param total_length: Total length of the 1D environment (in cm)
-    :param cue_loc: Cue location in the environment (in cm)
+    :param landmarks: Cue location in the environment (in cm)
     :param ax: ``Axes``
     """
     if ax is None:
@@ -65,8 +65,8 @@ def plot_confusion_scatter(actual_position: np.ndarray,
 
     ax.scatter(actual_position, predicted_position, s=3, alpha=0.7, color='grey', edgecolor='none')
 
-    if cue_loc is not None:
-        for c in cue_loc:
+    if landmarks is not None:
+        for c in landmarks:
             ax.axvline(c, ls='--', color='k', alpha=0.5)
             ax.axhline(c, ls='--', color='k', alpha=0.5)
 
@@ -79,7 +79,7 @@ def plot_confusion_heatmap(actual_position: np.ndarray,
                            nbins: int = 30,
                            *,
                            total_length: int = 150,
-                           cue_loc: tuple[float, ...] | None = None,
+                           landmarks: tuple[int, ...] | None = None,
                            ax: Axes | None = None):
     """
     Plot `heatmap confusion matrix` of the decoding results
@@ -90,7 +90,7 @@ def plot_confusion_heatmap(actual_position: np.ndarray,
     :param predicted_position: Position by model prediction. `Array[float, T]`
     :param nbins: Number of position bins
     :param total_length: Total length of the 1D environment (in cm)
-    :param cue_loc: Cue location of labeling
+    :param landmarks: Cue location of labeling
     :param ax: ``Axes``
     :return:
     """
@@ -110,8 +110,8 @@ def plot_confusion_heatmap(actual_position: np.ndarray,
                    extent=(0, total_length, 0, total_length),
                    vmin=0, vmax=1)  # for visualization
 
-    if cue_loc is not None:
-        for c in cue_loc:
+    if landmarks is not None:
+        for c in landmarks:
             ax.axvline(c, ls='--', color='k', alpha=0.5)
             ax.axhline(c, ls='--', color='k', alpha=0.5)
 

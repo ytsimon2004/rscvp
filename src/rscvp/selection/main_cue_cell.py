@@ -165,7 +165,7 @@ class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
 
         # make sure the distances between cue points
         delta = crossdiff(points)
-        cue_distance = self.cue_loc[1] - self.cue_loc[0]
+        cue_distance = self.track_landmarks[1] - self.track_landmarks[0]
         cue_range = cue_distance * error_perc
         upper_limit = cue_distance + cue_range
         lower_limit = cue_distance - cue_range

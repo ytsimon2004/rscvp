@@ -105,8 +105,8 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
                 norm=norm
             )
 
-            if self.cue_loc is not None:
-                for i in self.cue_loc:
+            if self.track_landmarks is not None:
+                for i in self.track_landmarks:
                     ax.axvline(i, lw=0.5, color='w', alpha=0.5)
                     ax.axhline(i, lw=0.5, color='w', alpha=0.5)
 
