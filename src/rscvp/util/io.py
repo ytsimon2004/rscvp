@@ -130,9 +130,9 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
     )),
 
     'bkrunch-linux': IOConfig(source_root=dict(
-        stimpy='/tmp_data/user/yuting/presentation',
-        physiology='/tmp_data/user/yuting/analysis/phys',
-        histology='/tmp_data/user/yuting/analysis/hist'
+        stimpy='/scratch/data/user/yuting/presentation',
+        physiology='/scratch/data/user/yuting/analysis/phys',
+        histology='/scratch/data/user/yuting/analysis/hist'
     )),
 
     # ========= #
