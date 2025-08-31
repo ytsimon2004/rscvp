@@ -65,32 +65,6 @@ run_python spatial si \
   --shuffle-times 100 \
   -s open
 
-run_python spatial slb \
-  --shuffle-times 100 \
-  --do-smooth \
-  -s close
-
-run_python spatial slb \
-  --shuffle-times 100 \
-  --do-smooth \
-  -s open
-
-run_python spatial ev \
-  -s close
-
-run_python spatial ev \
-  -s open
-
-run_python spatial tcc \
-  -s close
-
-run_python spatial tcc \
-  -s open
-
-# =========== #
-# Place Field #
-# =========== #
-
 run_python spatial pf \
   -s close \
   --threshold 0.3
@@ -101,6 +75,28 @@ run_python spatial pf \
   --pre \
   --used_session close \
   --summary
+
+run_python spatial slb \
+  --shuffle-times 100 \
+  --do-smooth \
+  -s close
+
+run_python spatial slb \
+  --shuffle-times 100 \
+  --do-smooth \
+  -s open
+
+run_python spatial ev \
+  -s close
+
+run_python spatial ev \
+  -s open
+
+run_python spatial tcc \
+  -s close
+
+run_python spatial tcc \
+  -s open
 
 run_python spatial ss \
   -s close \

@@ -1,6 +1,11 @@
 import sys
 from typing import ClassVar
 
+if sys.platform == 'linux':
+    import os
+
+    os.environ.setdefault('JOBLIB_START_METHOD', 'spawn')
+
 import joblib
 import polars as pl
 
@@ -32,10 +37,6 @@ class MultiProcOptions:
             n_cpu = 1
         else:
             n_cpu = int(joblib.cpu_count() * self._f_cpu)
-
-        if sys.platform == 'linux':
-            import os
-            os.environ.setdefault('JOBLIB_START_METHOD', 'spawn')
 
         return n_cpu
 

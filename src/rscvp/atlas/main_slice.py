@@ -12,7 +12,7 @@ class SliceViewOptions(AbstractParser):
 
     region: Literal['inj', 'SS', 'MO', 'ACA', 'PTLp', 'ATN'] = argument(
         '--region',
-        default='ATN',
+        default='inj',
         help='region to plot',
     )
 
@@ -46,7 +46,7 @@ class SliceViewOptions(AbstractParser):
         with plot_figure(None, 1, 2, sharex=True, sharey=True) as ax:
             kwargs = dict(boundaries=True,
                           annotation_region=['RSPd', 'RSPv', 'RSPagl'],
-                          annotation_cmap='PiYG')
+                          annotation_cmap='copper')
 
             view = get_slice_view('reference', plane_type='coronal', resolution=self.resolution)
             x, y = coords
