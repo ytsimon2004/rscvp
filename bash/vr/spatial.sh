@@ -69,22 +69,26 @@ run_python spatial pf \
   -s close \
   --threshold 0.3
 
+run_python spatial slb \
+  --shuffle-times 100 \
+  --do-smooth \
+  --heatmap \
+  --pf \
+  -s close
+
+run_python spatial slb \
+  --shuffle-times 100 \
+  --do-smooth \
+  --heatmap \
+  --pf \
+  -s open
+
 run_python spatial pf \
   -s close \
   -c slb \
   --pre \
   --used_session close \
   --summary
-
-run_python spatial slb \
-  --shuffle-times 100 \
-  --do-smooth \
-  -s close
-
-run_python spatial slb \
-  --shuffle-times 100 \
-  --do-smooth \
-  -s open
 
 run_python spatial ev \
   -s close
