@@ -195,7 +195,7 @@ class PositionBinnedSig:
         :param smooth: If do the gaussian kernel smoothing after binned
         :param running_epoch: If only take running epoch
         :param enable_tqdm: enable tqdm progress bar
-        :param norm: whether do the maximal normalization
+        :param norm: whether do the maximal normalization per neuron (after occupancy-normalized)
         :param desc: description in tqdm
         :return: Position binned signal. `Array[float, [N, L, B] | [L, B]]`
         """
@@ -251,7 +251,14 @@ class PositionBinnedSig:
                     ret[n, i] = self._binned_signal(pos, bins, act[n, pos_mask], occ, smooth)  # (N, L, B)
 
         if norm:
-            ret /= np.max(ret)
+            if act_1d:
+                if (max_val := np.max(ret)) > 0:
+                    ret /= max_val
+            else:
+                # per-neuron normalization
+                for n in range(ret.shape[0]):
+                    if (max_val := np.max(ret[n])) > 0:
+                        ret[n] /= max_val
 
         return ret
 

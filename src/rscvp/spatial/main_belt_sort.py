@@ -72,7 +72,7 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
     @property
     def fig_kwargs(self) -> dict[str, Any]:
         return dict(
-            total_length=self.track_length,
+            track_length=self.track_length,
             landmarks=self.track_landmarks,
             n_selected_neurons=self.n_selected_neurons,
             n_total_neurons=self.n_total_neurons,
