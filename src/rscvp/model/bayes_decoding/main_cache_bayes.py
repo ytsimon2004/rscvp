@@ -103,8 +103,8 @@ class BayesDecodeData(NamedTuple):
 class BayesDecodeCache(ETLConcatable):
     exp_date: str = persistence.field(validator=True, filename=True)
     animal: str = persistence.field(validator=True, filename=True)
+    # false validator for concat plane
     plane_index: int | str = persistence.field(validator=False, filename=True, filename_prefix='plane')
-    """concat thus validator false"""
     session: str = persistence.field(validator=True, filename=True)
     cv_info: str = persistence.field(validator=True, filename=True)
     bins: int = persistence.field(validator=True, filename=True, filename_prefix='bins_')
@@ -112,6 +112,7 @@ class BayesDecodeCache(ETLConcatable):
     selection: str = persistence.field(validator=True, filename=False)
     run_epoch: bool = persistence.field(validator=True, filename=False)
     random: str | None = persistence.field(validator=False, filename=False)
+    use_virtual_space: bool = persistence.field(validator=True, filename=True, filename_prefix='vr_')
     version: int = persistence.autoinc_field(filename_prefix='#')
 
     #
@@ -169,8 +170,7 @@ class BayesDecodeCache(ETLConcatable):
             binned_decode_error=self.binned_decode_error
         )
 
-    def get_signal(self,
-                   opt: AbstractBayesDecodeOptions,
+    def get_signal(self, opt: AbstractBayesDecodeOptions,
                    time: np.ndarray,
                    value: np.ndarray,
                    position_down_sampling: bool = True) -> tuple[np.ndarray, np.ndarray]:
@@ -187,7 +187,11 @@ class BayesDecodeCache(ETLConcatable):
         s2p = opt.load_suite_2p()
 
         #
-        trial = TrialSelection.from_rig(rig, self.session).get_selected_profile()
+        trial = (
+            TrialSelection
+            .from_rig(rig, self.session, use_virtual_space=opt.use_virtual_space)
+            .get_selected_profile()
+        )
         start_t = trial.start_time
         end_t = trial.end_time
 
@@ -240,6 +244,7 @@ class BayesDecodeCache(ETLConcatable):
             selection=data[0].selection,
             run_epoch=data[0].run_epoch,
             random=None,
+            use_virtual_space=data[0].use_virtual_space
         )
 
         ret.trial_range = data[0].trial_range
@@ -334,8 +339,10 @@ class BayesDecodeCacheBuilder(AbstractParser,
 
         #
         if self.spatial_bin_size is None:
-            self.spatial_bin_size = self.belt_length / self.pos_bins
-        self.pos_bins = int(self.belt_length / self.spatial_bin_size)  # force set
+            self.spatial_bin_size = self.track_length / self.pos_bins
+            fprint(f'spatial bins using: {self.spatial_bin_size} cm')
+        self.pos_bins = int(self.track_length / self.spatial_bin_size)
+        fprint(f'number of position bins using: {self.pos_bins}')
 
         #
         if self.temporal_bin_size is None:
@@ -375,7 +382,11 @@ class BayesDecodeCacheBuilder(AbstractParser,
 
     def _prepare_image_time(self):
         # trial selection
-        trial = TrialSelection.from_rig(self.rig, self.session).get_selected_profile()
+        trial = (
+            TrialSelection
+            .from_rig(self.rig, self.session, use_virtual_space=self.use_virtual_space)
+            .get_selected_profile()
+        )
 
         start_time = trial.start_time
         end_time = trial.end_time
@@ -406,6 +417,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
             selection=self.selection_prefix(),
             run_epoch=self.running_epoch,
             random=self.n_selected_neurons if self.random else 'None',
+            use_virtual_space=self.use_virtual_space,
             version=self.cache_version
         )
 
@@ -442,7 +454,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
         cache.posterior = pr
         cache.predicted_position = predicted_position
 
-        cache.decode_error = calc_wrap_distance(predicted_position, data.actual_position)
+        cache.decode_error = calc_wrap_distance(predicted_position, data.actual_position, upper_bound=self.track_length)
         cache.binned_decode_error = self.calc_position_binned_error(data, predicted_position)
 
         return cache
@@ -487,10 +499,11 @@ class BayesDecodeCacheBuilder(AbstractParser,
         rate_map = np.nanmean(rate_map, axis=1)[neuron_list]  # trial average  (N, X)
 
         #
-        if rate_map.shape[1] != int(self.belt_length / self.spatial_bin_size):
+        print(f'{rate_map.shape=}, {int(self.track_length / self.spatial_bin_size)}')
+        if rate_map.shape[1] != int(self.track_length / self.spatial_bin_size):
             raise RuntimeError('spatial bin size inconsistent in rate_map and decoding parameter, '
-                               'spatial bin size should be'
-                               f'{self.belt_length / rate_map.shape[1]}')
+                               'spatial bin size should be:'
+                               f'{self.track_length / rate_map.shape[1]}')
 
         assert train.trial_range_in_session == index
         trial_index = np.zeros((index[1] - index[0]), dtype=int)  # (L')
@@ -554,7 +567,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
     # =========================== #
 
     def err_to_accuracy(self, err: float) -> float:
-        max_err = self.belt_length / 2
+        max_err = self.track_length / 2
         return np.abs(err - max_err) / max_err * 100
 
     def calc_position_binned_error(self, result: BayesDecodeData, predicted_position: np.ndarray) -> np.ndarray:
@@ -562,7 +575,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
         :return: Position-binned decoding error across trials. `Array[float, [L, B]]`
         """
         rig = self.load_riglog_data()
-        pbs = PositionBinnedSig(rig, bin_range=(0, self.belt_length, self.pos_bins))
+        pbs = PositionBinnedSig(rig, bin_range=(0, self.track_length, self.pos_bins))
 
         # trial range for model testing
         if self.cross_validation != 0:

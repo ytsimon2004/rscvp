@@ -107,7 +107,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
         with plot_figure(None, 2, 1) as ax:
             for i, dat in enumerate(data):
                 plot_decoding_err_position(dat[0], dat[1],
-                                           total_length=self.belt_length,
+                                           track_length=self.track_length,
                                            window=self.pos_bins,
                                            color=None,
                                            label=self.get_label(i),
@@ -115,7 +115,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
 
             ax[0].legend()
 
-            x = np.linspace(0, self.belt_length, self.pos_bins)
+            x = np.linspace(0, self.track_length, self.pos_bins)
             ax[1].plot(x, np.abs(data[0][0] - data[1][0]), 'ko', markerfacecolor='none', markersize=6)
 
     def _position_bins_error_foreach(self, data: list[np.ndarray]):
@@ -126,7 +126,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
             dtype='xy',
             hide_axis=False,
             figsize=(8, 8),
-            total_length=self.belt_length,
+            track_length=self.track_length,
             window=self.pos_bins,
             title=[f'{self.exp_list[i]}_{self.animal_list[i]}' for i in range(len(data))]
         )
@@ -179,7 +179,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
             for group, dat in enumerate(data):
                 plot_confusion_heatmap(dat[0], dat[1],
                                        nbins=30,
-                                       total_length=self.belt_length,
+                                       track_length=self.track_length,
                                        landmarks=self.track_landmarks,
                                        ax=ax[group])
                 ax[group].set_title(self.get_label(group))
@@ -192,7 +192,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
             dtype='xy',
             hide_axis=False,
             figsize=(6, 6),
-            total_length=self.belt_length,
+            track_length=self.track_length,
             landmarks=self.track_landmarks,
             title=[f'{self.exp_list[i]}_{self.animal_list[i]}' for i in range(len(data))]
         )

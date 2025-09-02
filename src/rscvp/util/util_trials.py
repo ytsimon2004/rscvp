@@ -247,8 +247,8 @@ class TrialSelection:
         """
         Get the time/trial profile for each session
 
-        :param verbose:
-        :return:
+        :param verbose: verbose selection information
+        :return: ``SelectedProfile``
         """
         info = self.session_trial[self.session_type]
 

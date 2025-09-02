@@ -14,7 +14,7 @@ __all__ = [
 def plot_decoding_err_position(mean_err: np.ndarray,
                                sem_err: np.ndarray,
                                *,
-                               total_length: int = 150,
+                               track_length: int = 150,
                                window: int = 100,
                                color: str | None = 'k',
                                ax: Axes | None = None,
@@ -26,7 +26,7 @@ def plot_decoding_err_position(mean_err: np.ndarray,
 
     :param mean_err: Mean decoding error. `Array[float, B]`
     :param sem_err: Standard error of mean decoding error. `Array[float, B]`
-    :param total_length: Total length of the 1D environment (in cm)
+    :param track_length: Total length of the 1D environment (in cm)
     :param window: Number of position bins for each trial, must the same as the length of the ``mean_err`` and ``sem_err``
     :param color: Color for the mean curve.
     :param ax: ``Axes``
@@ -37,7 +37,7 @@ def plot_decoding_err_position(mean_err: np.ndarray,
     if ax is None:
         _, ax = plt.subplots()
 
-    x = np.linspace(0, total_length, window)
+    x = np.linspace(0, track_length, window)
     ax.plot(x, mean_err, color=color, **kwargs)
     ax.fill_between(x, mean_err + sem_err, mean_err - sem_err, color='grey', alpha=0.5)
     ax.set(xlabel='position(cm)', ylabel='decoding error(cm)', ylim=(0, 60))
@@ -46,7 +46,7 @@ def plot_decoding_err_position(mean_err: np.ndarray,
 def plot_confusion_scatter(actual_position: np.ndarray,
                            predicted_position: np.ndarray,
                            *,
-                           total_length: float = 150,
+                           track_length: float = 150,
                            landmarks: tuple[int, ...] | None = None,
                            ax: Axes | None = None):
     """
@@ -56,7 +56,7 @@ def plot_confusion_scatter(actual_position: np.ndarray,
 
     :param actual_position: Animal actual position. `Array[float, T]`
     :param predicted_position: Position by model prediction. `Array[float, T]`
-    :param total_length: Total length of the 1D environment (in cm)
+    :param track_length: Total length of the 1D environment (in cm)
     :param landmarks: Cue location in the environment (in cm)
     :param ax: ``Axes``
     """
@@ -71,14 +71,14 @@ def plot_confusion_scatter(actual_position: np.ndarray,
             ax.axhline(c, ls='--', color='k', alpha=0.5)
 
     ax.axis('square')
-    ax.set(xlabel='predicted', ylabel='actual', xlim=(0, total_length), ylim=(0, total_length))
+    ax.set(xlabel='predicted', ylabel='actual', xlim=(0, track_length), ylim=(0, track_length))
 
 
 def plot_confusion_heatmap(actual_position: np.ndarray,
                            predicted_position: np.ndarray,
                            nbins: int = 30,
                            *,
-                           total_length: int = 150,
+                           track_length: int = 150,
                            landmarks: tuple[int, ...] | None = None,
                            ax: Axes | None = None):
     """
@@ -89,7 +89,7 @@ def plot_confusion_heatmap(actual_position: np.ndarray,
     :param actual_position: Animal actual position. `Array[float, T]`
     :param predicted_position: Position by model prediction. `Array[float, T]`
     :param nbins: Number of position bins
-    :param total_length: Total length of the 1D environment (in cm)
+    :param track_length: Total length of the 1D environment (in cm)
     :param landmarks: Cue location of labeling
     :param ax: ``Axes``
     :return:
@@ -107,7 +107,7 @@ def plot_confusion_heatmap(actual_position: np.ndarray,
                    cmap='Blues',
                    aspect='auto',
                    origin='lower',
-                   extent=(0, total_length, 0, total_length),
+                   extent=(0, track_length, 0, track_length),
                    vmin=0, vmax=1)  # for visualization
 
     if landmarks is not None:

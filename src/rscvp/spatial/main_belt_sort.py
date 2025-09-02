@@ -119,7 +119,7 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
             )
 
             ax = ax_merge(_ax)[2:]
-            plot_fraction_active(ax, signal, belt_length=self.belt_length, landmarks=self.track_landmarks)
+            plot_fraction_active(ax, signal, track_length=self.track_length, landmarks=self.track_landmarks)
 
     def plot_selected_trials(self, signal: np.ndarray, trial_range: tuple[int, int], output: DataOutput):
         """
@@ -167,7 +167,8 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
                 #
                 ax = ax_merge(_ax)[2:, i]
-                plot_fraction_active(ax, signal[:, i, :], belt_length=self.track_length, landmarks=self.track_landmarks)
+                plot_fraction_active(ax, signal[:, i, :], track_length=self.track_length,
+                                     landmarks=self.track_landmarks)
 
                 if not first_panel:
                     ax.axes.yaxis.set_visible(False)

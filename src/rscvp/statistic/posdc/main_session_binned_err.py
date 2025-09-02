@@ -2,12 +2,12 @@ import collections
 
 import numpy as np
 import polars as pl
-from rscvp.util.cli import CommonOptions, TreadmillOptions
 
 from argclz import AbstractParser
 from neuralib.plot import plot_figure
 from neuralib.typing import PathLike
 from neuralib.util.verbose import print_load
+from rscvp.util.cli import CommonOptions, TreadmillOptions
 from stimpyp import Session
 
 __all__ = ['SessionBinnedErr']
@@ -41,7 +41,7 @@ class SessionBinnedErr(AbstractParser, CommonOptions, TreadmillOptions):
                     ax = _ax[i]
 
                 for s, d in dat.items():
-                    x = np.linspace(0, self.belt_length, len(d))
+                    x = np.linspace(0, self.track_length, len(d))
                     ax.plot(x, d, label=s, color=color_dict[s])
 
                 ax.set_title(file)

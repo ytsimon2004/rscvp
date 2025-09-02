@@ -308,7 +308,7 @@ class DecodeAnalysisOptions(AbstractParser,
             median_value = cast(float, np.median(decode_err))
             y = np.linspace(0, 1, num=len(decode_err))
             xmin = -5
-            xmax = self.belt_length / 2
+            xmax = self.track_length / 2
 
             ax.plot(np.sort(decode_err), y, color='k')
             ax.set(xlim=(xmin, xmax), xlabel='decoding error (cm)', ylabel='cumulative probability')
@@ -343,7 +343,7 @@ class DecodeAnalysisOptions(AbstractParser,
             plot_args = {
                 'actual_position': act,
                 'predicted_position': pred,
-                'total_length': self.belt_length,
+                'track_length': self.track_length,
                 'landmarks': self.track_landmarks
             }
             plot_confusion_heatmap(ax=ax[0], **plot_args)
@@ -362,7 +362,7 @@ class DecodeAnalysisOptions(AbstractParser,
         with plot_figure(output) as ax:
             plot_decoding_err_position(result.binned_error_median,
                                        result.binned_error_sem,
-                                       total_length=self.belt_length,
+                                       track_length=self.track_length,
                                        window=self.pos_bins, ax=ax)
 
 

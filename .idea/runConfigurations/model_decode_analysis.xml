@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.model.bayes_decoding.main_decode_analysis" />
-    <option name="PARAMETERS" value="-D 210601 -A YW006 -P 0 --analysis overview --session light --used_session light --random 200 --CV odd --load 0 --pbin 100 --debug --plot-concat --disk BigDATA --mount /Volumes --fr-norm 1,99" />
+    <option name="PARAMETERS" value="-D 250829 -A YW102 -P 0 --analysis median_decode_error --session close --used_session close --random 200 --CV odd --load 0 --pbin 100 --debug --plot-concat --vr" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
