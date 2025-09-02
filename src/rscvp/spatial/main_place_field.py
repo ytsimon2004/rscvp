@@ -123,9 +123,6 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
             self.pc_selection = 'slb'
             self.reuse_output = True
 
-        if self.is_virtual_protocol:
-            self.session = 'close'
-
     def run(self):
         self.post_parsing()
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)

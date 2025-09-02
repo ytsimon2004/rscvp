@@ -91,6 +91,7 @@ class TreadmillOptions(StimpyOptions):
 
     @property
     def track_landmarks(self) -> tuple[int, ...]:
+        """get track landmarks location (cm) depending on either physical or virtual track"""
         if self._track_landmarks is None:
             self._track_landmarks = self._get_landmarks()
         return self._track_landmarks

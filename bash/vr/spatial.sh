@@ -14,7 +14,19 @@ else
   nP=$3
 fi
 
-OUTPUT="e:/data/user/yu-ting/analysis/phys"
+# which machine
+if [[ $(hostname) == "bkrunch-linux" ]]; then
+  OUTPUT="/scratch/data/user/yuting/analysis/phys"
+elif [[ $(hostname) == "bkrunch2" ]]; then
+  OUTPUT="e:/data/user/yu-ting/analysis/phys"
+elif [[ $(hostname) == "Yu-Tings-MacBook-Pro.local" ]]; then
+  OUTPUT="/Users/yuting/data/analysis/phys"
+else
+    echo "Unknown host: $(hostname)"
+    OUTPUT="./analysis"
+fi
+
+
 OUTPUT_FILE="$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}/cli.log"
 mkdir -p "$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}"
 
@@ -67,6 +79,10 @@ run_python spatial si \
 
 run_python spatial pf \
   -s close \
+  --threshold 0.3
+
+run_python spatial pf \
+  -s open \
   --threshold 0.3
 
 run_python spatial slb \
