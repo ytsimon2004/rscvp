@@ -123,7 +123,9 @@ class PositionLowerBoundOptions(AbstractParser,
 
             field = f'pf_reliability_{self.session}'
 
-            def _dtype_map(x: str) -> str:
+            def _dtype_map(x: str | float) -> str:
+                if isinstance(x, float):
+                    x = str(x)
                 return ' '.join(f"{round(float(r), 2)}" for r in x.split())
 
             df = pl.read_csv(pf_info).with_columns(

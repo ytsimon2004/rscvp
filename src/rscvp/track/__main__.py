@@ -1,5 +1,4 @@
-from argclz import parse_command_args
-
+from argclz.commands import parse_command_args
 from .main_lick_score import LickScoreOptions
 from .main_licking_cmp import LickingCmpOptions
 
