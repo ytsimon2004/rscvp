@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="spatial act_profile" type="PythonConfigurationType" factoryName="Python" folderName="spatial">
+  <configuration default="false" name="atlas roi view" type="PythonConfigurationType" factoryName="Python" folderName="atlas">
     <module name="YWAnalysis" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
@@ -23,8 +23,8 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="rscvp.spatial.main_trial_profile" />
-    <option name="PARAMETERS" value="-D 210315 -A YW006 -P 0 -t 5,15 --debug" />
+    <option name="SCRIPT_NAME" value="rscvp.atlas.main_roi_view" />
+    <option name="PARAMETERS" value="-A YW063 --area SUB --analysis 3d --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

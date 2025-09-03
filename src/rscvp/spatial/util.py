@@ -16,7 +16,7 @@ from neuralib.imaging.suite2p import (
 from neuralib.locomotion import running_mask1d
 from rscvp.util.cli.cli_shuffle import SHUFFLE_METHOD, PositionShuffleOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID, NORMALIZE_TYPE
-from rscvp.util.position import load_interpolated_position, PositionBinnedSig
+from rscvp.util.position import PositionBinnedSig
 from rscvp.util.typing import SIGNAL_TYPE
 from stimpyp import RiglogData, RigEvent
 
@@ -272,8 +272,7 @@ class SiSrcData(NamedTuple):
 
 
 def prepare_si_data(opt: PositionShuffleOptions,
-                    neuron_ids: NeuronID,
-                    use_virtual_space: bool = False) -> SiSrcData:
+                    neuron_ids: NeuronID) -> SiSrcData:
     s2p = opt.load_suite_2p()
     neuron_list = get_neuron_list(s2p, neuron_ids)
 
@@ -281,7 +280,7 @@ def prepare_si_data(opt: PositionShuffleOptions,
     image_time = rig.imaging_event.time
     image_time = sync_s2p_rigevent(image_time, s2p, opt.plane_index)
 
-    pos = load_interpolated_position(rig, use_virtual_space=use_virtual_space, norm_length=opt.track_length)
+    pos = opt.load_position()
 
     if opt.running_epoch:
         run_epoch = running_mask1d(pos.t, pos.v)

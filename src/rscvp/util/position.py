@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
@@ -37,7 +39,8 @@ class PositionBinnedSig:
             bin_range: int | tuple[int, int] | tuple[int, int, int] = (0, 150, 150),
             smooth_kernel: int = 3,
             position_sample_rate: int = 300,
-            use_virtual_space: bool = False
+            use_virtual_space: bool = False,
+            position_cache_file: Path | None = None
     ):
         """
         :param riglog: ``RiglogData``
@@ -61,6 +64,7 @@ class PositionBinnedSig:
         #
         self.smooth_kernel = smooth_kernel
         self.position_sample_rate = position_sample_rate
+        self.position_cache_file = position_cache_file
         self.use_virtual_space = use_virtual_space
 
         # running epoch
@@ -109,6 +113,7 @@ class PositionBinnedSig:
             self._pos_cache = load_interpolated_position(
                 self._riglog,
                 sample_rate=self.position_sample_rate,
+                cache_file=self.position_cache_file,
                 use_virtual_space=self.use_virtual_space,
                 norm_length=self.bin_range[1]
             )
@@ -326,7 +331,7 @@ class PositionBinnedSig:
 def load_interpolated_position(rig: RiglogData,
                                sample_rate: int = 1000,
                                force_compute: bool = False,
-                               save_cache: bool = True,
+                               cache_file: Path | None = None,
                                use_virtual_space: bool = False,
                                norm_length: float = 150) -> CircularPosition:
     """
@@ -335,15 +340,16 @@ def load_interpolated_position(rig: RiglogData,
     :param rig: ``RiglogData``
     :param sample_rate: sampling rate for interpolation
     :param force_compute: force recalculate and save as a new cache
-    :param save_cache: save cache in the same directory as riglog file
+    :param cache_file: specify cache file name. If None, create cache in riglog file directory
     :param use_virtual_space: if used virtual environment position space
     :param norm_length: maximal length for normalization for each trial
     :return: ``CircularPosition``
     """
 
-    file = rig.riglog_file
-    suffix = '_position_cache.npy' if not use_virtual_space else '_virtual_position_cache.npy'
-    cache_file = file.with_name(file.stem + suffix)
+    if cache_file is None:
+        file = rig.riglog_file
+        suffix = '_position_cache.npy' if not use_virtual_space else '_virtual_position_cache.npy'
+        cache_file = file.with_name(file.stem + f'{suffix}')
 
     if cache_file.exists() and not force_compute:
         d = np.load(cache_file)
@@ -356,12 +362,11 @@ def load_interpolated_position(rig: RiglogData,
         else:
             p = rig.position_event
 
-        d = interp_pos1d(p.time, p.value, sampling_rate=sample_rate, remove_nan=True, norm_max_value=norm_length)
+        pos = interp_pos1d(p.time, p.value, sampling_rate=sample_rate, remove_nan=True, norm_max_value=norm_length)
 
-        lt = np.full_like(d.t, np.nan, dtype=np.double)  # make (N,) array
-        lt[:len(d.trial_time_index)] = d.trial_time_index
+        lt = np.full_like(pos.t, np.nan, dtype=np.double)  # make (N,) array
+        lt[:len(pos.trial_time_index)] = pos.trial_time_index
 
-        if save_cache:
-            np.save(cache_file, np.vstack([d.t, d.p, d.d, d.v, lt]).T)
+        np.save(cache_file, np.vstack([pos.t, pos.p, pos.d, pos.v, lt]).T)
 
-        return d
+        return pos

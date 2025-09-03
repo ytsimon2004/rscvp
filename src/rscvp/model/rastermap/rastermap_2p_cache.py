@@ -11,7 +11,6 @@ from neuralib.locomotion import CircularPosition
 from neuralib.persistence import persistence
 from rscvp.util.cli import RasterMapOptions, SBXOptions, SelectionOptions, CameraOptions, PersistenceRSPOptions, \
     TreadmillOptions
-from rscvp.util.position import load_interpolated_position
 from rscvp.util.util_camera import truncate_video_to_pulse
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
@@ -254,11 +253,7 @@ class RasterMap2PCacheBuilder(AbstractParser,
         self.trial = TrialSelection.from_rig(self.rig, self.session, use_virtual_space=self.use_virtual_space)
         self.start_time = self.trial.session_info.time[0]
         self.end_time = self.trial.session_info.time[1]
-        self.pos = load_interpolated_position(
-            self.rig,
-            use_virtual_space=self.use_virtual_space,
-            norm_length=self.track_length
-        )
+        self.pos = self.load_position()
 
         self._prepare_image_time()
 

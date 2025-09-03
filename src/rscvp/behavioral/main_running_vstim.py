@@ -4,7 +4,6 @@ from argclz import AbstractParser
 from neuralib.plot import plot_figure, plot_peri_onset_1d
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import TreadmillOptions
-from rscvp.util.position import load_interpolated_position
 
 
 @publish_annotation('appendix', project='rscvp', caption='rev')
@@ -14,17 +13,14 @@ class StimRunningOptions(AbstractParser, TreadmillOptions):
     pre = 1
     stim = 3
     post = 4
+    invalid_riglog_cache = True
 
     def run(self):
         with plot_figure(None) as ax:
             for i, _ in enumerate(self.foreach_dataset()):
                 rig = self.load_riglog_data()
                 t = rig.get_stimlog().stimulus_segment[:, 0]
-                pos = load_interpolated_position(
-                    rig,
-                    use_virtual_space=self.use_virtual_space,
-                    norm_length=self.track_length
-                )
+                pos = self.load_position()
 
                 plot_peri_onset_1d(t, pos.t, pos.v, pre=self.pre, post=self.post, ax=ax,
                                    label=f'{self.exp_date}_{self.animal_id}')

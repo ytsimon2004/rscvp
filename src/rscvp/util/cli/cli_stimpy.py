@@ -49,6 +49,12 @@ class StimpyOptions(CommonOptions):
         help='use virtual position space & lap event if vr protocol'
     )
 
+    invalid_riglog_cache: bool = argument(
+        '--invalid-riglog',
+        group=GROUP_STIMPY,
+        help='force to re-load the riglog data. used for loop-through multiple dataset'
+    )
+
     _riglog: RiglogData | PyVlog | None = None
     """cached riglog data"""
 
@@ -60,7 +66,7 @@ class StimpyOptions(CommonOptions):
     def load_riglog_data(self, **kwargs) -> RiglogData | PyVlog:
         """Load :class:`~stimpyp.stimpy_core.RiglogData` or :class:`~stimpyp.pyvstim.PyVlog`
          object based on the source version"""
-        if self._riglog is None:
+        if self._riglog is None or self.invalid_riglog_cache:
             self._riglog = self._load_riglog_data(**kwargs)
 
         return self._riglog

@@ -6,13 +6,12 @@ from scipy.stats import sem
 
 from argclz import AbstractParser, as_argument, try_float_type, argument
 from argclz.dispatch import Dispatch, dispatch
-from neuralib.plot import plot_figure
+from neuralib.plot import plot_figure, plot_peri_onset_1d
 from neuralib.util.verbose import publish_annotation
 from rscvp.behavioral.util import get_velocity_per_trial
-from rscvp.behavioral.util_plot import plot_peri_reward_velocity, plot_velocity_line
+from rscvp.behavioral.util_plot import plot_velocity_line
 from rscvp.util.cli.cli_camera import CameraOptions
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
-from rscvp.util.position import load_interpolated_position
 from rscvp.util.util_lick import peri_reward_raster_hist
 
 __all__ = ['BehaviorBatchPlotOptions']
@@ -44,12 +43,15 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
     names: list[str] = []
     """list of data name. <ED>_<ID>"""
 
+    invalid_riglog_cache = True
+
     def run(self):
         self.invoke_command(self.dispatch_plot)
 
     def plot_batch(self, dataset: list[P.args],
                    plot_func: F,
                    with_multi_args: bool = True,
+                   ax_as_keyword: bool = False,
                    **kwargs):
         """
         foreach plot the batch dataset
@@ -63,6 +65,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
         :param dataset: container collect the arguments for plotting function
         :param plot_func: plotting function
         :param with_multi_args: plot_func has multiple args
+        :param ax_as_keyword: if True, pass ax as keyword argument; if False, pass as first positional
         :param kwargs: pass to arg `plot_func`
         :return: values across animals, which return by the ``plot_func()``
         """
@@ -70,11 +73,20 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
         with plot_figure(None) as ax:
             for i, it in enumerate(dataset):
                 args = (it,) if not with_multi_args else it
-                x, arr = plot_func(ax, *args,
-                                   label=self.names[i],
-                                   color='gray' if self.fix_color else None,
-                                   alpha=0.6,
-                                   **kwargs)
+
+                if ax_as_keyword:
+                    x, arr = plot_func(*args,
+                                       ax=ax,
+                                       label=self.names[i],
+                                       color='gray' if self.fix_color else None,
+                                       alpha=0.6,
+                                       **kwargs)
+                else:
+                    x, arr = plot_func(ax, *args,
+                                       label=self.names[i],
+                                       color='gray' if self.fix_color else None,
+                                       alpha=0.6,
+                                       **kwargs)
                 ret.append(arr)
                 ax.legend()
 
@@ -88,7 +100,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
     # Peri-Reward Velocity #
     # ==================== #
 
-    VelDType = list[tuple[np.ndarray, np.ndarray, np.ndarray, float]]
+    VelDType = list[tuple[np.ndarray, np.ndarray, np.ndarray]]
     """list of args from ``plot_peri_reward_velocity(ax, *arg)``"""
 
     @dispatch('peri_reward_vel')
@@ -99,22 +111,21 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
             riglog = self.load_riglog_data()
             reward_time = riglog.reward_event.time
 
-            pars = load_interpolated_position(
-                riglog,
-                use_virtual_space=self.use_virtual_space,
-                norm_length=self.track_length
-            )
-            pt, p, v = pars.t, pars.p, pars.v
+            pos = self.load_position()
+            pt, p, v = pos.t, pos.p, pos.v
 
             if self.cutoff_vel is not None:
                 v[(v < self.cutoff_vel)] = 0
-            dataset.append((reward_time, pt, v, self.psth_sec))
+            dataset.append((reward_time, pt, v))
 
             name = f'{self.exp_date}_{self.animal_id}'
             self.names.append(name)
 
         self.plot_batch(dataset,
-                        plot_peri_reward_velocity,
+                        plot_peri_onset_1d,
+                        ax_as_keyword=True,
+                        pre=self.psth_sec,
+                        post=self.psth_sec,
                         plot_all=False,
                         with_fill_between=False)
 
@@ -132,17 +143,13 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
             riglog = self.load_riglog_data()
             lap_time = riglog.lap_event.time
 
-            pars = load_interpolated_position(
-                riglog,
-                use_virtual_space=self.use_virtual_space,
-                norm_length=self.track_length
-            )
-            pt, p, v = pars.t, pars.p, pars.v
+            pos = self.load_position()
+            pt, p, v = pos.t, pos.p, pos.v
 
             if self.cutoff_vel is not None:
                 v[(v < self.cutoff_vel)] = 0
 
-            m = get_velocity_per_trial(lap_time, pars, self.track_length, self.smooth_vel)
+            m = get_velocity_per_trial(lap_time, pos, self.track_length, self.smooth_vel)
             dataset.append(m)
 
             #

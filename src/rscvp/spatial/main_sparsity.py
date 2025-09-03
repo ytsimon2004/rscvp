@@ -31,7 +31,7 @@ class SparsityOptions(AbstractParser, PositionShuffleOptions, SelectionOptions):
        :label: math-sample
 
         """
-        data = prepare_si_data(self, neuron_ids, use_virtual_space=self.use_virtual_space)
+        data = prepare_si_data(self, neuron_ids)
         with csv_header(output.csv_output, ['neuron_id', f'sparsity_{self.session}']) as csv:
             for neuron in tqdm(data.neuron_list, desc='sparsity', unit='neuron', ncols=80):
                 signal = data.signal(neuron, 'spks')

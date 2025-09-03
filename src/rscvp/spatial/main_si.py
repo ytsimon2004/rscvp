@@ -39,7 +39,7 @@ class SiOptions(AbstractParser, PositionShuffleOptions, PlotOptions):
 
     def foreach_spatial_info(self, output: DataOutput, neuron_ids: NeuronID):
 
-        data = prepare_si_data(self, neuron_ids, use_virtual_space=self.use_virtual_space)
+        data = prepare_si_data(self, neuron_ids)
 
         headers = ['neuron_id', f'si_{self.session}', f'shuffled_si_{self.session}', f'place_cell_si_{self.session}']
         with csv_header(output.csv_output, headers) as csv:

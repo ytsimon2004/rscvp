@@ -48,6 +48,7 @@ class SISortAlignPersistenceAgg(AbstractPersistenceAgg, ApplyAlignPeakOptions, T
 
     session = 'light'
     used_session = 'light'  # for query the spatial info
+    invalid_riglog_cache = True
 
     def run(self):
         caches = self.get_cache_list()

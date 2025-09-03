@@ -10,7 +10,6 @@ from neuralib.imaging.widefield import compute_singular_vector
 from neuralib.locomotion import CircularPosition
 from neuralib.persistence import persistence
 from rscvp.util.cli import PersistenceRSPOptions, WFieldOptions, TreadmillOptions
-from rscvp.util.position import load_interpolated_position
 from rscvp.util.wfield import WfieldResult
 from stimpyp import STIMPY_SOURCE_VERSION, RiglogData, PyVlog
 
@@ -208,11 +207,7 @@ class RasterMapWfieldCacheBuilder(AbstractParser,
         self.rig = self.load_riglog_data()
         self.image_time = self.wfield.camera_time
 
-        self.pos = load_interpolated_position(
-            self.rig,
-            use_virtual_space=self.use_virtual_space,
-            norm_length=self.track_length
-        )
+        self.pos = self.load_position()
 
     def _compute_singular_vector(self, cache: RasterMapWfieldCache) -> None:
         sv = compute_singular_vector(self.wfield.sequences, self.n_components)

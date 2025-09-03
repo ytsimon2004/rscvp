@@ -128,10 +128,8 @@ class CameraOptions(StimpyOptions):
         meta = uglob(self.pixviz_directory, '*.json')
         return PixVizResult.load(file, meta)
 
-    def load_lick_tracker(self, rig: RiglogData | None = None) -> LickTracker:
-        if rig is None:
-            rig = self.load_riglog_data()
-        #
+    def load_lick_tracker(self) -> LickTracker:
+        rig = self.load_riglog_data()
         file = uglob(self.pixviz_directory, '*.npy')
         meta = uglob(self.pixviz_directory, '*.json')
 

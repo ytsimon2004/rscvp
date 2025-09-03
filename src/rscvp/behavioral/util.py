@@ -2,13 +2,8 @@ import numpy as np
 
 from neuralib.locomotion import CircularPosition
 from neuralib.util.verbose import fprint
-from rscvp.util.position import load_interpolated_position
-from stimpyp import RiglogData
 
-__all__ = [
-    'get_velocity_per_trial',
-    'check_treadmill_trials'
-]
+__all__ = ['get_velocity_per_trial']
 
 
 def get_velocity_per_trial(lap_time: np.ndarray,
@@ -54,64 +49,3 @@ def get_velocity_per_trial(lap_time: np.ndarray,
         left_t = right_t
 
     return np.array(ret)
-
-
-def check_treadmill_trials(rig: RiglogData,
-                           error_when_abnormal: bool = False,
-                           use_virtual_space: bool = False,
-                           track_length: int = 150) -> list[int] | None:
-    """
-    Warning verbose of the abnormal behaviors in the linear treadmill setup,
-    and get the list of trial number for each behavioral session
-
-    :param rig: ``RiglogData``
-    :param error_when_abnormal: Raise error when rig hardware problem, otherwise, give warning
-    :return: behavior sessions lap separation (trial numbers)
-    """
-    vel = load_interpolated_position(
-        rig,
-        use_virtual_space=use_virtual_space,
-        norm_length=track_length
-    ).v
-
-    # printout warning msg for the abnormal animal's behavior
-    if np.any(vel < -10):
-        fprint("animal might run in an opposite direction, check further...", vtype='warning')
-
-    n_rt = len(rig.reward_event.time)
-    n_lt = len(rig.lap_event.time)
-    if n_rt != n_lt:
-        fprint(f'reward counts: {n_rt} mismatch with lap counts: {n_lt}, '
-               f'might give reward manually during the recording, check further...', vtype='warning')
-
-    err = ''
-    try:
-        sep = _get_lap_sep(rig)
-    except RuntimeError as e:
-        err += f'legacy fname: {repr(e)}'
-        sep = None
-    except ValueError as e:
-        err += f'abnormal trial selection across sessions: {repr(e)}'
-        sep = None
-
-    finally:
-        fprint(f'CHECKED {rig.riglog_file.parent.name} in treadmill task', vtype='pass')
-        if len(err) != 0:
-            if error_when_abnormal:
-                raise RuntimeError(err)
-            else:
-                fprint(f'WARNING: {err}')
-
-    return sep
-
-
-def _get_lap_sep(rig: RiglogData) -> list[int]:
-    """get the lap numbers cutoff in different behavioral sessions"""
-    session = rig.get_stimlog().session_trials()
-
-    val: list[slice] = [
-        info.in_slice(rig.lap_event.time, rig.lap_event.value.astype(int), error=False)
-        for _, info in zip(range(3), session.values())
-    ]
-
-    return [s.stop for s in val][:-1]

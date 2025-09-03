@@ -1,20 +1,25 @@
+from typing import NamedTuple
 from typing import Union
 
 import attrs
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.model.glm.input import GLMInputData
-from rscvp.util.cli import GLMOptions, SelectionOptions, DataOutput, NeuronID, get_neuron_list
-from rscvp.util.cli.cli_camera import CameraOptions
+from scipy.interpolate import interp1d
 from scipy.stats import pearsonr
 from sklearn.linear_model import PoissonRegressor
 from tqdm import tqdm
+from typing_extensions import Self
 
 from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import Suite2PResult
+from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_merge
 from neuralib.util.unstable import unstable
+from rscvp.util.cli import BEHAVIOR_COVARIANT, get_neuron_list
+from rscvp.util.cli import GLMOptions, SelectionOptions, DataOutput, NeuronID
+from rscvp.util.cli.cli_camera import CameraOptions
+from rscvp.util.util_lick import LickTracker
+from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
 
 __all__ = ['BehavioralGLMOptions']
@@ -42,20 +47,17 @@ class BehavioralGLMOptions(AbstractParser, SelectionOptions, CameraOptions, GLMO
         dat = self.get_lnp_inputs(s2p, rig)
         self.foreach_model_eval(s2p, dat, self.neuron_id, output_info)
 
-    def get_lnp_inputs(self, s2p: Suite2PResult, rig: RiglogData) -> GLMInputData:
-
-        args = dict(s2p=s2p, rig=rig, plane_index=self.plane_index, signal_type=self.signal_type, session=self.session)
+    def get_lnp_inputs(self, s2p: Suite2PResult, rig: RiglogData) -> 'GLMInputData':
 
         if self.var_type == 'pos':
-            cov = GLMInputData.of_pos(**args)
+            cov = GLMInputData.of_pos(self)
         elif self.var_type == 'speed':
-            cov = GLMInputData.of_speed(**args)
+            cov = GLMInputData.of_speed(self)
         elif self.var_type == 'lick_rate':
-            if self.lick_event_source == 'facecam':
-                args = {**args, **dict(lick_tracker=self.load_lick_tracker(rig))}
-            cov = GLMInputData.of_lick(**args)
+            lick_tracker = self.load_lick_tracker() if self.lick_event_source == 'facecam' else None
+            cov = GLMInputData.of_lick(self, lick_tracker)
         elif self.var_type == 'acceleration':
-            cov = GLMInputData.of_acceleration(**args)
+            cov = GLMInputData.of_acceleration(self)
         else:
             raise NotImplementedError('')
 
@@ -63,7 +65,7 @@ class BehavioralGLMOptions(AbstractParser, SelectionOptions, CameraOptions, GLMO
 
     def foreach_model_eval(self,
                            s2p: Suite2PResult,
-                           data: GLMInputData,
+                           data: 'GLMInputData',
                            neuron_ids: NeuronID,
                            output: DataOutput) -> None:
         """Model evaluation using scikit-learn `PoissonRegressor` by cross validation of D2 score, MSE
@@ -160,7 +162,7 @@ class GLMTestResult:
         return self.y_predict_all[self.best_predict_idx]
 
 
-def cross_validate(data: GLMInputData,
+def cross_validate(data: 'GLMInputData',
                    neuron_id: int,
                    predict_norm: bool,
                    n_splits: int) -> GLMTestResult:
@@ -222,6 +224,183 @@ def cross_validate(data: GLMInputData,
                          score_all)
 
 
+class DTypeParams(NamedTuple):
+    temporal_res: float
+    """Temporal resolution of the model in hz"""
+
+    sampling_rate: float
+    """Behavioral measure sampling rate in hz"""
+
+    n_cov_bins: int
+    """Number of bins for the value domain in the dtype"""
+
+
+DEFAULT_DTYPE_PARAMS: dict[BEHAVIOR_COVARIANT, DTypeParams] = {
+    'pos': DTypeParams(10, 30, 50),
+    'speed': DTypeParams(10, 30, 30),
+    'acceleration': DTypeParams(10, 30, 30),
+    'lick_rate': DTypeParams(10, 30, 20)
+}
+
+
+@attrs.define
+class GLMInputData:
+    """
+    `Dimension parameters`:
+
+        N = Number of neurons
+
+        S = Number of samples = sampling rate (hz) * total time (sec)
+
+    """
+    dtype: BEHAVIOR_COVARIANT
+    """``BEHAVIOR_COVARIANT``"""
+
+    time: np.ndarray
+    """Timestamp of the covariant in sec. `Array[float, S]`"""
+
+    cov: np.ndarray
+    """Covariant values. `Array[float, S]`"""
+
+    neural_activity: np.ndarray
+    """Neural activity (i.e., spks, dff). `Array[float, [N, S]]`"""
+
+    pars: DTypeParams = attrs.field(init=False, default=attrs.Factory(dict), kw_only=True)
+
+    def __attrs_post_init__(self):
+        self.pars = DEFAULT_DTYPE_PARAMS[self.dtype]
+
+    def __getitem__(self, idx: int | slice | list[int] | np.ndarray) -> Self:
+        """Train/Test dataset"""
+        return GLMInputData(
+            self.dtype,
+            self.time[idx],
+            self.cov[idx],
+            self.neural_activity[:, idx],
+        )
+
+    @property
+    def n_temporal_bins(self) -> int:
+        return int((np.max(self.time) - np.min(self.time)) * self.pars.temporal_res)
+
+    def prepare_XY(self, neuron_id: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        :param neuron_id:
+        :return:
+            X: binned covariant
+            Y: spike counts
+            t_bins: temporal bins
+        """
+        X, t_bins, x_bins = np.histogram2d(self.time, self.cov, bins=(self.n_temporal_bins, self.pars.n_cov_bins))
+        Y = np.histogram(self.time, t_bins, weights=self.neural_activity[neuron_id])[0]
+
+        return X, Y, t_bins
+
+    @classmethod
+    def of_pos(cls, opt) -> Self:
+        """position covariates"""
+        return cls.of_var('pos', opt, None)
+
+    @classmethod
+    def of_speed(cls, opt) -> Self:
+        """speed covariates"""
+        return cls.of_var('speed', opt, None)
+
+    @classmethod
+    def of_lick(cls, opt, lick_tracker) -> Self:
+        return cls.of_var('lick_rate', opt, lick_tracker)
+
+    @classmethod
+    def of_acceleration(cls, opt) -> Self:
+        return cls.of_var('acceleration', opt, None)
+
+    @classmethod
+    def of_var(cls, dtype: BEHAVIOR_COVARIANT,
+               opt: BehavioralGLMOptions,
+               lick_tracker: LickTracker | None = None) -> Self:
+        """
+        Create inputs for Linear-nonlinear Poisson GLM model
+
+        :param dtype: ``BEHAVIOR_COVARIANT``
+        :param opt: ``BehavioralGLMOptions``
+        :param lick_tracker
+        :return:
+        """
+
+        rig = opt.load_riglog_data()
+        s2p = opt.load_suite_2p()
+        plane_index = opt.plane_index
+        signal_type = opt.signal_type
+
+        trial = TrialSelection.from_rig(rig, opt.session, use_virtual_space=opt.use_virtual_space)
+        tprofile = trial.get_selected_profile()
+
+        sampling_rate = DEFAULT_DTYPE_PARAMS[dtype].sampling_rate
+        start_time = tprofile.start_time
+        end_time = tprofile.end_time
+        cov_time = np.linspace(start_time, end_time, int((end_time - start_time) * sampling_rate))
+
+        image_time = rig.imaging_event.time
+        image_time = sync_s2p_rigevent(image_time, s2p, plane_index)
+
+        # signal
+        sig, _ = get_neuron_signal(s2p, get_neuron_list(s2p), signal_type=signal_type, normalize=False)
+        imask = trial.masking_time(image_time)
+        image_time = image_time[imask]
+        sig = sig[:, imask]  # (N, fs*t)
+
+        #
+        if sampling_rate < 10:
+            # do histogram on signal peak
+            from scipy.signal import find_peaks
+
+            s = np.zeros((sig.shape[0], len(cov_time) - 1))
+            for i in range(sig.shape[0]):
+                s[i] = np.histogram(image_time[find_peaks(sig[i])[0]], cov_time)[0]
+            sig = s
+        else:
+            sig = interp1d(image_time, sig,
+                           axis=1, kind='nearest', copy=False, bounds_error=False, fill_value=0)(cov_time)
+
+        #
+        if dtype in ('pos', 'speed', 'acceleration'):
+            pos = opt.load_position()
+            pmask = trial.masking_time(pos.t)
+            ptime = pos.t[pmask]
+
+            if dtype == 'pos':
+                cov = pos.p[pmask]
+            elif dtype == 'speed':
+                cov = pos.v[pmask]
+            elif dtype == 'acceleration':
+                v = pos.v[pmask]
+                dv = np.diff(v, prepend=v[0])
+                cov = dv * sampling_rate
+            else:
+                raise ValueError(f'unknown covarient type: {dtype}')
+
+            cov = interp1d(ptime, cov, kind='nearest', copy=False, bounds_error=False, fill_value=0)(cov_time)
+
+        #
+        elif dtype == 'lick_rate':
+
+            if lick_tracker is None:
+                lick_time = rig.lick_event.time
+                time = np.linspace(start_time, end_time, int((end_time - start_time) * sampling_rate))
+                value, edg = np.histogram(lick_time, time)
+                t = edg[:-1]
+            else:
+                value = lick_tracker.pix_probability
+                t = lick_tracker.camera_time
+
+            cov = interp1d(t, value, kind='nearest', copy=False, bounds_error=False, fill_value=0)(cov_time)
+
+        else:
+            raise ValueError(f'unknown covarient type: {dtype}')
+
+        return GLMInputData(dtype, cov_time, cov, sig)
+
+
 # ============= #
 
 def plot_linear_corr(ax: Axes, y: np.ndarray, predict_y: np.ndarray):
@@ -278,7 +457,6 @@ def plot_act_cmp(ax: Axes,
     :param y_predict: model predict binned neural activity
     :param edg: histogram edg
     :param mse:
-    :param predict_norm:
     :return:
     """
 

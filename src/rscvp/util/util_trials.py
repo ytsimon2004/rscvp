@@ -1,4 +1,4 @@
-from typing import Iterable, Literal, get_args
+from typing import Literal, get_args
 
 import attrs
 import numpy as np
@@ -8,14 +8,12 @@ from typing_extensions import Self
 from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.verbose import fprint
 from rscvp.util.cli.cli_suite2p import NeuronID, get_neuron_list
-from rscvp.util.position import load_interpolated_position
 from stimpyp import Session, SessionInfo, RiglogData, RigEvent
 
 __all__ = [
     'TRIAL_CV_TYPE',
     'TrialSelection',
     'TrialSignal',
-    'foreach_session_signals',
     'signal_trial_cv_helper',
 ]
 
@@ -365,91 +363,6 @@ class TrialSignal:
     @property
     def n_neurons(self) -> int:
         return self.dff.shape[0]
-
-
-def foreach_session_signals(s2p: Suite2PResult,
-                            rig: RiglogData,
-                            neuron_ids: NeuronID,
-                            plane_index: int,
-                            normalize: bool = True,
-                            do_smooth: bool = False,
-                            trial_numbers: tuple[int, int] | None = None,
-                            use_virtual_space: bool = False,
-                            track_length: int = 150,
-                            visual_protocol: bool = True) -> Iterable[TrialSignal]:
-    """
-
-    :param s2p:
-    :param rig:
-    :param neuron_ids:
-    :param plane_index:
-    :param normalize: whether 01 normalize calcium raw signal
-    :param do_smooth: do the smoothing of calcium raw signal
-    :param trial_numbers: Only pick up the trial numbers from the beginning of each session
-    :return:
-    """
-    neuron_list = get_neuron_list(s2p, neuron_ids)
-
-    dff, _ = get_neuron_signal(s2p, neuron_list, signal_type='df_f', dff=True, normalize=normalize)
-    spks, _ = get_neuron_signal(s2p, neuron_list, signal_type='spks', normalize=normalize)
-
-    if do_smooth:
-        from scipy.ndimage import gaussian_filter1d
-        dff = gaussian_filter1d(dff, 3, axis=1)
-        spks = gaussian_filter1d(spks, 3, axis=1)
-
-    #
-    stim = rig.get_stimlog().stim_square_pulse_event() if visual_protocol else None
-
-    #
-    image_time = rig.imaging_event.time
-    image_time = sync_s2p_rigevent(image_time, s2p, plane_index)
-
-    #
-    pos = (
-        load_interpolated_position(rig, use_virtual_space=use_virtual_space, norm_length=track_length)
-        .interp_time(image_time)
-    )
-
-    #
-    session_info = rig.get_stimlog().session_trials()
-    session_info.pop('all', None)
-    sessions = list(session_info.keys())
-
-    for s in sessions:
-        prf = TrialSelection(rig, s, use_virtual_space=use_virtual_space).get_selected_profile()
-
-        if trial_numbers is not None:
-            prf = prf.with_selected_range(trial_numbers)
-
-        t0 = prf.start_time
-        t1 = prf.end_time
-
-        # neural activity
-        mx = np.logical_and(t0 < image_time, image_time < t1)
-        time = image_time[mx]
-        _dff = dff[:, mx]
-        _spks = spks[:, mx]
-
-        position = pos.p[mx]
-        velocity = pos.v[mx]
-
-        # visual
-        if visual_protocol:
-            vt_mask = np.logical_and(t0 < stim.time, stim.time < t1)
-            vtime = stim.time[vt_mask]
-            vpulse = stim.value[vt_mask]
-        else:
-            vpulse = None
-            vtime = None
-
-        yield TrialSignal(
-            prf, time, _dff, _spks,
-            position=position,
-            velocity=velocity,
-            vstim_pulse=vpulse,
-            vstim_time=vtime
-        )
 
 
 def signal_trial_cv_helper(rig: RiglogData,

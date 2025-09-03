@@ -20,6 +20,7 @@ class TopoCellTypePersistenceAgg(AbstractPersistenceAgg, CellTypeSelectionOption
 
     smooth_kernel: float | None = argument('--smooth', default=None, help='kernel size for filter histogram')
 
+    invalid_riglog_cache = True
     field = dict(plane_index=try_int_type)
 
     def run(self):

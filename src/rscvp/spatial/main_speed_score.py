@@ -13,7 +13,7 @@ from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
 from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
 from rscvp.util.cli import DataOutput
-from rscvp.util.position import PositionBinnedSig, load_interpolated_position
+from rscvp.util.position import PositionBinnedSig
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
 
@@ -66,11 +66,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
         image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
 
         dff = get_neuron_signal(s2p, signal_type=self.signal_type)[0]
-        pos = load_interpolated_position(
-            rig,
-            use_virtual_space=self.use_virtual_space,
-            norm_length=self.track_length
-        ).interp_time(image_time)
+        pos = self.load_position().interp_time(image_time)
 
         if self.running_epoch:
             mx = running_mask1d(pos.t, pos.v)

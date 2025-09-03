@@ -1,15 +1,13 @@
 from argclz import AbstractParser, union_type, str_tuple_type, as_argument
 from neuralib.plot import plot_figure, ax_merge, plot_peri_onset_1d
 from rscvp.behavioral.util import *
-from rscvp.behavioral.util import check_treadmill_trials
 from rscvp.behavioral.util_plot import *
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_stimpy import StimpyOptions
 from rscvp.util.cli.cli_suite2p import Suite2pOptions
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
-from rscvp.util.position import load_interpolated_position
 from rscvp.util.util_lick import peri_reward_raster_hist
-from stimpyp import Session
+from stimpyp import Session, RiglogData
 
 __all__ = ['BehaviorSumOptions']
 
@@ -34,33 +32,29 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
     def behavior_sum_plot(self, output: DataOutput):
         """plot for behavioral overview, including running speed, licking information"""
         riglog = self.load_riglog_data()
-        interp_pos = load_interpolated_position(
-            riglog,
-            use_virtual_space=self.use_virtual_space,
-            norm_length=self.track_length
-        )
+        pos = self.load_position()
 
         if self.session is not None:
             riglog = riglog.with_sessions(self.session)
             t0 = riglog.dat[0, 2] / 1000
             t1 = riglog.dat[-1, 2] / 1000
-            interp_pos = interp_pos.with_time_range(t0, t1)
+            pos = pos.with_time_range(t0, t1)
 
         lick_event = riglog.lick_event
         reward_event = riglog.reward_event
         lap_event = riglog.lap_event
 
-        pos = interp_pos.p
-        pos_time = interp_pos.t
-        vel = interp_pos.v
+        p = pos.p
+        pt = pos.t
+        vel = pos.v
 
         if self.cutoff_vel is not None:
             vel[(vel < self.cutoff_vel)] = 0
 
-        sep = check_treadmill_trials(riglog, use_virtual_space=self.use_virtual_space, track_length=self.track_length)
+        sep = self.session_sep(riglog)
 
         # running speed heatmap
-        m = get_velocity_per_trial(lap_event.time, interp_pos, self.track_length, self.smooth_vel)
+        m = get_velocity_per_trial(lap_event.time, pos, self.track_length, self.smooth_vel)
 
         output_file = output.summary_figure_output(
             self.session if self.session is not None else None
@@ -84,7 +78,7 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
 
             # peri-reward velocity
             ax = _ax[2, 1]
-            plot_peri_onset_1d(reward_event.time, pos_time, vel, pre=self.psth_sec, post=self.psth_sec, ax=ax)
+            plot_peri_onset_1d(reward_event.time, pt, vel, pre=self.psth_sec, post=self.psth_sec, ax=ax)
 
             # lap interval to check dj mice
             ax = _ax[3, 1]
@@ -92,11 +86,23 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
 
             # position
             ax = ax_merge(_ax)[4, :]
-            plot_position_and_event_raster(ax, pos_time, pos, lick_event, reward_event, lap_event)
+            plot_position_and_event_raster(ax, pt, p, lick_event, reward_event, lap_event)
 
             # velocity
             ax = ax_merge(_ax)[5, :]
-            plot_value_time(ax, pos_time, vel, ylabel='Velocity (cm/s)')
+            plot_value_time(ax, pt, vel, ylabel='Velocity (cm/s)')
+
+    def session_sep(self, rig: RiglogData) -> list[int]:
+        """get the lap numbers cutoff in different behavioral sessions"""
+        session = self.get_session_info(rig, ignore_all=True)
+        lap_event = self.get_lap_event(rig)
+
+        val: list[slice] = [
+            info.in_slice(lap_event.time, lap_event.value.astype(int), error=False)
+            for _, info in zip(range(3), session.values())
+        ]
+
+        return [s.stop for s in val][:-1]
 
 
 if __name__ == '__main__':

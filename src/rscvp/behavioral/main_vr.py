@@ -7,7 +7,6 @@ from neuralib.locomotion import CircularPosition
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import TreadmillOptions
-from rscvp.util.position import load_interpolated_position
 from stimpyp import RiglogData
 
 __all__ = ['LinearVRTaskOptions']
@@ -31,7 +30,7 @@ class LinearVRTaskOptions(AbstractParser, TreadmillOptions):
         """Plot two lick rasters side by side: position space (left) + reward zone time (right)"""
 
         rig = self.load_riglog_data()
-        pos = load_interpolated_position(rig, use_virtual_space=self.use_virtual_space, norm_length=self.track_length)
+        pos = self.load_position()
 
         with plot_figure(None, 1, 2, gridspec_kw={'width_ratios': [2, 1]}) as ax:
             self.plot_position_space(ax[0], rig, pos)

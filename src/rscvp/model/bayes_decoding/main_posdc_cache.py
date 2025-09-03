@@ -7,7 +7,6 @@ from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_
 from neuralib.util.utils import ensure_dir
 from neuralib.util.verbose import publish_annotation, print_save
 from rscvp.util.cli import SelectionOptions
-from rscvp.util.position import load_interpolated_position
 from stimpyp import RiglogData
 
 __all__ = ['PositionDecodeCacheBuilder']
@@ -41,11 +40,7 @@ class PositionDecodeCacheBuilder(AbstractParser, SelectionOptions):
         act_time = sync_s2p_rigevent(rig.imaging_event.time, s2p, self.plane_index)
 
         #
-        pos = load_interpolated_position(
-            rig,
-            use_virtual_space=self.use_virtual_space,
-            norm_length=self.track_length
-        )
+        pos = self.load_position()
         position = pos.p
         position_time = pos.t
         lap_time = rig.lap_event.time

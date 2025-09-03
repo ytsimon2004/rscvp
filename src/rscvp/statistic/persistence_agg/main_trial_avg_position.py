@@ -45,6 +45,8 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, S
     pre_selection = True
     pc_selection = 'slb'
 
+    invalid_riglog_cache = True
+
     def post_parsing(self):
         if self.session is None:
             raise ValueError('specify a certain session for masking the position [N, L, B] cache')

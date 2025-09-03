@@ -1,12 +1,15 @@
+from typing import Iterable
+
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
 from argclz import int_tuple_type, AbstractParser, argument
+from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent, Suite2PResult
 from neuralib.plot import plot_figure
 from neuralib.typing import AxesArray
-from rscvp.util.cli import DataOutput, Suite2pOptions, TreadmillOptions
-from rscvp.util.util_trials import foreach_session_signals, TrialSignal
+from rscvp.util.cli import DataOutput, Suite2pOptions, TreadmillOptions, get_neuron_list
+from rscvp.util.util_trials import TrialSignal, TrialSelection
 
 __all__ = ['TrialActProfile']
 
@@ -35,20 +38,7 @@ class TrialActProfile(AbstractParser, Suite2pOptions, TreadmillOptions):
 
     def foreach_session_signal(self, output: DataOutput):
         s2p = self.load_suite_2p()
-        rig = self.load_riglog_data()
-
-        iter_session = list(foreach_session_signals(
-            s2p,
-            rig,
-            self.neuron_id,
-            self.plane_index,
-            normalize=False,
-            do_smooth=False,
-            trial_numbers=self.trial_numbers,
-            use_virtual_space=self.use_virtual_space,
-            track_length=self.track_length,
-            visual_protocol=self.is_vop_protocol
-        ))
+        iter_session = list(self.foreach_signals(s2p))
 
         try:
             si = self._get_spatial_info(iter_session)
@@ -104,6 +94,60 @@ class TrialActProfile(AbstractParser, Suite2pOptions, TreadmillOptions):
                 axes[i].spines['left'].set_visible(False)
             if i == (axes.shape[0] - 1):
                 axes[i].set(xlabel='time(s)')
+
+    def foreach_signals(self, s2p: Suite2PResult) -> Iterable[TrialSignal]:
+        rig = self.load_riglog_data()
+        neuron_ids = self.neuron_id
+
+        neuron_list = get_neuron_list(s2p, neuron_ids)
+
+        dff, _ = get_neuron_signal(s2p, neuron_list, signal_type='df_f', dff=True, normalize=False)
+        spks, _ = get_neuron_signal(s2p, neuron_list, signal_type='spks', normalize=False)
+        stim = rig.get_stimlog().stim_square_pulse_event() if self.is_vop_protocol else None
+
+        image_time = rig.imaging_event.time
+        image_time = sync_s2p_rigevent(image_time, s2p, self.plane_index)
+
+        pos = self.load_position().interp_time(image_time)
+
+        session_info = rig.get_stimlog().session_trials()
+        session_info.pop('all', None)
+        sessions = list(session_info.keys())
+
+        for s in sessions:
+            prf = TrialSelection(rig, s, use_virtual_space=self.use_virtual_space).get_selected_profile()
+
+            if self.trial_numbers is not None:
+                prf = prf.with_selected_range(self.trial_numbers)
+
+            t0 = prf.start_time
+            t1 = prf.end_time
+
+            # neural activity
+            mx = np.logical_and(t0 < image_time, image_time < t1)
+            time = image_time[mx]
+            _dff = dff[:, mx]
+            _spks = spks[:, mx]
+
+            position = pos.p[mx]
+            velocity = pos.v[mx]
+
+            # visual
+            if self.is_vop_protocol:
+                vt_mask = np.logical_and(t0 < stim.time, stim.time < t1)
+                vtime = stim.time[vt_mask]
+                vpulse = stim.value[vt_mask]
+            else:
+                vpulse = None
+                vtime = None
+
+            yield TrialSignal(
+                prf, time, _dff, _spks,
+                position=position,
+                velocity=velocity,
+                vstim_pulse=vpulse,
+                vstim_time=vtime
+            )
 
 
 if __name__ == '__main__':

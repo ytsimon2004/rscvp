@@ -33,6 +33,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
     )
 
     field = dict(plane_index=try_int_type)
+    invalid_riglog_cache = True
     cache_version = 0
 
     GROUP_REPR: Final[dict[GroupInt, GroupName]] = AbstractPersistenceAgg.GROUP_REPR

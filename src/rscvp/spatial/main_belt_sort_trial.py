@@ -8,7 +8,6 @@ from neuralib.plot.colormap import insert_colorbar
 from rscvp.spatial.main_cache_sortidx import ApplySortIdxOptions
 from rscvp.util.cli import Suite2pOptions
 from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.position import load_interpolated_position
 from rscvp.util.typing import SIGNAL_TYPE
 from rscvp.util.util_trials import TrialSelection
 
@@ -57,14 +56,10 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
         else:
             raise ValueError('')
 
-        p_result = load_interpolated_position(
-            rig,
-            use_virtual_space=self.use_virtual_space,
-            norm_length=self.track_length
-        )
-        pt = p_result.t
-        p = p_result.p
-        v = p_result.v
+        pos = self.load_position()
+        pt = pos.t
+        p = pos.p
+        v = pos.v
 
         # signal
         neuron_list = np.arange(s2p.n_neurons)

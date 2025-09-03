@@ -19,7 +19,7 @@ from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions, AbstractPosBinAc
 from rscvp.util.cli.cli_model import ModelOptions, trial_cross_validate
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
-from rscvp.util.position import PositionBinnedSig, load_interpolated_position
+from rscvp.util.position import PositionBinnedSig
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import RiglogData
 
@@ -202,11 +202,7 @@ class BayesDecodeCache(ETLConcatable):
         image_time = image_time[image_mask]
 
         #
-        pos = load_interpolated_position(
-            rig,
-            use_virtual_space=opt.use_virtual_space,
-            norm_length=opt.track_length
-        )
+        pos = opt.load_position()
 
         match self.run_epoch, position_down_sampling:
             case (True, True):
@@ -352,7 +348,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
 
         #
         self._prepare_image_time()
-        self._prepare_pos()
+        self.pos = self.load_position()
 
         #
         self.trial_selection = TrialSelection.from_rig(self.rig, self.session, use_virtual_space=self.use_virtual_space)
@@ -395,13 +391,6 @@ class BayesDecodeCacheBuilder(AbstractParser,
         image_time = sync_s2p_rigevent(image_time, self.s2p, self.plane_index)
         self.image_mask = np.logical_and(start_time < image_time, image_time < end_time)
         self.image_time = image_time[self.image_mask]
-
-    def _prepare_pos(self):
-        self.pos = load_interpolated_position(
-            self.rig,
-            use_virtual_space=self.use_virtual_space,
-            norm_length=self.track_length
-        )
 
     def empty_cache(self) -> BayesDecodeCache:
         self.setattr()
@@ -575,7 +564,13 @@ class BayesDecodeCacheBuilder(AbstractParser,
         :return: Position-binned decoding error across trials. `Array[float, [L, B]]`
         """
         rig = self.load_riglog_data()
-        pbs = PositionBinnedSig(rig, bin_range=(0, self.track_length, self.pos_bins))
+        pbs = PositionBinnedSig(
+            rig,
+            bin_range=(0, self.track_length, self.pos_bins),
+            position_sample_rate=self.position_sampling_rate,
+            use_virtual_space=self.use_virtual_space,
+            position_cache_file=self.position_cache
+        )
 
         # trial range for model testing
         if self.cross_validation != 0:

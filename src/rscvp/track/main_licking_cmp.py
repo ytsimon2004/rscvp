@@ -1,12 +1,12 @@
 import numpy as np
 from matplotlib.axes import Axes
-from rscvp.util.cli import Suite2pOptions, DataOutput
-from rscvp.util.cli.cli_camera import CameraOptions
-from rscvp.util.util_lick import peri_reward_raster_hist, LickTracker
 
 from argclz import AbstractParser, argument
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import fprint
+from rscvp.util.cli import Suite2pOptions, DataOutput
+from rscvp.util.cli.cli_camera import CameraOptions
+from rscvp.util.util_lick import peri_reward_raster_hist, LickTracker
 
 __all__ = ['LickingCmpOptions']
 
@@ -43,7 +43,7 @@ class LickingCmpOptions(AbstractParser, CameraOptions, Suite2pOptions):
         riglog = self.load_riglog_data()
         reward_time = riglog.reward_event.time
 
-        track = self.load_lick_tracker(riglog)
+        track = self.load_lick_tracker()
 
         lick_per_trial_v, hist_vt, _ = peri_reward_raster_hist(
             track.prob_to_event().time,
