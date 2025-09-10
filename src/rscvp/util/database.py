@@ -202,6 +202,7 @@ class BlankBeltGenericDB(NamedTuple):
     optic: Annotated[str, sqlp.PRIMARY]
 
     region: Optional[str] = None
+    pair_wise_group: Optional[int] = None
     n_total_neurons: Optional[int] = None
     n_selected_neurons: Optional[int] = None
     n_spatial_neurons: Optional[int] = None

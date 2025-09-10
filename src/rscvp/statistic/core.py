@@ -130,25 +130,22 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
         :param concat_plane_only: in ETL dataset, only filter ``optic`` with ``all``(i.e., db pipeline)
         :return:
         """
-        #
         if self.group_header == 'session':
             melt_session_vars = self.header
         else:
             melt_session_vars = None
 
         #
-        if self.load_source in ('gspread', 'parquet'):
-            gs = GSPExtractor(self.sheet_name)
-            if self.load_source == 'gspread':
-                df = gs.load_from_gspread(primary_key=primary_key)
-            elif self.load_source == 'parquet':
-                df = gs.load_parquet_file(self.statistic_dir, melt_session_vars, primary_key=primary_key)
-            else:
-                raise ValueError('')
-        elif self.load_source == 'db':
-            df = self._load_database(self.db_table)
-        else:
-            raise ValueError(f'Unknown load source: {self.load_source}')
+        match self.load_source:
+            case 'gspread':
+                df = GSPExtractor(self.sheet_name).load_from_gspread(primary_key=primary_key)
+            case 'parquet':
+                df = GSPExtractor(self.sheet_name).load_parquet_file(self.statistic_dir, melt_session_vars,
+                                                                     primary_key=primary_key)
+            case 'db':
+                df = self._load_database(self.db_table)
+            case _:
+                raise ValueError(f'Unknown load source: {self.load_source}')
 
         #
         if concat_plane_only:

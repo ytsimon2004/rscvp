@@ -55,6 +55,7 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
             user=self.username,
             optic=self.plane_index if self.plane_index is not None else 'all',
             region=region,
+            pair_wise_group=self.get_primary_key_field('pair_wise_group', page='apcls_blank'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=mask.n_neurons,
             n_spatial_neurons=np.count_nonzero(mask.place_mask),

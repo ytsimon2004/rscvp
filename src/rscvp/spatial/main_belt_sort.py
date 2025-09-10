@@ -113,7 +113,7 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
             plot_sorted_trial_averaged_heatmap(
                 signal,
                 ax=ax,
-                cmap='inferno',
+                cmap='cividis',
                 interpolation='antialiased',
                 **self.fig_kwargs
             )

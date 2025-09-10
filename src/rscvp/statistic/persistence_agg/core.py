@@ -4,10 +4,10 @@ from typing import TypeVar, overload, Generic
 
 import numpy as np
 import polars as pl
-from rscvp.util.cli import Region, CommonOptions
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
 from argclz import AbstractParser, argument, int_tuple_type
+from rscvp.util.cli import Region, CommonOptions
+from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
 __all__ = [
     'GroupInt',
