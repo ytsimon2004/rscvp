@@ -96,7 +96,8 @@ class TopoMetricVolumeOptions(StatPipeline):
                   edges: tuple[np.ndarray, ...],
                   count: np.ndarray,
                   camera: CAMERA_ANGLE_TYPE,
-                  no_value: bool = False):
+                  no_value: bool = True,
+                  show_dorsal_layer_only: bool = True):
         data_mean = np.divide(data, count, where=count > 0)
 
         if no_value:
@@ -105,7 +106,6 @@ class TopoMetricVolumeOptions(StatPipeline):
         data_mean[count == 0] = np.nan
 
         brainrender.settings.SHOW_AXES = False
-        brainrender.settings.DEFAULT_CAMERA = camera
         scene = Scene(root=False, inset=False)
         actor = Volume(data_mean, voxel_size=self.bin_size, cmap='inferno')
 
@@ -114,9 +114,30 @@ class TopoMetricVolumeOptions(StatPipeline):
         scene.add(actor)
 
         a = 0.5
-        scene.add_brain_region("RSPd", alpha=a, color='lightblue', hemisphere='left')
-        scene.add_brain_region("RSPv", alpha=a, color='pink', hemisphere='left')
-        scene.add_brain_region("RSPagl", alpha=a, color='turquoise', hemisphere='left')
+        if show_dorsal_layer_only:
+            region = {
+                'RSPd1': 'lightblue',
+                'RSPd2/3': 'pink',
+                # 'RSPd4': 'lightgreen',
+                'RSPd5': 'turquoise',
+                'RSPd6a': 'green',
+                'RSPd6b': 'orange'
+            }
+
+            camera = 'sagittal2'
+
+        else:
+            region = {
+                'RSPd': 'lightblue',
+                'RSPv': 'pink',
+                'RSPagl': 'turquoise'
+            }
+
+        for r, c in region.items():
+            scene.add_brain_region(r, alpha=a, color=c, hemisphere='left')
+
+        brainrender.settings.DEFAULT_CAMERA = camera
+
         scene.render(camera=camera)
 
     def _compute_coordinates(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
