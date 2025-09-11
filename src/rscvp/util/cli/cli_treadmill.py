@@ -116,6 +116,9 @@ class TreadmillOptions(StimpyOptions):
                 char=self._virtual_landmark_char
             )
 
+            if len(landmarks) == 0:
+                return ()
+
             return tuple([int(it[0]) for it in landmarks])
         else:
             return self.tactile_cues
