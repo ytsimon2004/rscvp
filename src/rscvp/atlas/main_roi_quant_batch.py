@@ -7,6 +7,7 @@ import numpy as np
 import polars as pl
 import seaborn as sns
 from matplotlib.axes import Axes
+from scipy.stats import wilcoxon
 
 from argclz import AbstractParser, argument, as_argument, str_tuple_type, var_argument
 from argclz.dispatch import Dispatch, dispatch
@@ -124,7 +125,7 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
     # ======== #
 
     @dispatch('region_x')
-    def plot_categorical_region(self, flatten: bool = False):
+    def plot_categorical_region(self, flatten: bool = True):
         """
         Plot a specific region bar/cat plot across animals (x axis)
 
@@ -140,10 +141,12 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
                 order = self._source
                 palette = {k: REGION_COLORS_HIST[k] for k in order}
 
-                sns.stripplot(df, x='source', y=self._value_col, hue='animal', jitter=False, order=order, size=7.5, ax=ax)
-                sns.barplot(df, x='source', y=self._value_col, hue='source', palette=palette, order=order, errorbar='se', ax=ax)
+                sns.stripplot(df, x='source', y=self._value_col, hue='animal', jitter=False, order=order, size=7.5,
+                              ax=ax)
+                sns.barplot(df, x='source', y=self._value_col, hue='source', palette=palette, order=order,
+                            errorbar='se', ax=ax)
                 self._plot_connect_points(ax, df)
-                self._print_var(df)
+                self._verbose(df)
 
                 ax.set(ylabel=self._normalized_unit)
                 ax.set_title(self.area)
@@ -151,9 +154,16 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
                 plot_categorical_region(df, x='animal', y=self._value_col, ylabel=self._normalized_unit,
                                         xlabel='animal', show_area_name=False, title=self.area)
 
-    def _print_var(self, df):
+    def _verbose(self, df: pl.DataFrame):
+
+        arsc_data = df.filter(pl.col('source') == 'aRSC').sort('animal')[self._value_col].to_numpy()
+        prsc_data = df.filter(pl.col('source') == 'pRSC').sort('animal')[self._value_col].to_numpy()
+
+        stat = wilcoxon(arsc_data, prsc_data)
+        print(f'statistic of {self.area} in {self.roi_norm} normalized:', stat)
+
         for src in df.partition_by('source'):
-            print_var(src[self._value_col], prefix=f"{src['source'][0]}")
+            print_var(src[self._value_col], prefix=f"{src['source'].unique().item()}")
 
     def _plot_connect_points(self, ax, df):
         """Connect same-animal points across source categories with a line."""
