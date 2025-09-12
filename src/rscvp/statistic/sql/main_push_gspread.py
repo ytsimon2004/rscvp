@@ -9,7 +9,7 @@ __all__ = ['DBtoGspreadOptions']
 class DBtoGspreadOptions(AbstractParser):
     DESCRIPTION = 'Push a DB table to a gspread'
 
-    db_type: Literal['generic', 'bayes', 'visual', 'generic_darkness', 'generic_blankbelt'] = argument(
+    db_type: Literal['generic', 'bayes', 'visual', 'generic_darkness', 'generic_blankbelt', 'generic_vr'] = argument(
         '--db',
         required=True,
         help='push db type'
@@ -29,7 +29,7 @@ class DBtoGspreadOptions(AbstractParser):
                 db = DarknessGenericDB
             case 'generic_blankbelt':
                 db = BlankBeltGenericDB
-            case 'vr':
+            case 'generic_vr':
                 db = VRGenericDB
             case _:
                 raise ValueError(f'unknown db type: {self.db_type}')

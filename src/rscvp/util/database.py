@@ -240,7 +240,11 @@ class RSCDatabase(sqlp.Database):
 
     @property
     def database_tables(self) -> list[type]:
-        return [PhysiologyDB, GenericDB, BayesDecodeDB, VisualSFTFDirDB, DarknessGenericDB, BlankBeltGenericDB]
+        return [
+            PhysiologyDB,
+            GenericDB, DarknessGenericDB, BlankBeltGenericDB, VRGenericDB,
+            BayesDecodeDB, VisualSFTFDirDB
+        ]
 
     # ========= #
     # AnimalExp #
