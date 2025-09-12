@@ -7,8 +7,8 @@ from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_set_default_style, VennDiagram
 from neuralib.plot.plot import axvline_histplot
 from neuralib.util.verbose import publish_annotation
-from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, SelectionMask, SQLDatabaseOptions
-from rscvp.util.database import GenericDB, DarknessGenericDB, BlankBeltGenericDB
+from rscvp.util.cli import PlotOptions, SelectionOptions, SelectionMask, SQLDatabaseOptions
+from rscvp.util.database import GenericDB, DarknessGenericDB, BlankBeltGenericDB, VRGenericDB
 
 __all__ = ['ClsCellTypeOptions']
 
@@ -26,16 +26,21 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         self.populate_database()
 
-    # ======== #
-    # Database #
-    # ======== #
-
     def populate_database(self):
         if self.blankbelt_db:
             db = self._populate_blankbelt_database()
         else:
-            db = self._populate_protocol_database()
-            self.plot()
+            if self.is_ldl_protocol:
+                self.vc_selection = None
+                db = self._populate_database_ldl()
+            elif self.is_virtual_protocol:
+                db = self._populate_database_vr()
+            elif self.is_vop_protocol:
+                self.vc_selection = 0.3
+                db = self._populate_database_vop()
+                self.plot_visuospatial_summary()
+            else:
+                raise ValueError('unsupported protocol')
 
         print('NEW', db)
         if self.db_commit:
@@ -61,18 +66,6 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
             n_spatial_neurons=np.count_nonzero(mask.place_mask),
             update_time=self.cur_time
         )
-
-    def _populate_protocol_database(self) -> GenericDB | DarknessGenericDB:
-        if self.is_ldl_protocol:
-            self.vc_selection = None
-            db = self._populate_database_ldl()
-        elif self.is_vop_protocol:
-            self.vc_selection = 0.3
-            db = self._populate_database_vop()
-        else:
-            raise ValueError('unsupported protocol')
-
-        return db
 
     def _populate_database_vop(self) -> GenericDB:
         mask = self.get_selection_mask()
@@ -116,18 +109,24 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
             update_time=self.cur_time
         )
 
-    # ======== #
-    # Plotting #
-    # ======== #
+    def _populate_database_vr(self) -> VRGenericDB:
 
-    def plot(self):
-        output_info = self.get_data_output('cls')
-        if self.is_ldl_protocol:
-            self.plot_lower_bound(output_info)
-        else:
-            self.plot_cell_type_summary(output_info)
+        return VRGenericDB(
+            date=self.exp_date,
+            animal=self.animal_id,
+            rec=self.daq_type,
+            user=self.username,
+            optic=self.plane_index if self.plane_index is not None else 'all',
+            region=self.get_primary_key_field('region', page='ap_vr'),
+            pair_wise_group=self.get_primary_key_field('pair_wise_group', page='ap_vr'),
+            n_total_neurons=self.n_total_neurons,
+            n_selected_neurons=self.n_selected_neurons,
+            n_spatial_neurons=np.count_nonzero(self.select_place_neurons('slb')),
+            update_time=self.cur_time
+        )
 
-    def plot_cell_type_summary(self, output: DataOutput, verbose: bool = True):
+    def plot_visuospatial_summary(self, verbose: bool = True):
+        output = self.get_data_output('cls')
         mask = self.get_selection_mask()
         n_total = mask.n_neurons
         n_visual = mask.n_visual
@@ -170,19 +169,6 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
                 fraction_ch2 = f'{np.count_nonzero(mask.ch2_mask)} / {n_total}' if self.has_chan2 else 'None'
                 csv(eval(fraction_vc), eval(fraction_pc), eval(fraction_overlap), eval(fraction_ch2))
                 csv(fraction_vc, fraction_pc, fraction_overlap, fraction_ch2)
-
-    def plot_lower_bound(self, output: DataOutput):
-        n_total = self.n_total_neurons
-        n_place_cells = np.count_nonzero(self.select_place_neurons('slb'))
-        output_file = output.summary_figure_output()
-
-        with plot_figure(output_file, figsize=(10, 10)) as ax:
-            axvline_histplot(ax,
-                             self.get_csv_data(f'nbins_exceed_{self.session}'),
-                             cutoff=1,
-                             xlabel='lower bound activity exceed (bin)',
-                             ylabel='population (%)',
-                             title=f'place_cell: {n_place_cells}/{n_total}')
 
     @staticmethod
     def venn_plot(ax, mask: SelectionMask):

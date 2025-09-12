@@ -18,17 +18,20 @@ __all__ = [
     #
     'PhysiologyDB',
     'GenericDB',
+    'DarknessGenericDB',
+    'BlankBeltGenericDB',
+    'VRGenericDB',
+    #
     'BayesDecodeDB',
     'VisualSFTFDirDB',
-    #
-    'DarknessGenericDB',
-    #
-    'BlankBeltGenericDB',
     #
     'RSCDatabase',
 ]
 
-DB_TYPE = Literal['GenericDB', 'BayesDecodeDB', 'VisualSFTFDirDB', 'DarknessGenericDB', 'BlankBeltGenericDB']
+DB_TYPE = Literal[
+    'GenericDB', 'DarknessGenericDB', 'BlankBeltGenericDB', 'VRGenericDB',
+    'BayesDecodeDB', 'VisualSFTFDirDB'
+]
 
 
 @sqlp.named_tuple_table_class
@@ -62,10 +65,6 @@ class PhysiologyDB(NamedTuple):
             fprint(f'{directory.name} invalid', vtype='error')
             return []
 
-
-# ====================== #
-# Visuo-Spatial Analysis #
-# ====================== #
 
 @sqlp.named_tuple_table_class
 class GenericDB(NamedTuple):
@@ -162,10 +161,6 @@ class VisualSFTFDirDB(NamedTuple):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-# ================= #
-# Darkness Analysis #
-# ================= #
-
 @sqlp.named_tuple_table_class
 class DarknessGenericDB(NamedTuple):
     date: Annotated[str, sqlp.PRIMARY]
@@ -189,10 +184,6 @@ class DarknessGenericDB(NamedTuple):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-# ================== #
-# BlankBelt Analysis #
-# ================== #
-
 @sqlp.named_tuple_table_class
 class BlankBeltGenericDB(NamedTuple):
     date: Annotated[str, sqlp.PRIMARY]
@@ -213,7 +204,27 @@ class BlankBeltGenericDB(NamedTuple):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-DataBaseType = GenericDB | BayesDecodeDB | VisualSFTFDirDB | DarknessGenericDB | BlankBeltGenericDB
+@sqlp.named_tuple_table_class
+class VRGenericDB(NamedTuple):
+    date: Annotated[str, sqlp.PRIMARY]
+    animal: Annotated[str, sqlp.PRIMARY]
+    rec: Annotated[str, sqlp.PRIMARY]
+    user: Annotated[str, sqlp.PRIMARY]
+    optic: Annotated[str, sqlp.PRIMARY]
+
+    region: str | None = None
+    pair_wise_group: int | None = None
+    n_total_neurons: int | None = None
+    n_selected_neurons: int | None = None
+    n_spatial_neurons: int | None = None
+    update_time: datetime.datetime | None = None
+
+    @sqlp.foreign(PhysiologyDB)
+    def _animal(self):
+        return self.date, self.animal, self.rec, self.user, self.optic
+
+
+DataBaseType = GenericDB | BayesDecodeDB | VisualSFTFDirDB | DarknessGenericDB | BlankBeltGenericDB | VRGenericDB
 
 
 class RSCDatabase(sqlp.Database):

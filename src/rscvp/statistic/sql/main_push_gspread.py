@@ -29,6 +29,8 @@ class DBtoGspreadOptions(AbstractParser):
                 db = DarknessGenericDB
             case 'generic_blankbelt':
                 db = BlankBeltGenericDB
+            case 'vr':
+                db = VRGenericDB
             case _:
                 raise ValueError(f'unknown db type: {self.db_type}')
 

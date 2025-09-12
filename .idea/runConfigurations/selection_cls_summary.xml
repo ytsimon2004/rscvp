@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.selection.main_cls_summary" />
-    <option name="PARAMETERS" value="-D 210315 -A YW006 -P 0 --session light --used_session light --debug" />
+    <option name="PARAMETERS" value="-D 250829 -A YW102 -P 0 --session close --used_session close --vr" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
