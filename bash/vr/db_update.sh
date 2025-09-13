@@ -25,6 +25,11 @@ else
     OUTPUT="./analysis"
 fi
 
+
+OUTPUT_FILE="$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}/cli.log"
+mkdir -p "$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}"
+
+
 export NO_COLOR=1
 
 # Redirect all script output (stdout and stderr) to the log file
@@ -36,7 +41,7 @@ run_python() {
   local a=$2
   shift 2
 
-  echo "*** now run ${ED}_${ID}__2P_YW/concat $m $a ***"
+  echo "*** now run ${ED}_${ID}__2P_YW/plane${nP} $m $a ***"
   python -m rscvp.$m $a \
     -D "$ED" \
     -A "$ID" \
@@ -44,32 +49,7 @@ run_python() {
     "$@"
 }
 
-echo '# ================================================== #'
-echo 'git commit hash: ' $(git rev-parse --verify HEAD --short)
-date
-
-
-run_python spatial sa \
-  -t close \
-  -c slb \
-  -T spks \
-  --used_session close
-
-
-#run_python spatial cm \
-#  -x close-odd \
-#  -y close-even \
-#  -T spks \
-#  -c slb \
-#  --pre \
-#  --used_session close \
-#  --re
-#
-#run_python spatial cm \
-#  -x close \
-#  -y open \
-#  -T spks \
-#  -c slb \
-#  --pre \
-#  --used_session close \
-#  --re
+run_python selection cls \
+  --session close \
+  --used_session close \
+  --commit
