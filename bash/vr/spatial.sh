@@ -174,3 +174,9 @@ run_python spatial cm \
   --pre \
   --used_session close \
   --re
+
+
+run_python selection cls \
+  --session close \
+  --used_session close \
+  --commit

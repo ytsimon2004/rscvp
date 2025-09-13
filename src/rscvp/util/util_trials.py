@@ -96,10 +96,10 @@ class TrialSelection:
         self._session = session
 
         if session == 'all':
-            self._selected_trials = self.rig.lap_event.value_index
+            self._selected_trials = self.lap_event.value_index
         else:
             session_info = self.session_trial[session]
-            ret = session_info.in_range(self.rig.lap_event.time, self.rig.lap_event.value_index)
+            ret = session_info.in_range(self.lap_event.time, self.lap_event.value_index)
             self._selected_trials = np.arange(ret[0], ret[1])
 
     @property
@@ -197,6 +197,8 @@ class TrialSelection:
 
         time = self.lap_event.time  # (L+1,)
         index = self.selected_trials  # ranging from 0 to L-1
+
+        print(f'{self.selected_trials=}')
 
         # time index? find a trial index which interval include t
         trial_index = np.searchsorted(time, t) - 1  # (T,), ranging from 0 to L-1
