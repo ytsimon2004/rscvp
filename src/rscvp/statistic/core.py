@@ -405,17 +405,26 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
             .sort('pair_wise_group', 'region')
             .with_columns(pl.col(h).list.len().alias('n_neurons'))
             .with_columns(pl.col(h).list.mean())
+            .with_columns(
+                pl.when(pl.col('Data').str.contains('|'.join(self._mouseline_thy1)))
+                .then(pl.lit('thy1'))
+                .when(pl.col('Data').str.contains('|'.join(self._mouseline_camk2)))
+                .then(pl.lit('camk2'))
+                .otherwise(pl.lit('other'))
+                .alias('mouseline')
+            )
         )
 
         value_a = df.filter(pl.col('region') == 'aRSC')[h].to_list()
         value_b = df.filter(pl.col('region') == 'pRSC')[h].to_list()
 
         with plot_figure(None, figsize=(3, 8)) as ax:
-            self.plot_connect_datapoints(ax, value_a, value_b, with_bar=with_bar)
+            self.plot_connect_datapoints(ax, value_a, value_b, df=df, with_bar=with_bar)
 
     def plot_connect_datapoints(self, ax: Axes,
                                 value_a: np.ndarray,
                                 value_b: np.ndarray,
+                                df: pl.DataFrame | None = None,
                                 with_bar: bool = True,
                                 errorbar: Literal['ci', 'pi', 'se', 'sd'] = 'se'):
         if self.dependent:
@@ -425,9 +434,25 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
 
         name = type(stat).__name__
         p = stat.pvalue
-        for pair in list(zip(value_a, value_b)):
-            ax.plot(pair, color='k')
 
+        # if different mouseline connected line
+        if df is not None:
+            h = self.variable
+            mouseline_colors = {'thy1': 'gray', 'camk2': 'black'}
+
+            for mouseline in df['mouseline'].unique():
+                subset = df.filter(pl.col('mouseline') == mouseline)
+                sub_a = subset.filter(pl.col('region') == 'aRSC')[h].to_list()
+                sub_b = subset.filter(pl.col('region') == 'pRSC')[h].to_list()
+
+                color = mouseline_colors.get(mouseline, 'red')
+                for pair in zip(sub_a, sub_b):
+                    ax.plot([0, 1], pair, color=color, alpha=0.7)
+        else:
+            for pair in zip(value_a, value_b):
+                ax.plot([0, 1], pair, color='k')
+
+        #
         if with_bar:
             import seaborn as sns
             sns.barplot(data=[value_a, value_b], errorbar=errorbar)
@@ -438,11 +463,6 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
 
         print_var(value_a, t='std')
         print_var(value_b, t='std')
-
-    @staticmethod
-    def join_group_col(df: pl.DataFrame) -> pl.DataFrame:
-        df2 = get_statistic_key_info().drop('region')
-        return df.join(df2, on='Data')
 
 
 def print_pkl(file: PathLike):

@@ -1,5 +1,5 @@
 import pickle
-from typing import Optional, Literal
+from typing import Literal
 
 import numpy as np
 from matplotlib.axes import Axes
@@ -36,8 +36,12 @@ class VZDirStatGSP(StatPipeline, BaseVisPolarOptions):
     parametric = False
 
     def run(self):
-        self.load_table()
-        self.run_pipeline()
+        self.load_table(to_pandas=False if self.animal_based_comp else True)
+
+        if self.animal_based_comp:
+            self.plot_pairwise_mean()
+        else:
+            self.run_pipeline()
 
     def get_collect_data(self) -> CollectDataSet:
         if self._collect_data is None:
@@ -75,11 +79,9 @@ class VZDirStatGSP(StatPipeline, BaseVisPolarOptions):
             self._plot_hist_opt(ax, dataset[0], color='g', label=dataset.group_vars[0])
             self._plot_hist_opt(ax, dataset[1], color='magenta', label=dataset.group_vars[1])
 
-    def _plot_hist_opt(self,
-                       ax: Axes,
-                       data: np.ndarray,
-                       *,
-                       label: Optional[str] = None,
+    def _plot_hist_opt(self, ax: Axes,
+                       data: np.ndarray, *,
+                       label: str | None = None,
                        color: str = 'k'):
 
         if self.hist_unit == 'fraction':

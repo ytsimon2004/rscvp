@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Literal, Iterable, ClassVar, TypeVar, Any
+from typing import Literal, Iterable, ClassVar, TypeVar, Any, Final
 
 from typing_extensions import Self
 
@@ -119,6 +119,10 @@ class CommonOptions:
         group=GROUP_IO,
         help='preview qt without save and generate files'
     )
+
+    # used for plotting
+    _mouseline_thy1: Final[tuple[str, ...]] = ('YW006', 'YW008', 'YW010', 'YW017')
+    _mouseline_camk2: Final[tuple[str, ...]] = ('YW022', 'YW032', 'YW033', 'YW048')
 
     # after extend
     __config: IOConfig | None = None

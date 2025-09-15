@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.statistic.parq.main_visual_gsp" />
-    <option name="PARAMETERS" value="-H reliability --stat-test ttest --hist-norm" />
+    <option name="PARAMETERS" value="-H reliability --stat-test ttest --hist-norm --animals-comp" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

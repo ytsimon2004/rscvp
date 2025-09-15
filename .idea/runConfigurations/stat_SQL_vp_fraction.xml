@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.statistic.sql.main_vp_fraction" />
-    <option name="PARAMETERS" value="-H visual_frac --load db" />
+    <option name="PARAMETERS" value="-H spatial_frac --load gspread" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

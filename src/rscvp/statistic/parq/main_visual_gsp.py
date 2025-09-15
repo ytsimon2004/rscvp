@@ -42,8 +42,12 @@ class VisStatGSP(StatPipeline):
     ttest_parametric_infer = True
 
     def run(self):
-        self.load_table()
-        self.run_pipeline()
+        self.load_table(to_pandas=False if self.animal_based_comp else True)
+
+        if self.animal_based_comp:
+            self.plot_pairwise_mean()
+        else:
+            self.run_pipeline()
 
     def get_collect_data(self) -> CollectDataSet:
         if self._collect_data is None:

@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.statistic.sql.main_decode_err" />
-    <option name="PARAMETERS" value="--load db" />
+    <option name="PARAMETERS" value="--load gspread" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

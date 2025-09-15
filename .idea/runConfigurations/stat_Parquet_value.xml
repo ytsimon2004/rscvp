@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.statistic.parq.main_value_gsp" />
-    <option name="PARAMETERS" value="-H si --plot violin --stat-test ttest --page ap_place --animals-comp --debug" />
+    <option name="PARAMETERS" value="-H perc95_dff --stat-test ttest --page ap_generic -s light --animals-comp --debug --para" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

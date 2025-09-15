@@ -30,16 +30,28 @@ class VisSpaFracStat(StatPipeline):
         self.plot()
 
     def plot(self):
-        df = self.df.with_columns(
-            (pl.col('n_spatial_neurons') / pl.col('n_selected_neurons')).alias('spatial_frac'),
-            (pl.col('n_visual_neurons') / pl.col('n_selected_neurons')).alias('visual_frac')
-        ).sort('pair_wise_group', 'region')
+        df = (
+            self.df
+            .with_columns(
+                (pl.col('n_spatial_neurons') / pl.col('n_selected_neurons')).alias('spatial_frac'),
+                (pl.col('n_visual_neurons') / pl.col('n_selected_neurons')).alias('visual_frac')
+            )
+            .with_columns(
+                pl.when(pl.col('animal').str.contains('|'.join(self._mouseline_thy1)))
+                .then(pl.lit('thy1'))
+                .when(pl.col('animal').str.contains('|'.join(self._mouseline_camk2)))
+                .then(pl.lit('camk2'))
+                .otherwise(pl.lit('other'))
+                .alias('mouseline')
+            )
+            .sort('pair_wise_group', 'region')
+        )
 
         # statistic
         value_a = df.filter(pl.col('region') == 'aRSC')[self.header].to_list()
         value_b = df.filter(pl.col('region') == 'pRSC')[self.header].to_list()
         with plot_figure(None, figsize=(3, 6)) as ax:
-            self.plot_connect_datapoints(ax, value_a, value_b)
+            self.plot_connect_datapoints(ax, value_a, value_b, df=df)
 
 
 if __name__ == '__main__':
