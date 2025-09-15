@@ -236,11 +236,11 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
             elif self.is_virtual_protocol:
                 self.logger.info('do the preselection in virtual prot')
                 return n & t
+            else:
+                raise ValueError('unknown protocol')
 
         except FileNotFoundError as e:
             raise RuntimeError(f'data incomplete to do preselection: {repr(e)}')
-
-        raise ValueError('')
 
     def select_place_neurons(self, classifier: PC_CLASSIFIER,
                              pf_limit: bool = True,
@@ -267,19 +267,19 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
             case 'si':
                 si = self.get_csv_data('si')
                 ss = self.get_csv_data('shuffled_si')
-                ret = np.array(si > ss) & pf
+                mx = np.array(si > ss) & pf
             case 'slb':
-                ret = (self.get_csv_data(f'nbins_exceed_{use_session}') >= 1) & pf
+                mx = (self.get_csv_data(f'nbins_exceed_{use_session}') >= 1) & pf
             case 'intersec':
                 six = self.select_place_neurons('si', pf_limit=self.pf_limit)
                 slbx = self.select_place_neurons('slb', pf_limit=self.pf_limit)
-                ret = six & slbx
+                mx = six & slbx
             case _:
                 raise ValueError(f'invalid classifier {classifier}')
 
         self.used_session = _prev_used_session  # rollback
 
-        return ret
+        return self.pre_select() & mx
 
     def select_visual_neurons(self, reliability: float = 0.3) -> np.ndarray:
         """Select visually-responsive neuron using visual reliability
@@ -288,15 +288,19 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
         :return: mask array
         """
         self.logger.info(f'use visual reliability {reliability} to select visual cell...')
-        return self.get_csv_data('reliability', enable_use_session=False) >= reliability
+        mx = self.get_csv_data('reliability', enable_use_session=False) >= reliability
+        return self.pre_select() & mx
 
     def select_visuospatial_neurons(self) -> np.ndarray:
         if self.pc_selection is None:
             raise ValueError('')
-        return (
+
+        mx = (
                 self.select_place_neurons(self.pc_selection, pf_limit=self.pf_limit) &
                 self.select_visual_neurons(self.vc_selection)
         )
+
+        return self.pre_select() & mx
 
     def select_red_neurons(self, p: bool = 0.65) -> np.ndarray:
         """
@@ -313,7 +317,6 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
             s2p = self.load_suite_2p()
             return s2p.red_cell_prob >= p
 
-    # cannot cache due to batch foreach stat
     def get_selected_neurons(self) -> np.ndarray:
         """Do the selection, can be directly used in cli.
 
@@ -335,7 +338,7 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
 
         # random selection
         if self.random is not None:
-            ret = self._random_value(ret, self.random)
+            ret = self.select_random(ret, self.random)
 
         if np.count_nonzero(ret) == 0:
             raise RuntimeError('no cells were selected, something wrong! check all the preselection criteria files')
@@ -363,11 +366,11 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
             self.select_red_neurons() & ps if self.has_chan2 else None
         )
 
-    def _random_value(self, mask: np.ndarray, value: str | int) -> np.ndarray:
+    def select_random(self, mask: np.ndarray, value: str | int) -> np.ndarray:
         """Handle union random type and return a new mask"""
         selected_ids = np.nonzero(mask)[0]
         n_neurons = len(selected_ids)
-        ret = np.zeros_like(mask)  # new indices
+        mx = np.zeros_like(mask)  # new indices
 
         if isinstance(value, int):
             n = value
@@ -386,8 +389,9 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
         else:
             raise RuntimeError('')
 
-        ret[random.sample(list(selected_ids), n)] = 1
-        return ret
+        mx[random.sample(list(selected_ids), n)] = 1
+
+        return mx
 
     # ===================== #
     # Verbose/Filename Info #
