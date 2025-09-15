@@ -14,7 +14,7 @@ from argclz.dispatch import Dispatch, dispatch
 from neuralib.atlas.typing import Source, Area
 from neuralib.plot import plot_figure, dotplot
 from neuralib.typing import AxesArray
-from neuralib.util.verbose import publish_annotation
+from neuralib.util.verbose import publish_annotation, printdf
 from rscvp.atlas.util_plot import plot_categorical_region
 from rscvp.statistic.core import print_var
 from rscvp.util.cli import HistOptions, PlotOptions, ROIOptions
@@ -546,7 +546,6 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
 
         if foreach_animal:
             n_animals = df['animal'].n_unique()
-
             with plot_figure(None, 2, n_animals) as ax:
                 for i, (animal, dat) in enumerate(df.group_by(['animal'])):
 
@@ -564,11 +563,13 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
 
                         bottom = 0
                         for k, val in enumerate(y):
-                            ax[j, i].bar(f'{animal[0]}_{src}',
-                                         val,
-                                         bottom=bottom,
-                                         color=self.STACKED_COLOR_LIST[k] if k < len(self.STACKED_COLOR_LIST) else None,
-                                         label=x[k])
+                            ax[j, i].bar(
+                                f'{animal[0]}_{src}',
+                                val,
+                                bottom=bottom,
+                                color=self.STACKED_COLOR_LIST[k] if k < len(self.STACKED_COLOR_LIST) else None,
+                                label=x[k]
+                            )
                             ax[j, i].legend()
 
                             bottom += val
@@ -576,13 +577,16 @@ class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
         else:
             df = df.group_by(['family', 'source']).agg([
                 pl.col("counts").mean(),
-                pl.col(self._value_col).mean()
+                (pl.col(self._value_col).mean()).alias('mean'),
+                (pl.col(self._value_col).std() / pl.col(self._value_col).len().sqrt()).alias('sem')
             ])
+
+            printdf(df)
 
             with plot_figure(None, 2, 1) as ax:
                 for i, (src, dat) in enumerate(df.group_by(['source'])):
                     x = dat['family']
-                    y = dat[self._value_col]
+                    y = dat['mean']
 
                     family = [f for f in self.FAMILY_ORDER if f in x]
                     idx = [list(x).index(f) for f in family]
