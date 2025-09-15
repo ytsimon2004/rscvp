@@ -79,7 +79,6 @@ class LinearVRTaskOptions(AbstractParser, TreadmillOptions):
 
     def plot_reward_zone(self, ax: Axes, rig: RiglogData):
         """Plot lick raster aligned to reward events with x=post-reward time, y=trial number"""
-
         reward = rig.reward_event
         lick = rig.lick_event
 

@@ -217,6 +217,11 @@ class VRGenericDB(NamedTuple):
     n_total_neurons: int | None = None
     n_selected_neurons: int | None = None
     n_spatial_neurons: int | None = None
+    """number of position selective neurons"""
+    n_spatial_persist: int | None = None
+    """number of position selective neurons persisted in open-loop from closed-loop"""
+    n_spatial_remap: int | None = None
+    """number of position selective neurons remap in open-loop from closed-loop"""
     update_time: datetime.datetime | None = None
 
     @sqlp.foreign(PhysiologyDB)

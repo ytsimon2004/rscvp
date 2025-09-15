@@ -6,7 +6,8 @@ from argclz import AbstractParser, argument
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_set_default_style, VennDiagram
 from neuralib.plot.plot import axvline_histplot
-from neuralib.util.verbose import publish_annotation
+from neuralib.util.verbose import publish_annotation, printdf
+from rscvp.spatial.util import get_remap_dataframe
 from rscvp.util.cli import PlotOptions, SelectionOptions, SelectionMask, SQLDatabaseOptions
 from rscvp.util.database import GenericDB, DarknessGenericDB, BlankBeltGenericDB, VRGenericDB
 
@@ -111,6 +112,9 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
 
     def _populate_database_vr(self) -> VRGenericDB:
 
+        df = get_remap_dataframe(self)
+        printdf(df)
+
         return VRGenericDB(
             date=self.exp_date,
             animal=self.animal_id,
@@ -121,7 +125,9 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
             pair_wise_group=self.get_primary_key_field('pair_wise_group', page='ap_vr'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=self.n_selected_neurons,
-            n_spatial_neurons=np.count_nonzero(self.select_place_neurons('slb')),
+            n_spatial_neurons=np.count_nonzero(df['spatial_close']),
+            n_spatial_persist=np.count_nonzero(df['persist']),
+            n_spatial_remap=np.count_nonzero(df['remap']),
             update_time=self.cur_time
         )
 

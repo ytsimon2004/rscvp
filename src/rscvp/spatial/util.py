@@ -1,6 +1,7 @@
 from typing import NamedTuple, Callable
 
 import numpy as np
+import polars as pl
 import scipy
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
@@ -14,6 +15,7 @@ from neuralib.imaging.suite2p import (
     CALCIUM_TYPE
 )
 from neuralib.locomotion import running_mask1d
+from rscvp.util.cli import SelectionOptions
 from rscvp.util.cli.cli_shuffle import SHUFFLE_METHOD, PositionShuffleOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID, NORMALIZE_TYPE
 from rscvp.util.position import PositionBinnedSig
@@ -32,7 +34,9 @@ __all__ = [
     'sort_neuron',
     'PositionSignal',
     #
-    'normalized_trial_avg'
+    'normalized_trial_avg',
+    #
+    'get_remap_dataframe'
 ]
 
 
@@ -484,3 +488,82 @@ def normalized_trial_avg(signal_all: np.ndarray) -> np.ndarray:
     """
     signal = np.nanmean(signal_all, axis=1)  # (N', B)
     return normalize_signal(signal, axis=1)  # (N', B)  normalize across spatial bins
+
+
+def get_remap_dataframe(opt: SelectionOptions, remap_value: int = 10) -> pl.DataFrame:
+    """Based on shuffled lower bound activity and place field response
+    to see if position response is persisted and remap ::
+
+        ┌───────────┬───────────────┬──────────────┬──────────────────┬──────────────────┬─────────┬───────┐
+        │ neuron_id ┆ spatial_close ┆ spatial_open ┆ pf_close         ┆ pf_open          ┆ persist ┆ remap │
+        │ ---       ┆ ---           ┆ ---          ┆ ---              ┆ ---              ┆ ---     ┆ ---   │
+        │ i64       ┆ bool          ┆ bool         ┆ list[f64]        ┆ list[f64]        ┆ bool    ┆ bool  │
+        ╞═══════════╪═══════════════╪══════════════╪══════════════════╪══════════════════╪═════════╪═══════╡
+        │ 0         ┆ false         ┆ false        ┆ null             ┆ null             ┆ false   ┆ false │
+        │ 1         ┆ true          ┆ false        ┆ [12.42]          ┆ [16.56, 76.59,   ┆ false   ┆ false │
+        │           ┆               ┆              ┆                  ┆ 180.09]          ┆         ┆       │
+        │ …         ┆ …             ┆ …            ┆ …                ┆ …                ┆ …       ┆ …     │
+        │ 653       ┆ false         ┆ false        ┆ null             ┆ null             ┆ false   ┆ false │
+        │ 654       ┆ true          ┆ false        ┆ [35.19, 76.59,   ┆ null             ┆ false   ┆ false │
+        │           ┆               ┆              ┆ 169.74]          ┆                  ┆         ┆       │
+        │ 657       ┆ false         ┆ false        ┆ null             ┆ null             ┆ false   ┆ false │
+        └───────────┴───────────────┴──────────────┴──────────────────┴──────────────────┴─────────┴───────┘
+
+    """
+
+    if not opt.is_virtual_protocol:
+        raise NotImplementedError('currently only support VR protocol')
+
+    neurons = get_neuron_list(opt)
+
+    spatial_close = opt.select_place_neurons('slb', force_session='close')
+    spatial_open = opt.select_place_neurons('slb', force_session='open')
+
+    pf_close = opt.get_csv_data('pf_peak_close', session='close')
+    pf_open = opt.get_csv_data('pf_peak_open', session='open')
+
+    def parse_pf_data(data):
+        if data is None:
+            return None
+        try:
+            return [float(x) for x in str(data).split()]
+        except:
+            return None
+
+    pf_close_parsed = [parse_pf_data(x) for x in pf_close]
+    pf_open_parsed = [parse_pf_data(x) for x in pf_open]
+
+    # remap: spatial in both sessions but not the simular tuning
+    remap_values = []
+    for pf_c, pf_o in zip(pf_close_parsed, pf_open_parsed):
+        if pf_c is None or pf_o is None:
+            remap_values.append(False)
+        elif len(pf_c) != len(pf_o):
+            remap_values.append(False)
+        elif len(pf_c) > 0 and sum(abs(c - o) for c, o in zip(pf_c, pf_o)) > remap_value:
+            remap_values.append(True)
+        else:
+            remap_values.append(False)
+
+    # persist: spatial in both sessions AND not remapping
+    persist_values = []
+    for spatial_c, spatial_o, remap, pf_c, pf_o in zip(spatial_close, spatial_open, remap_values,
+                                                       pf_close_parsed, pf_open_parsed):
+        if pf_c is None or pf_o is None:
+            persist_values.append(False)
+        elif spatial_c and spatial_o and len(pf_c) == len(pf_o) and not remap:
+            persist_values.append(True)
+        else:
+            persist_values.append(False)
+
+    df = pl.DataFrame({
+        'neuron_id': neurons,
+        'spatial_close': [bool(x) for x in spatial_close],
+        'spatial_open': [bool(x) for x in spatial_open],
+        'pf_close': pf_close_parsed,
+        'pf_open': pf_open_parsed,
+        'persist': persist_values,
+        'remap': remap_values
+    })
+
+    return df

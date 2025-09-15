@@ -56,20 +56,20 @@ run_python spatial sa \
   --used_session close
 
 
-#run_python spatial cm \
-#  -x close-odd \
-#  -y close-even \
-#  -T spks \
-#  -c slb \
-#  --pre \
-#  --used_session close \
-#  --re
-#
-#run_python spatial cm \
-#  -x close \
-#  -y open \
-#  -T spks \
-#  -c slb \
-#  --pre \
-#  --used_session close \
-#  --re
+run_python spatial cm \
+  -x close-odd \
+  -y close-even \
+  -T spks \
+  -c slb \
+  --pre \
+  --used_session close \
+  --re
+
+run_python spatial cm \
+  -x close \
+  -y open \
+  -T spks \
+  -c slb \
+  --pre \
+  --used_session close \
+  --re

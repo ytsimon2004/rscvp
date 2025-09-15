@@ -198,8 +198,6 @@ class TrialSelection:
         time = self.lap_event.time  # (L+1,)
         index = self.selected_trials  # ranging from 0 to L-1
 
-        print(f'{self.selected_trials=}')
-
         # time index? find a trial index which interval include t
         trial_index = np.searchsorted(time, t) - 1  # (T,), ranging from 0 to L-1
 
