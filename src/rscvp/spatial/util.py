@@ -490,7 +490,7 @@ def normalized_trial_avg(signal_all: np.ndarray) -> np.ndarray:
     return normalize_signal(signal, axis=1)  # (N', B)  normalize across spatial bins
 
 
-def get_remap_dataframe(opt: SelectionOptions, remap_value: int = 10) -> pl.DataFrame:
+def get_remap_dataframe(opt: SelectionOptions, remap_value: float = 20) -> pl.DataFrame:
     """Based on shuffled lower bound activity and place field response
     to see if position response is persisted and remap ::
 
@@ -514,7 +514,6 @@ def get_remap_dataframe(opt: SelectionOptions, remap_value: int = 10) -> pl.Data
     if not opt.is_virtual_protocol:
         raise NotImplementedError('currently only support VR protocol')
 
-    neurons = get_neuron_list(opt)
 
     spatial_close = opt.select_place_neurons('slb', force_session='close')
     spatial_open = opt.select_place_neurons('slb', force_session='open')
@@ -557,7 +556,7 @@ def get_remap_dataframe(opt: SelectionOptions, remap_value: int = 10) -> pl.Data
             persist_values.append(False)
 
     df = pl.DataFrame({
-        'neuron_id': neurons,
+        'neuron_id': np.arange(len(spatial_close)),  # all cells across planes
         'spatial_close': [bool(x) for x in spatial_close],
         'spatial_open': [bool(x) for x in spatial_open],
         'pf_close': pf_close_parsed,

@@ -20,6 +20,8 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
 
     blankbelt_db: bool = argument('--blankbelt-db', help='populate to blank belt db instead of protocol based')
 
+    vr_remap_value: float = argument('--remap', default=20, help='shifted value that define the remap position tuning')
+
     pre_selection = True
     reuse_output = True
 
@@ -112,7 +114,7 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
 
     def _populate_database_vr(self) -> VRGenericDB:
 
-        df = get_remap_dataframe(self)
+        df = get_remap_dataframe(self, remap_value=self.vr_remap_value)
         printdf(df)
 
         return VRGenericDB(
