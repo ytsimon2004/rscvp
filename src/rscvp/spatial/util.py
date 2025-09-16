@@ -534,12 +534,12 @@ def get_remap_dataframe(opt: SelectionOptions, remap_value: float = 20) -> pl.Da
 
     # remap: spatial in both sessions but not the simular tuning
     remap_values = []
-    for pf_c, pf_o in zip(pf_close_parsed, pf_open_parsed):
+    for spatial_o, pf_c, pf_o in zip(spatial_open, pf_close_parsed, pf_open_parsed):
         if pf_c is None or pf_o is None:
             remap_values.append(False)
         elif len(pf_c) != len(pf_o):
             remap_values.append(False)
-        elif len(pf_c) > 0 and sum(abs(c - o) for c, o in zip(pf_c, pf_o)) > remap_value:
+        elif len(pf_c) > 0 and spatial_o and sum(abs(c - o) for c, o in zip(pf_c, pf_o)) > remap_value:
             remap_values.append(True)
         else:
             remap_values.append(False)
