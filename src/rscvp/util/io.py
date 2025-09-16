@@ -27,9 +27,9 @@ HISTOLOGY_HOME_ROOT = RSCVP_CACHE_DIRECTORY / 'histology'
 #
 DISK_TYPE = Literal[
     'default',
-    'local', 'WD-2T', 'BigDATA',
+    'local', 'WD-2T', 'BigDATA', 'bkrunch-linux-scratch',
     'bkrunch', 'bkrunch2',
-    'bkrunch-linux', 'bkrunch-linux-bigdata'
+    'bkrunch-linux'
 ]
 
 DATA_SRC_TYPE = Literal['stimpy', 'suite2p', 'behavior', 'histology', 'track', 'cache']
@@ -145,9 +145,9 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
         histology='/Volumes/WD-2T/histology'
     )),
 
-    # ============= #
-    # Mounted Drive #
-    # ============= #
+    # =================== #
+    # Local Mounted Drive #
+    # =================== #
 
     'BigDATA': IOConfig(source_root=dict(
         stimpy='/Volumes/BigDATA/data/user/yu-ting/presentation',
@@ -155,16 +155,16 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
         histology='/Volumes/BigDATA/data/user/yu-ting/analysis/hist'
     )),
 
+    'bkrunch-linux-scratch': IOConfig(source_root=dict(
+        stimpy='/Volumes/bkrunch-linux-scratch/user/yuting/presentation',
+        physiology='/Volumes/bkrunch-linux-scratch/user/yuting/analysis/phys',
+        histology='/Volumes/bkrunch-linux-scratch/user/yuting/analysis/hist'
+    )),
+
     'default': IOConfig(source_root=dict(
         stimpy=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'presentation',
         physiology=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'analysis' / 'phys',
         histology=RSCVP_CACHE_DIRECTORY / 'rscvp_dataset' / 'analysis' / 'hist'
-    )),
-
-    'bkrunch-linux-bigdata': IOConfig(source_root=dict(
-        stimpy='/mnt/bigdata/data/user/yu-ting/presentation',
-        physiology='/mnt/bigdata/data/user/yu-ting/analysis/phys',
-        histology='/mnt/bigdata/data/user/yu-ting/analysis/hist'
     ))
 
 }
@@ -215,6 +215,8 @@ def get_io_config(config: dict[str, IOConfig] | None = None,
             return config['WD-2T']
         case ('Yu-Tings-MacBook-Pro.local', 'BigDATA'):
             return config['BigDATA']
+        case ('Yu-Tings-MacBook-Pro.local', 'bkrunch-linux-scratch'):
+            return config['bkrunch-linux-scratch']
 
         # other
         case ('bkrunch', None):
@@ -223,8 +225,6 @@ def get_io_config(config: dict[str, IOConfig] | None = None,
             return config['bkrunch2']
         case ('bkrunch-linux', None):
             return config['bkrunch-linux']
-        case ('bkrunch-linux', 'bigdata'):
-            return config['bkrunch-linux-bigdata']
         case _:
             return config['default']
 

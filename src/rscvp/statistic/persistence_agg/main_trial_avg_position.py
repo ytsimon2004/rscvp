@@ -47,6 +47,10 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, S
 
     invalid_riglog_cache = True
 
+    # getter while foreach
+    _track_length = None
+    _track_landmarks = None
+
     def post_parsing(self):
         if self.session is None:
             raise ValueError('specify a certain session for masking the position [N, L, B] cache')
@@ -83,8 +87,18 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, S
 
             cell_mask = self.get_selected_neurons()
 
-            # trial
-            trial = np.arange(*TrialSelection(self.load_riglog_data(), self.session).get_selected_profile().trial_range)
+            trial = np.arange(
+                *TrialSelection(self.load_riglog_data(), self.session, use_virtual_space=self.use_virtual_space)
+                .get_selected_profile()
+                .trial_range
+            )
+
+            if self._track_length is None:
+                self._track_length = self.track_length
+
+            if self._track_landmarks is None:
+                self._track_landmarks = self.track_landmarks
+
             ret.append(self.apply_binned_act_cache()
                        .with_mask(cell_mask)
                        .with_trial(trial))
@@ -125,8 +139,8 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, S
                 signal_type=self.signal_type,
                 cmap='cividis',
                 interpolation='antialiased',
-                track_length=self.track_length,
-                landmarks=self.track_landmarks,
+                track_length=self._track_length,
+                landmarks=self._track_landmarks,
                 ax=ax
             )
 

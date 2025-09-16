@@ -20,7 +20,7 @@ __all__ = [
 ]
 
 GSPREAD_SHEET_PAGE = Literal[
-    'apcls_blank', 'apcls_tac', 'ap_vz', 'ap_place', 'ap_ldl', 'ap_generic',
+    'apcls_blank', 'apcls_tac', 'ap_vz', 'ap_place', 'ap_ldl', 'ap_generic', 'ap_vr',
     'GenericDB', 'VisualSFTFDirDB', 'BayesDecodeDB', 'DarknessGenericDB', 'BlankBeltGenericDB'
 ]
 
