@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.behavioral.main_running_vstim" />
-    <option name="PARAMETERS" value="-D 221018,221019 -A YW048,YW048 --debug --disk BigDATA --mount /Volumes" />
+    <option name="PARAMETERS" value="-D 210402,210409,210407,210409,210610,210514,211209,211208,211208,221019 -A YW006,YW006,YW008,YW008,YW010,YW017,YW022,YW032,YW033,YW048 --debug --disk BigDATA --mount /Volumes --collapse" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
