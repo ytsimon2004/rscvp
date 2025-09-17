@@ -10,11 +10,11 @@ from rscvp.statistic.core import StatPipeline, print_var
 from rscvp.statistic.sql.util import as_validate_sql_table
 from rscvp.util.cli import CommonOptions
 
-__all__ = ['SpatialFracLDLStat']
+__all__ = ['SpatialFractionDarkStat']
 
 
 @publish_annotation('sup', project='rscvp', figure='fig.S2C', as_doc=True)
-class SpatialFracLDLStat(StatPipeline):
+class SpatialFractionDarkStat(StatPipeline):
     DESCRIPTION = 'Compare fraction of spatial cells across behavioral sessions from multiple animals'
 
     header = as_argument(StatPipeline.header).with_options(required=False)
@@ -78,4 +78,4 @@ class SpatialFracLDLStat(StatPipeline):
 
 
 if __name__ == '__main__':
-    SpatialFracLDLStat().main()
+    SpatialFractionDarkStat().main()

@@ -9,10 +9,10 @@ from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.statistic.core import StatPipeline, print_var
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
-__all__ = ['SpatialBlankStat']
+__all__ = ['SpatialFractionBlankStat']
 
 
-class SpatialBlankStat(StatPipeline):
+class SpatialFractionBlankStat(StatPipeline):
     DESCRIPTION = 'Fraction of spatial cells in anterior v.s. posterior RSC in blank belt treadmill'
 
     header = as_argument(StatPipeline.header).with_options(required=False)
@@ -269,4 +269,4 @@ class SpatialBlankStat(StatPipeline):
 
 
 if __name__ == '__main__':
-    SpatialBlankStat().main()
+    SpatialFractionBlankStat().main()

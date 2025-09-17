@@ -10,11 +10,11 @@ from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.database import DB_TYPE
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
-__all__ = ['VisSpaFracStat']
+__all__ = ['VisuoSpatialFractionStat']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.2A right & fig.4D right', as_doc=True)
-class VisSpaFracStat(StatPipeline):
+class VisuoSpatialFractionStat(StatPipeline):
     DESCRIPTION = 'Compare and plot the fraction of visuospatial cell types in aRSC versus pRSC'
 
     header: Literal['visual_frac', 'spatial_frac'] = as_argument(StatisticOptions.header).with_options(...)
@@ -55,4 +55,4 @@ class VisSpaFracStat(StatPipeline):
 
 
 if __name__ == '__main__':
-    VisSpaFracStat().main()
+    VisuoSpatialFractionStat().main()
