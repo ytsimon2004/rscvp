@@ -22,37 +22,6 @@ class SIStat(LocalSpreadsheetSync):
         super().__init__(opt, collector=collector, sheet_page=opt.sheet_name)
 
 
-class SpeedStat(LocalSpreadsheetSync):
-    """speed score"""
-
-    def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
-            code='sc',
-            stat_col=['speed_score'],
-            exclude_col=None,
-            fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
-        )
-
-        super().__init__(opt, collector=collector, sheet_page=opt.sheet_name)
-
-
-class SpeedRunStat(LocalSpreadsheetSync):
-    """speed score in run epoch"""
-
-    def __init__(self, opt: StatisticOptions):
-        opt.running_epoch = True
-
-        collector = CSVCollector(
-            code='sc',
-            stat_col=['speed_score_run'],
-            exclude_col=None,
-            fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
-        )
-
-        super().__init__(opt, collector=collector, sheet_page=opt.sheet_name)
-
 
 class TCCStat(LocalSpreadsheetSync):
     """median trial correlation coefficient"""
@@ -140,10 +109,6 @@ class SpatialStatAggOptions(AbstractParser, StatisticOptions):
                 stat = TrStat(self)
             case 'ap_cords' | 'ml_cords' | 'ap_cords_scale' | 'ml_cords_scale' | 'dv_cords':
                 stat = CordSpatialStat(self)
-            case 'speed_score':
-                stat = SpeedStat(self)
-            case 'speed_score_run':
-                stat = SpeedRunStat(self)
             case _:
                 raise ValueError(f'unknown header: {self.header}')
 

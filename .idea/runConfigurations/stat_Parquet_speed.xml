@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.statistic.parq.main_speed_gsp" />
-    <option name="PARAMETERS" value="--page ap_place" />
+    <option name="PARAMETERS" value="--page ap_generic --vis" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

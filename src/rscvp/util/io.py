@@ -197,7 +197,7 @@ def get_io_config(config: dict[str, IOConfig] | None = None,
         config = DEFAULT_IO_CONFIG
 
     if isinstance(remote_disk, str) and not (Path(mnt_prefix) / remote_disk).exists():
-        raise RuntimeError(f'check remote disk connection: {remote_disk}')
+        raise RuntimeError(f'check remote disk connection: {(Path(mnt_prefix) / remote_disk)}')
 
     if force_use_default:
         return config['default']

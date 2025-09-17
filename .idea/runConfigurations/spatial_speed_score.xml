@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_speed_score" />
-    <option name="PARAMETERS" value="-D 210402 -A YW006 -s light -P 0 --run" />
+    <option name="PARAMETERS" value="-D 210315 -A YW006 -s light -P 0 --disk BigDATA --mount /Volumes" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

@@ -13,12 +13,11 @@ __all__ = ['GENERIC_HEADERS',
            'var_module_dict']
 
 #
-GENERIC_HEADERS = ('perc95_dff', 'max_dff')
+GENERIC_HEADERS = ('perc95_dff', 'max_dff', 'speed_score', 'speed_score_run')
 
 #
 SPATIAL_HEADERS = (
     'si', 'trial_cc', 'ev_trial_avg', 'trial_reliability',
-    'speed_score', 'speed_score_run',
     'ap_cords', 'ml_cords', 'ap_cords_scale', 'ml_cords_scale', 'dv_cords'
 )
 

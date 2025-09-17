@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.visual.main_tuning" />
-    <option name="PARAMETERS" value="-D 210401 -A YW006 -P 0 --debug" />
+    <option name="PARAMETERS" value="-D 210409 -A YW006 -P 0 --invalid-cache" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

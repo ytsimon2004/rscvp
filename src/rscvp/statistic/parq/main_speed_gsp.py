@@ -1,9 +1,11 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from rich.pretty import pprint
 
-from argclz import as_argument
+from argclz import as_argument, argument
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
+from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.statistic.core import StatPipeline
 from rscvp.util.cli import StatisticOptions
 
@@ -18,16 +20,19 @@ class SpeedStatGSP(StatPipeline):
         default='speed_score'
     )
 
+    visual_only: bool = argument('--vis', help='filter with only visual cells')
+
     sheet_name = as_argument(StatisticOptions.sheet_name).with_options(required=True)
     load_source = 'parquet'
     test_type = 'kstest'
 
     def run(self):
         self.load_table(to_pandas=False)
+
         self.run_pipeline()
 
     def plot(self):
-        data = self.get_collect_data().data
+        data = self.post_processing()
         output = self.get_output_figure_type()
 
         with plot_figure(output) as ax:
@@ -38,6 +43,38 @@ class SpeedStatGSP(StatPipeline):
 
             ax.set(xlabel='Speed score', ylabel='percent (%)')
             plt.legend()
+
+    def post_processing(self):
+        df_ss = self.df.select('Data', 'region', self.header)
+
+        if not self.visual_only:
+            ret = {}
+            for subset in df_ss.partition_by('region'):
+                ss = subset.explode(self.header)[self.header].to_numpy()
+                ret[subset['region'].unique().item()] = ss
+
+            return ret
+
+        else:
+            df_vis = GSPExtractor('ap_vz').load_parquet_file(
+                self.statistic_dir,
+                session_melt_header=None,
+                primary_key='Data'
+            ).select('Data', 'region', 'reliability')
+
+            df = df_ss.join(df_vis, on=['Data', 'region'], how='inner')
+
+            ret = {}
+            for subset in df.partition_by('region'):
+                rel = subset.explode('reliability')['reliability'].to_numpy()
+                mx = rel > 0.3
+                ss = subset.explode(self.header)[self.header].to_numpy()[mx]
+
+                ret[subset['region'].unique().item()] = ss
+
+            pprint(ret)
+
+            return ret
 
 
 if __name__ == '__main__':
