@@ -15,7 +15,7 @@ generic_agg() {
   -s light \
   --used_session light \
   --page ap_generic \
-  --update
+  --update \
   "$@"
 }
 
@@ -39,6 +39,6 @@ generic_agg csv_agg.main_generic_agg \
 
 python -m rscvp.statistic.parq.main_generic_gsp \
   -H perc95_dff \
-  --page ap_generic \
+  -s light \
   --stat-test kstest \
   --para

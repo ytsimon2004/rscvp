@@ -6,7 +6,7 @@
 
 
 python -m rscvp.statistic.persistence_agg.main_trial_avg_position \
-  -D 250906,250907 \
+  -D 250916,250918 \
   -A YW102,YW071 \
   -P , \
   --region aRSC,aRSC \
@@ -21,8 +21,8 @@ python -m rscvp.statistic.persistence_agg.main_trial_avg_position \
 
 
 python -m rscvp.statistic.persistence_agg.main_trial_avg_position \
-  -D 250906,250907 \
-  -A YW071,YW102 \
+  -D 250917,250919 \
+  -A YW102,YW071 \
   -P , \
   --region pRSC,pRSC \
   --group \
