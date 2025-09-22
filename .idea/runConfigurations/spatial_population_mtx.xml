@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_population_matrix" />
-    <option name="PARAMETERS" value="-D 250827 -A YW102 -x close-even -y close-odd -T spks -c slb --pre --re --used_session close -P 0 --debug --vr" />
+    <option name="PARAMETERS" value="-D 211209 -A YW022 -x light-odd -y light-even -T spks -c slb --pre --re --used_session light --debug --disk BigDATA --mount /Volumes" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

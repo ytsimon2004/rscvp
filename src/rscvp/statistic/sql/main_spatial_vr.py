@@ -36,8 +36,10 @@ class SpatialFractionVRStat(StatPipeline):
             self.df
             .with_columns((pl.col('n_spatial_neurons') / pl.col('n_selected_neurons')).alias('fraction'))
             .select('region', 'pair_wise_group', 'fraction')
-            .sort('region', 'region')
+            .sort('region', 'pair_wise_group')
         )
+
+        print(df)
 
         value_a = df.filter(pl.col('region') == 'aRSC')['fraction'].to_numpy()
         value_b = df.filter(pl.col('region') == 'pRSC')['fraction'].to_numpy()

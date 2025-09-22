@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import re
 from pathlib import Path
-from typing import NamedTuple, Optional, Annotated, Type, Literal, overload
+from typing import NamedTuple, Annotated, Type, Literal, overload
 
 import polars as pl
 
@@ -76,17 +76,17 @@ class GenericDB(NamedTuple):
     optic: Annotated[str, sqlp.PRIMARY]
 
     # Statistic
-    n_planes: Optional[int] = None
-    region: Optional[str] = None
-    pair_wise_group: Optional[int] = None
+    n_planes: int | None = None
+    region: str | None = None
+    pair_wise_group: int | None = None
 
-    n_total_neurons: Optional[int] = None
-    n_selected_neurons: Optional[int] = None
-    n_visual_neurons: Optional[int] = None
-    n_spatial_neurons: Optional[int] = None
-    n_overlap_neurons: Optional[int] = None
+    n_total_neurons: int | None = None
+    n_selected_neurons: int | None = None
+    n_visual_neurons: int | None = None
+    n_spatial_neurons: int | None = None
+    n_overlap_neurons: int | None = None
 
-    update_time: Optional[datetime.datetime] = None
+    update_time: datetime.datetime | None = None
 
     @sqlp.foreign(PhysiologyDB)
     def _animal(self):
@@ -102,17 +102,17 @@ class BayesDecodeDB(NamedTuple):
     user: Annotated[str, sqlp.PRIMARY]
     optic: Annotated[str, sqlp.PRIMARY]
 
-    # Statistic
-    region: Optional[str] = None
-    pair_wise_group: Optional[int] = None
+    region: str | None = None
+    pair_wise_group: int | None = None
 
-    n_neurons: Optional[int] = None
-    spatial_bins: Optional[float] = None
-    temporal_bins: Optional[float] = None
-    median_decode_error: Optional[float] = None
-    cross_validation: Optional[str] = None
+    n_neurons: int | None = None
+    spatial_bins: float | None = None
+    temporal_bins: float | None = None
+    median_decode_error: float | None = None
+    cross_validation: str | None = None
     """CrossValidateType {'odd', 'even', 'random_split', int}"""
-    update_time: Optional[datetime.datetime] = None
+
+    update_time: datetime.datetime | None = None
 
     @sqlp.foreign(PhysiologyDB)
     def _animal(self):
@@ -127,34 +127,33 @@ class VisualSFTFDirDB(NamedTuple):
     user: Annotated[str, sqlp.PRIMARY]
     optic: Annotated[str, sqlp.PRIMARY]
 
-    # Statistic
-    region: Optional[str] = None
-    pair_wise_group: Optional[int] = None
+    region: str | None = None
+    pair_wise_group: int | None = None
 
     # Order followed by ``SFTF_ARRANGEMENT``
-    sftf_amp_group1: Optional[float] = None
-    sftf_amp_group2: Optional[float] = None
-    sftf_amp_group3: Optional[float] = None
-    sftf_amp_group4: Optional[float] = None
-    sftf_amp_group5: Optional[float] = None
-    sftf_amp_group6: Optional[float] = None
-    sftf_frac_group1: Optional[float] = None
-    sftf_frac_group2: Optional[float] = None
-    sftf_frac_group3: Optional[float] = None
-    sftf_frac_group4: Optional[float] = None
-    sftf_frac_group5: Optional[float] = None
-    sftf_frac_group6: Optional[float] = None
+    sftf_amp_group1: float | None = None
+    sftf_amp_group2: float | None = None
+    sftf_amp_group3: float | None = None
+    sftf_amp_group4: float | None = None
+    sftf_amp_group5: float | None = None
+    sftf_amp_group6: float | None = None
+    sftf_frac_group1: float | None = None
+    sftf_frac_group2: float | None = None
+    sftf_frac_group3: float | None = None
+    sftf_frac_group4: float | None = None
+    sftf_frac_group5: float | None = None
+    sftf_frac_group6: float | None = None
 
-    n_ds_neurons: Optional[int] = None
+    n_ds_neurons: int | None = None
     """Number of direction selective neurons"""
-    n_os_neurons: Optional[int] = None
+    n_os_neurons: int | None = None
     """Number of orientation selective neurons"""
-    ds_frac: Optional[float] = None
+    ds_frac: float | None = None
     """Fraction of direction selective"""
-    os_frac: Optional[float] = None
+    os_frac: float | None = None
     """Fraction of orientation selective"""
 
-    update_time: Optional[datetime.datetime] = None
+    update_time: datetime.datetime | None = None
 
     @sqlp.foreign(PhysiologyDB)
     def _animal(self):
@@ -169,15 +168,15 @@ class DarknessGenericDB(NamedTuple):
     user: Annotated[str, sqlp.PRIMARY]
     optic: Annotated[str, sqlp.PRIMARY]
 
-    #
-    n_planes: Optional[int] = None
-    region: Optional[str] = None
-    n_total_neurons: Optional[int] = None
-    n_selected_neurons: Optional[int] = None
-    n_spatial_neurons_light_bas: Optional[int] = None
-    n_spatial_neurons_dark: Optional[int] = None
-    n_spatial_neurons_light_end: Optional[int] = None
-    update_time: Optional[datetime.datetime] = None
+    n_planes: int | None = None
+    region: str | None = None
+    n_total_neurons: int | None = None
+    n_selected_neurons: int | None = None
+    n_spatial_neurons_light_bas: int | None = None
+    n_spatial_neurons_dark: int | None = None
+    n_spatial_neurons_light_end: int | None = None
+
+    update_time: datetime.datetime | None = None
 
     @sqlp.foreign(PhysiologyDB)
     def _animal(self):
@@ -192,12 +191,13 @@ class BlankBeltGenericDB(NamedTuple):
     user: Annotated[str, sqlp.PRIMARY]
     optic: Annotated[str, sqlp.PRIMARY]
 
-    region: Optional[str] = None
-    pair_wise_group: Optional[int] = None
-    n_total_neurons: Optional[int] = None
-    n_selected_neurons: Optional[int] = None
-    n_spatial_neurons: Optional[int] = None
-    update_time: Optional[datetime.datetime] = None
+    region: str | None = None
+    pair_wise_group: int | None = None
+    n_total_neurons: int | None = None
+    n_selected_neurons: int | None = None
+    n_spatial_neurons: int | None = None
+
+    update_time: datetime.datetime | None = None
 
     @sqlp.foreign(PhysiologyDB)
     def _animal(self):
@@ -350,8 +350,7 @@ class RSCDatabase(sqlp.Database):
                 sqlp.update(table, *update).where(*where).submit()
 
     @overload
-    def get_data(self,
-                 db: Type[DataBaseType], *,
+    def get_data(self, db: Type[DataBaseType], *,
                  date: str,
                  animal: str,
                  rec: str,
@@ -395,3 +394,4 @@ class RSCDatabase(sqlp.Database):
             primary_key=('date', 'animal', 'rec', 'user', 'optic')
         )
         fprint(f'PUSH {db.__name__} to {gspread_name}')
+        print(df)
