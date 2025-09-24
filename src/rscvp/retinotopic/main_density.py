@@ -1,9 +1,13 @@
 import numpy as np
+import tifffile
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
 
-from argclz import AbstractParser
+from argclz import AbstractParser, argument
 from neuralib.imaging.widefield import SequenceFFT
 from neuralib.persistence.cli_persistence import get_options_and_cache
+from neuralib.plot import plot_figure
+from neuralib.plot.colormap import insert_cyclic_colorbar
 from rscvp.retinotopic.cache_retinotopic import RetinotopicCacheBuilder
 from rscvp.util.cli import WFieldOptions
 
@@ -11,37 +15,41 @@ from rscvp.util.cli import WFieldOptions
 class RetinotopicDensityOptions(AbstractParser, WFieldOptions):
     DESCRIPTION = ...
 
+    bin_size: int = argument('--bin', default=50, help='bin size for the image pixel')
+
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         cache = get_options_and_cache(RetinotopicCacheBuilder, self)
 
-        fft = SequenceFFT(cache.trial_averaged_resp)
+        f = ...
+        seq = tifffile.imread(f)
+
+        fft = SequenceFFT(seq)
         phase = fft.get_phase()  # This represents azimuth position preference
 
+        with plot_figure(None, 1, 2) as ax:
+            self.plot_phase(ax[0], phase)
+            self.plot_density(ax[1], phase)
+
+    def plot_phase(self, ax: Axes, phase: np.ndarray):
+        im = ax.imshow(phase, cmap='hsv')
+        insert_cyclic_colorbar(ax, im, num_colors=36, width=0.2, inner_diameter=1, vmin=0, vmax=1)
+
+    def plot_density(self, ax: Axes, phase: np.ndarray):
         height, width = phase.shape
+        b = self.bin_size
+        x_bins = np.arange(0, width + b, b)
+        y_bins = np.arange(0, height, b)
 
-        # Create x-axis bins (every 50 pixels)
-        bin_size = 50
-        x_bins = np.arange(0, width + bin_size, bin_size)
-
-        # Create y-axis bins for different cortical regions
-        y_bin_size = 50
-        y_bins = np.arange(0, height, y_bin_size)
-
-        plt.figure(figsize=(12, 8))
-
-        # Plot multiple lines for different y-axis regions
         colors = plt.cm.viridis(np.linspace(0, 1, len(y_bins) - 1))
-
         for i, (y_start, color) in enumerate(zip(y_bins[:-1], colors)):
-            y_end = min(y_start + y_bin_size, height)
+            y_end = min(y_start + b, height)
 
-            # Calculate mean azimuth preference for each x bin
             x_centers = []
-            azimuth_means = []
+            deg_means = []
 
             for x_start in x_bins[:-1]:
-                x_end = min(x_start + bin_size, width)
+                x_end = min(x_start + b, width)
 
                 # Extract phase values for this y-region and x range
                 phase_values = []
@@ -53,30 +61,21 @@ class RetinotopicDensityOptions(AbstractParser, WFieldOptions):
                     phase_values = np.array(phase_values)
                     # Handle circular statistics for phase
                     mean_phase = np.angle(np.mean(np.exp(1j * phase_values)))
-                    # Convert to degrees
                     mean_phase_deg = np.degrees(mean_phase)
 
-                    x_centers.append(x_start + bin_size / 2)
-                    azimuth_means.append(mean_phase_deg)
+                    x_centers.append(x_start + b / 2)
+                    deg_means.append(mean_phase_deg)
 
-            # Plot line for this y-region
-            if x_centers:
-                label = f'Y: {y_start}-{y_end - 1} pixels'
-                plt.plot(x_centers, azimuth_means,
-                         marker='o', linewidth=2, color=color, alpha=0.8,
-                         label=label)
+            if len(x_centers) > 0:
+                if x_centers:
+                    label = f'Y: {y_start}-{y_end - 1} pixels'
+                    plt.plot(x_centers, deg_means,
+                             marker='o', linewidth=2, color=color, alpha=0.8,
+                             label=label)
 
-        plt.xlabel('X Position (pixels)')
-        plt.ylabel('Azimuth Position Preference (degrees)')
-        plt.title('Azimuth Preference vs X Position\n(Different Y-axis regions)')
+        ax.set_xlabel('X position (pixels)')
+        ax.set_ylabel('circular preference (degrees)')
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        plt.grid(True, alpha=0.3)
-        plt.axhline(y=0, color='k', linestyle='--', alpha=0.5)
-        plt.axhline(y=180, color='k', linestyle='--', alpha=0.5)
-        plt.axhline(y=-180, color='k', linestyle='--', alpha=0.5)
-
-        plt.tight_layout()
-        plt.show()
 
 
 if __name__ == '__main__':
