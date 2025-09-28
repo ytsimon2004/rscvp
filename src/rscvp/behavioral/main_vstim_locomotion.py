@@ -9,7 +9,7 @@ from rscvp.util.cli import TreadmillOptions
 
 
 @publish_annotation('appendix', project='rscvp', caption='rev')
-class StimRunningOptions(AbstractParser, TreadmillOptions):
+class LocomotionVstimOptions(AbstractParser, TreadmillOptions):
     DESCRIPTION = 'plot the running speed pre and post the visual stimulation (for multiple animal)'
 
     collapse: bool = argument(
@@ -82,4 +82,4 @@ class StimRunningOptions(AbstractParser, TreadmillOptions):
 
 
 if __name__ == '__main__':
-    StimRunningOptions().main()
+    LocomotionVstimOptions().main()

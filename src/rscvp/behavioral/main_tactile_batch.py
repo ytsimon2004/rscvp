@@ -8,20 +8,20 @@ from argclz import AbstractParser, as_argument, try_float_type, argument
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure, plot_peri_onset_1d
 from neuralib.util.verbose import publish_annotation
-from rscvp.behavioral.util import get_velocity_per_trial
+from rscvp.behavioral.util import get_binned_velocity
 from rscvp.behavioral.util_plot import plot_velocity_line
 from rscvp.util.cli.cli_camera import CameraOptions
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.util_lick import peri_reward_raster_hist
 
-__all__ = ['BehaviorBatchPlotOptions']
+__all__ = ['TactileBatchOptions']
 
 P = ParamSpec('P')
 F = TypeVar('F', bound=Callable[P, Any])
 
 
 @publish_annotation('appendix', project='rscvp', as_doc=True)
-class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, Dispatch, Generic[P]):
+class TactileBatchOptions(AbstractParser, CameraOptions, TreadmillOptions, Dispatch, Generic[P]):
     DESCRIPTION = 'Plot multiple (batch) animals for treadmill behavioral analysis'
 
     dispatch_plot: Literal[
@@ -106,7 +106,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
     @dispatch('peri_reward_vel')
     def plot_peri_reward_velocity_batch(self):
         """Plot peri-reward velocity in batch dataset"""
-        dataset: BehaviorBatchPlotOptions.VelDType = []
+        dataset: TactileBatchOptions.VelDType = []
         for i, _ in enumerate(self.foreach_dataset()):
             riglog = self.load_riglog_data()
             reward_time = riglog.reward_event.time
@@ -138,7 +138,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
     @dispatch('vel_as_position')
     def plot_velocity_line_batch(self):
         """Plot velocity as a function of position bins in batch dataset"""
-        dataset: BehaviorBatchPlotOptions.PosDType = []
+        dataset: TactileBatchOptions.PosDType = []
         for i, _ in enumerate(self.foreach_dataset()):
             riglog = self.load_riglog_data()
             lap_time = riglog.lap_event.time
@@ -149,7 +149,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
             if self.cutoff_vel is not None:
                 v[(v < self.cutoff_vel)] = 0
 
-            m = get_velocity_per_trial(lap_time, pos, self.track_length, self.smooth_vel)
+            m = get_binned_velocity(lap_time, pos, self.track_length, self.pos_bins, self.smooth_vel)
             dataset.append(m)
 
             #
@@ -184,7 +184,7 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
 
         :return:
         """
-        dataset: BehaviorBatchPlotOptions.LickDType = []
+        dataset: TactileBatchOptions.LickDType = []
 
         event_source = self.lick_event_source
         for _ in self.foreach_dataset(lick_thres=try_float_type):  # foreach lick
@@ -249,4 +249,4 @@ class BehaviorBatchPlotOptions(AbstractParser, CameraOptions, TreadmillOptions, 
 
 
 if __name__ == '__main__':
-    BehaviorBatchPlotOptions().main()
+    TactileBatchOptions().main()

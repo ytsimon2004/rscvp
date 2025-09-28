@@ -5,8 +5,8 @@ from unittest.mock import patch
 import matplotlib.pyplot as plt
 
 from argclz import AbstractParser
-from rscvp.behavioral.main_batch import BehaviorBatchPlotOptions
-from rscvp.behavioral.main_summary import BehaviorSumOptions
+from rscvp.behavioral.main_tactile_batch import TactileBatchOptions
+from rscvp.behavioral.main_tactile_summary import TactileSummaryOptions
 from rscvp.track.main_lick_score import LickScoreOptions
 from rscvp.track.main_licking_cmp import LickingCmpOptions
 from rscvp.track.main_licking_prob import LickProbOptions
@@ -51,46 +51,46 @@ class TestBehaviorTrackModule(unittest.TestCase):
 
     @patch('matplotlib.pyplot.show')
     def test_individual_summary(self, *args):
-        class Opt(BehaviorSumOptions):
+        class Opt(TactileSummaryOptions):
             exp_date = '210315'
             animal_id = 'YW006'
             debug_mode = True
 
-        check_attr(Opt, BehaviorSumOptions)
+        check_attr(Opt, TactileSummaryOptions)
         Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_batch_peri_reward_vel(self, *args):
-        class Opt(BehaviorBatchPlotOptions):
+        class Opt(TactileBatchOptions):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             dispatch_plot = 'peri_reward_vel'
             debug_mode = True
 
-        check_attr(Opt, BehaviorBatchPlotOptions)
+        check_attr(Opt, TactileBatchOptions)
         Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_batch_vel_as_position(self, *args):
-        class Opt(BehaviorBatchPlotOptions):
+        class Opt(TactileBatchOptions):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             dispatch_plot = 'vel_as_position'
             debug_mode = True
 
-        check_attr(Opt, BehaviorBatchPlotOptions)
+        check_attr(Opt, TactileBatchOptions)
         Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_batch_peri_reward_lick(self, *args):
-        class Opt(BehaviorBatchPlotOptions):
+        class Opt(TactileBatchOptions):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             dispatch_plot = 'peri_reward_lick'
             lick_thres = '80,80'
             debug_mode = True
 
-        check_attr(Opt, BehaviorBatchPlotOptions)
+        check_attr(Opt, TactileBatchOptions)
         Opt().main([])
 
     # =================== #

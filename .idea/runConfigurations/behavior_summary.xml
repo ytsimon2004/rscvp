@@ -23,8 +23,8 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="rscvp.behavioral.main_summary" />
-    <option name="PARAMETERS" value="-D 210315 -A YW006 --vcut -20 --debug" />
+    <option name="SCRIPT_NAME" value="rscvp.behavioral.main_tactile_summary" />
+    <option name="PARAMETERS" value="-D 210402 -A YW008 --debug --disk BigDATA --mount /Volumes" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

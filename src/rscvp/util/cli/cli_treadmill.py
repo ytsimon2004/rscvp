@@ -4,6 +4,7 @@ from typing import ClassVar
 
 from argclz import argument, int_tuple_type
 from neuralib.locomotion import CircularPosition
+from stimpyp import Session
 from .cli_stimpy import StimpyOptions
 
 __all__ = ['TreadmillOptions']
@@ -77,6 +78,12 @@ class TreadmillOptions(StimpyOptions):
 
     # ----- position ----- #
 
+    position_session: Session | None = argument(
+        '--position-session',
+        group=GROUP_TREADMILL,
+        help='position session for loading. use while using virtual space, and see open-loop running',
+    )
+
     invalid_position_cache: bool = argument(
         '--invalid-position-cache',
         group=GROUP_TREADMILL,
@@ -92,7 +99,7 @@ class TreadmillOptions(StimpyOptions):
     _virtual_linear_row = 0
     _virtual_landmark_char = 'v'
 
-    @cached_property
+    @property
     def track_length(self) -> int:
         """get track length depending on either physical or virtual track"""
         if self.use_virtual_space:
@@ -132,8 +139,12 @@ class TreadmillOptions(StimpyOptions):
 
     @property
     def position_cache(self) -> Path:
-        suffix = 'virtual_position_cache.npy' if self.use_virtual_space else 'position_cache.npy'
-        return self.cache_directory / suffix
+        suffix = 'virtual_position_cache' if self.use_virtual_space else 'position_cache'
+
+        if self.position_session is not None:
+            suffix += f'_{self.position_session}'
+
+        return (self.cache_directory / suffix).with_suffix('.npy')
 
     def load_position(self) -> CircularPosition:
         from rscvp.util.position import load_interpolated_position
@@ -146,5 +157,6 @@ class TreadmillOptions(StimpyOptions):
             force_compute=self.invalid_position_cache,
             cache_file=self.position_cache,
             use_virtual_space=self.use_virtual_space,
+            session=self.position_session,
             norm_length=self.track_length,
         )

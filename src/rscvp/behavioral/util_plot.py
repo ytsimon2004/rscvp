@@ -21,7 +21,8 @@ __all__ = [
 
 def plot_velocity_heatmap(ax: Axes,
                           velocity: np.ndarray,
-                          sep: list[int] | None = None):
+                          sep: list[int] | None = None,
+                          **kwargs):
     """
     velocity heatmap (laps versus position)
 
@@ -35,7 +36,8 @@ def plot_velocity_heatmap(ax: Axes,
         cmap='hot',
         interpolation='none',
         origin='lower',
-        aspect='auto'
+        aspect='auto',
+        **kwargs
     )
     ax.set_ylabel('Trial #')
 

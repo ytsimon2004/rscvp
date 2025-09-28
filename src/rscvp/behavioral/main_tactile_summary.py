@@ -9,10 +9,10 @@ from rscvp.util.cli.cli_treadmill import TreadmillOptions
 from rscvp.util.util_lick import peri_reward_raster_hist
 from stimpyp import Session, RiglogData
 
-__all__ = ['BehaviorSumOptions']
+__all__ = ['TactileSummaryOptions']
 
 
-class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
+class TactileSummaryOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
     DESCRIPTION = 'Plot single animal in treadmill behavioral overview'
 
     session: Session | tuple[Session, ...] | None = as_argument(StimpyOptions.session).with_options(
@@ -42,7 +42,7 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
 
         lick_event = riglog.lick_event
         reward_event = riglog.reward_event
-        lap_event = riglog.lap_event
+        lap_event = self.get_lap_event(riglog)
 
         p = pos.p
         pt = pos.t
@@ -54,7 +54,13 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
         sep = self.session_sep(riglog)
 
         # running speed heatmap
-        m = get_velocity_per_trial(lap_event.time, pos, self.track_length, self.smooth_vel)
+        m = get_binned_velocity(
+            lap_event.time,
+            pos,
+            track_length=self.track_length,
+            bins=self.pos_bins,
+            smooth=self.smooth_vel
+        )
 
         output_file = output.summary_figure_output(
             self.session if self.session is not None else None
@@ -63,7 +69,7 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
         with plot_figure(output_file, 6, 2, figsize=(8, 12), tight_layout=False) as _ax:
             # vel heatmap
             ax = ax_merge(_ax)[0:3, 0]
-            plot_velocity_heatmap(ax, m, sep)
+            plot_velocity_heatmap(ax, m, sep, extent=(0, self.track_length, 0, m.shape[0]))
 
             # velocity line chart
             ax = ax_merge(_ax)[3:4, 0]
@@ -106,4 +112,4 @@ class BehaviorSumOptions(AbstractParser, Suite2pOptions, TreadmillOptions):
 
 
 if __name__ == '__main__':
-    BehaviorSumOptions().main()
+    TactileSummaryOptions().main()

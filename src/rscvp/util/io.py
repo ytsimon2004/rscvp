@@ -172,7 +172,7 @@ DEFAULT_IO_CONFIG: dict[DISK_TYPE, IOConfig] = {
 
 def get_io_config(config: dict[str, IOConfig] | None = None,
                   remote_disk: str | None = None,
-                  mnt_prefix: str = '/Volumes',
+                  mnt_prefix: str = '/mnt',
                   force_use_default: bool = False) -> IOConfig:
     """
     Determines and retrieves the appropriate IO configuration for the current node and remote disk

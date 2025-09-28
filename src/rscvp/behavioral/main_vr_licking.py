@@ -9,11 +9,11 @@ from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import TreadmillOptions
 from stimpyp import RiglogData
 
-__all__ = ['LinearVRTaskOptions']
+__all__ = ['VRLickingOptions']
 
 
 @publish_annotation('sup', project='rscvp', as_doc=True)
-class LinearVRTaskOptions(AbstractParser, TreadmillOptions):
+class VRLickingOptions(AbstractParser, TreadmillOptions):
     DESCRIPTION = 'Plot lick raster in the linear VR task'
 
     pre_reward: float = argument(
@@ -115,4 +115,4 @@ class LinearVRTaskOptions(AbstractParser, TreadmillOptions):
 
 
 if __name__ == '__main__':
-    LinearVRTaskOptions().main()
+    VRLickingOptions().main()

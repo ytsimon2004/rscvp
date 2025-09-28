@@ -5,8 +5,8 @@ from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
 
 from neuralib.locomotion import running_mask1d, interp_pos1d, CircularPosition
-from neuralib.util.verbose import fprint
-from stimpyp import RiglogData, RigEvent
+from neuralib.util.verbose import fprint, print_load, print_save
+from stimpyp import RiglogData, RigEvent, Session
 
 __all__ = [
     'PositionBinnedSig',
@@ -333,6 +333,7 @@ def load_interpolated_position(rig: RiglogData,
                                force_compute: bool = False,
                                cache_file: Path | None = None,
                                use_virtual_space: bool = False,
+                               session: Session | None = None,
                                norm_length: float = 150) -> CircularPosition:
     """
     get 'CircularPosition' and save as cache
@@ -342,23 +343,28 @@ def load_interpolated_position(rig: RiglogData,
     :param force_compute: force recalculate and save as a new cache
     :param cache_file: specify cache file name. If None, create cache in riglog file directory
     :param use_virtual_space: if used virtual environment position space
+    :param session: stimpy protocol session
     :param norm_length: maximal length for normalization for each trial
     :return: ``CircularPosition``
     """
 
     if cache_file is None:
         file = rig.riglog_file
-        suffix = '_position_cache.npy' if not use_virtual_space else '_virtual_position_cache.npy'
-        cache_file = file.with_name(file.stem + f'{suffix}')
+        suffix = '_position_cache' if not use_virtual_space else '_virtual_position_cache'
+        if session is not None:
+            suffix += f'_{session}'
+
+        cache_file = file.with_name(file.stem + f'{suffix}').with_suffix('.npy')
 
     if cache_file.exists() and not force_compute:
         d = np.load(cache_file)
         lt = d[:, 4]
         lt = lt[~np.isnan(lt)].astype(int)
+        print_load(cache_file)
         return CircularPosition(d[:, 0], d[:, 1], d[:, 2], d[:, 3], lt)
     else:
         if use_virtual_space:
-            p = rig.get_pygame_stimlog().virtual_position_event
+            p = rig.get_pygame_stimlog().virtual_position_event(session=session)
         else:
             p = rig.position_event
 
@@ -368,5 +374,6 @@ def load_interpolated_position(rig: RiglogData,
         lt[:len(pos.trial_time_index)] = pos.trial_time_index
 
         np.save(cache_file, np.vstack([pos.t, pos.p, pos.d, pos.v, lt]).T)
+        print_save(cache_file)
 
         return pos
