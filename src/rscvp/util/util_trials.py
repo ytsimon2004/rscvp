@@ -118,15 +118,15 @@ class TrialSelection:
     @property
     def trials_time(self) -> np.ndarray:
         """Time for selected trials"""
-        return self.rig.lap_event.time[self.selected_trials]
+        return self.lap_event.time[self.selected_trials]
 
     @property
     def trial_range_in_session(self) -> tuple[int, int]:
         """Range within the session"""
         session_info = self.session_trial[self.session_type]
         ret = session_info.in_range(
-            self.rig.lap_event.time,
-            self.rig.lap_event.value_index
+            self.lap_event.time,
+            self.lap_event.value_index
         )
         return ret
 
