@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.model.bayes_decoding.main_cache_bayes" />
-    <option name="PARAMETERS" value="-D 250829 -A YW102 -P 0 --session close --used_session close --random 200 --CV odd --spatial-bin 1.5 --vr" />
+    <option name="PARAMETERS" value="-D 250917 -A YW102 -P 0 --session close --used_session close --random 200 --CV odd --spatial-bin 1.5 --vr --disk bkrunch-linux-scratch --mount /Volumes --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

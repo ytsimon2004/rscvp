@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_belt_sort_trial" />
-    <option name="PARAMETERS" value="-D 250827 -A YW102 -P 0 -t close --us close --debug --vr" />
+    <option name="PARAMETERS" value="-D 250916 -A YW102 -P 0 -t close --us close --debug --vr --disk bkrunch-linux-scratch --mount /Volumes" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

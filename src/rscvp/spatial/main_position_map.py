@@ -33,7 +33,11 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         if self.overview:
             self.pre_selection = True
             self.pc_selection = 'slb'
-            self.used_session = 'light'
+
+            if self.is_vop_protocol or self.is_ldl_protocol:
+                self.used_session = 'light'
+            elif self.is_virtual_protocol:
+                self.used_session = 'close'
 
     def run(self):
         self.post_parsing()
