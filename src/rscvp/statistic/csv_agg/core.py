@@ -18,7 +18,8 @@ _INIT_DEFAULT_COLS_GSPREAD_PARQUET = {
     'ap_place': 'B1:E1',
     'ap_generic': 'B1:E1',
     #
-    'ap_ldl': 'B1:E1'
+    'ap_ldl': 'B1:E1',
+    'ap_vr': 'B1:G1'
 }
 
 

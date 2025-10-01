@@ -28,7 +28,6 @@ class PFStatGSP(StatPipeline):
     dependent = False
     parametric = False
     load_source: Final = 'parquet'
-    sheet_name: Final = 'ap_place'
 
     def post_parsing(self):
         if self.header == 'n_pf' and self.animal_based_comp:
@@ -144,14 +143,18 @@ class PFStatGSP(StatPipeline):
         collect_data = self._get_collect_data_npf(df)
         pprint(collect_data)
 
-        g = sns.catplot(data=df,
-                        kind='bar',
-                        x='n_pf',
-                        y='fraction',
-                        hue='region',
-                        errorbar=('se', 1),
-                        palette=REGION_COLORS_HIST)
+        g = sns.catplot(
+            data=df,
+            kind='bar',
+            x='n_pf',
+            y='fraction',
+            hue='region',
+            errorbar=('se', 1),
+            palette=REGION_COLORS_HIST
+        )
+
         ax = g.ax
+
         for f in ax.patches:
             try:
                 txt = str(round(f.get_height(), 2)) + '%'
@@ -164,13 +167,15 @@ class PFStatGSP(StatPipeline):
                 ax.text(txt_x, txt_y, txt)
 
         #
-        sns.swarmplot(data=df,
-                      x='n_pf',
-                      y='fraction',
-                      hue='region',
-                      dodge=True,
-                      palette=['g', 'magenta'],
-                      ax=ax)
+        sns.swarmplot(
+            data=df,
+            x='n_pf',
+            y='fraction',
+            hue='region',
+            dodge=True,
+            palette=['g', 'magenta'],
+            ax=ax
+        )
 
         self._print_npf_info(df)
         ax.set(ylabel='fraction', xlabel='n_pf')
@@ -218,12 +223,23 @@ class PFStatGSP(StatPipeline):
     # ==================== #
 
     def plot_pf_peak_loc(self, data: DataSetType):
+        bin_range = (0, 210) if self.sheet_name == 'ap_vr' else (0, 150)
+
         with plot_figure(self.output_figure) as ax:
             for i, (var, peak_loc) in enumerate(data.items()):
                 n = len(peak_loc)
-                sns.histplot(ax=ax, data=peak_loc, binrange=(0, 150), bins=50, stat='percent',
-                             kde=True, alpha=0.7, color=REGION_COLORS_HIST[var], element='step',
-                             label=f'{var} (n={n})')
+                sns.histplot(
+                    ax=ax,
+                    data=peak_loc,
+                    binrange=bin_range,
+                    bins=50,
+                    stat='percent',
+                    kde=True,
+                    alpha=0.7,
+                    color=REGION_COLORS_HIST[var],
+                    element='step',
+                    label=f'{var} (n={n})'
+                )
 
             ax.set(xlabel='position (cm)', ylabel='Fraction')
             self.insert_pval(ax)

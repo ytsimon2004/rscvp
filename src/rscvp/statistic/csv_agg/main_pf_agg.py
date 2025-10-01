@@ -20,7 +20,7 @@ class PFStat(LocalSpreadsheetSync):
             truncate_session_agg=opt.truncate_session_agg
         )
 
-        super().__init__(opt, sheet_page='ap_place', collector=collector)
+        super().__init__(opt, sheet_page=opt.sheet_name, collector=collector)
 
 
 class PFStatAggOptions(AbstractParser, StatisticOptions):

@@ -39,7 +39,7 @@
       <excludeFolder url="file://$MODULE_DIR$/../stimpyp/doc/source/notebooks/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/../stimpyp/src/stimpyp.egg-info" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (rscvp)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="uv (rscvp)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
