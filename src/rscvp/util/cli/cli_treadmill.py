@@ -97,7 +97,7 @@ class TreadmillOptions(StimpyOptions):
 
     _track_landmarks: tuple[int, ...] | None = None
     _virtual_linear_row = 0
-    _virtual_landmark_char = 'v'
+    _virtual_landmark_char = ('v', 'd')
 
     @property
     def track_length(self) -> int:
@@ -118,10 +118,16 @@ class TreadmillOptions(StimpyOptions):
     def _get_landmarks(self) -> tuple[int, ...]:
         if self.use_virtual_space:
             rig = self.load_riglog_data()
-            landmarks = rig.get_pygame_stimlog().get_landmarks(
-                row=self._virtual_linear_row,
-                char=self._virtual_landmark_char
-            )
+
+            landmarks = []
+            for char in self._virtual_landmark_char:
+                lks = (
+                    rig
+                    .get_pygame_stimlog()
+                    .get_landmarks(row=self._virtual_linear_row, char=char)
+                )
+
+                landmarks.extend(lks)
 
             if len(landmarks) == 0:
                 return ()

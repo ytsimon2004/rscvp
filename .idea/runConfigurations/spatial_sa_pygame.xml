@@ -23,8 +23,8 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="rscvp.spatial.main_belt_sort" />
-    <option name="PARAMETERS" value="-D 250829 -A YW102 -P 0 -t close --us close -c slb -T spks --vr --debug" />
+    <option name="SCRIPT_NAME" value="rscvp.spatial.main_position_sort" />
+    <option name="PARAMETERS" value="-D 251001 -A YW071 -P 0 -t close --us close -c slb -T spks --vr --debug --disk bkrunch-linux-scratch --mount /Volumes" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

@@ -11,10 +11,10 @@ from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.typing import SIGNAL_TYPE
 from rscvp.util.util_trials import TrialSelection
 
-__all__ = ['CPBeltSortTrialOptions']
+__all__ = ['PositionSortTrialOptions']
 
 
-class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
+class PositionSortTrialOptions(AbstractParser, ApplySortIdxOptions):
     DESCRIPTION = 'plot the sorted calcium activities of population neurons in the given laps'
 
     sort_lap: int | None = argument(
@@ -150,4 +150,4 @@ class CPBeltSortTrialOptions(AbstractParser, ApplySortIdxOptions):
 
 
 if __name__ == '__main__':
-    CPBeltSortTrialOptions().main()
+    PositionSortTrialOptions().main()

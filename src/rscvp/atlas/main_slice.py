@@ -4,13 +4,15 @@ from argclz import AbstractParser, argument
 from neuralib.atlas.view import get_slice_view
 from neuralib.plot import plot_figure
 
+__all__ = ['SliceViewOptions']
+
 
 class SliceViewOptions(AbstractParser):
     DESCRIPTION = 'Plot the slice view of the injection site'
 
     resolution: Final = 10
 
-    region: Literal['inj', 'SS', 'MO', 'ACA', 'PTLp', 'ATN'] = argument(
+    region: Literal['inj', 'SS', 'MO', 'ACA', 'PTLp', 'ATN', 'POST', 'LD'] = argument(
         '--region',
         default='inj',
         help='region to plot',
@@ -36,9 +38,16 @@ class SliceViewOptions(AbstractParser):
             case 'ATN':
                 index = 615
                 self.plot_coronal(['AD', 'AM', 'AV', 'IAD', 'IAM', 'LD'], index)
+            case 'POST':
+                index = 960
+                self.plot_coronal(self.region, index)
+            case 'LD':
+                index = 669
+                self.plot_coronal(self.region, index)
+            case _:
+                raise NotImplementedError(f'{self.region}')
 
     def plot_injection(self):
-
         anterior_index = 690
         posterior_index = 863
         coords = (500, 800)  # ml, dv in um

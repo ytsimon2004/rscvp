@@ -12,10 +12,10 @@ from rscvp.spatial.util_plot import plot_sorted_trial_averaged_heatmap, plot_fra
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.util_trials import signal_trial_cv_helper
 
-__all__ = ['CPBeltSortOptions']
+__all__ = ['PositionSortOptions']
 
 
-class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptions):
+class PositionSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptions):
     DESCRIPTION = 'plot the sorted trial-average calcium activities of population neurons along the 1d environment'
     EPILOG = """
     Example:
@@ -178,4 +178,4 @@ class CPBeltSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptio
 
 
 if __name__ == '__main__':
-    CPBeltSortOptions().main()
+    PositionSortOptions().main()
