@@ -18,11 +18,11 @@ run_python() {
   local a=$2
   shift 2
 
-  echo "*** now run ${ED}_${ID}__2P_YW/concat $m $a ***"
+  echo "*** now run ${ED}_${ID}__2P_YW/signal $m $a ***"
   python -m rscvp.$m $a \
     -D "$ED" \
     -A "$ID"
 }
 
 ##
-run_python concat csv
+run_python signal csv

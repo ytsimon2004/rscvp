@@ -12,8 +12,6 @@ from rscvp.util.cli.cli_selection import SelectionOptions
 __all__ = ['ConcatCellCSVOptions']
 
 
-# TODO mv to signal module0
-
 class ConcatCellCSVOptions(AbstractParser, SelectionOptions):
     DESCRIPTION = 'concat all .csv file (per cell) in separated planes analysis'
 

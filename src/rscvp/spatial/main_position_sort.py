@@ -19,7 +19,6 @@ class PositionSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOpt
     DESCRIPTION = 'plot the sorted trial-average calcium activities of population neurons along the 1d environment'
     EPILOG = """
     Example:
-    python -m rscvp.spatial.main_belt_sort
     -t light                 # save idx (sort by light)
     -t dark --sort light     # use dark session activity (sort by light cache)
     """
