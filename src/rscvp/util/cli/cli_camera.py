@@ -56,12 +56,6 @@ class CameraOptions(StimpyOptions):
         help='start-end frame number'
     )
 
-    not_outlier_filtering: bool = argument(
-        '--no-filter',
-        group=GROUP_CAM,
-        help='Apply median filter to the keypoints data to remove outliers'
-    )
-
     with_keypoints: bool = argument(
         '--with-keypoints',
         group=GROUP_CAM,

@@ -17,9 +17,6 @@ __all__ = ['GROUP_HEADER_TYPE',
            'get_stat_group_vars',
            'CollectDataSet']
 
-# =============== #
-# Collect DataSet #
-# =============== #
 
 GROUP_HEADER_TYPE = Literal['region', 'session']
 

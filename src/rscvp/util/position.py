@@ -79,7 +79,7 @@ class PositionBinnedSig:
         self._pos_cache: CircularPosition | None = None
         self._run_mask = None
         self._pos_mask_cache: dict[int, np.ndarray] = {}  # lap: pos_mask(bool arr)
-        self._occ_map_cache: dict[(int, bool), np.ndarray] = {}  # (lap, running_epoch): occ_map
+        self._occ_map_cache: dict[tuple[int, bool], np.ndarray] = {}  # (lap, running_epoch): occ_map
 
     @property
     def riglog(self) -> RiglogData:

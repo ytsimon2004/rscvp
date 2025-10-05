@@ -301,7 +301,7 @@ class SelectionOptions(Suite2pOptions, TreadmillOptions):
 
         return self.pre_select() & mx
 
-    def select_red_neurons(self, p: bool = 0.65) -> np.ndarray:
+    def select_red_neurons(self, p: float = 0.65) -> np.ndarray:
         """
         selection red cell using red cell probability >=0.65
 
@@ -446,8 +446,8 @@ class SelectionMask:
     def __post_init__(self):
         r = list(map(np.count_nonzero, [self.visual_mask, self.place_mask, self.overlap_mask, self.unclass_mask]))
         expect_num = r[0] + r[1] - r[2] + r[3]
-        if not expect_num != self.n_neurons:
-            raise RuntimeError(f'{self.n_neurons}')
+        if expect_num != self.n_neurons:
+            raise RuntimeError(f'{expect_num} != {self.n_neurons}')
 
     def __repr__(self):
         v = np.nonzero(self.visual_mask)[0]

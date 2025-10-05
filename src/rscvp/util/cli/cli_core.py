@@ -206,8 +206,6 @@ class CommonOptions:
                 g += f'/run{self.run_number}_*'
 
             f = uglob(d, g, is_dir=True)
-            assert f.name in (self.stimpy_filename, self.pyvstim_filename), 'f.name != self.filename'
-
             self.__config.phy_animal_dir = f
 
     def foreach_dataset(self, **field) -> Iterable[Self]:

@@ -222,8 +222,8 @@ class TrialSelection:
         for train_index, test_index in kfold_iter.split(self.selected_trials):
             ret.append(
                 (
-                    TrialSelection(self.rig, self.session_type, train_index),
-                    TrialSelection(self.rig, self.session_type, test_index)
+                    TrialSelection(self.rig, self.session_type, train_index, use_virtual_space=self.use_virtual_space),
+                    TrialSelection(self.rig, self.session_type, test_index, use_virtual_space=self.use_virtual_space)
                 )
             )
 

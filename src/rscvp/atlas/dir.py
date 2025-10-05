@@ -25,8 +25,6 @@ CCF_GLOB_TYPE = Literal[
 ]
 
 
-# TODO from here
-
 class AbstractCCFDir(metaclass=abc.ABCMeta):
     """
     ::
