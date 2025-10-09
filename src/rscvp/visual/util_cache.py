@@ -101,8 +101,9 @@ class VisualTuningCache(ETLConcatable):
     """experimental date"""
     animal: str = persistence.field(validator=True, filename=True)
     """animal ID"""
-    plane_index: int | str = persistence.field(validator=False, filename=True, filename_prefix='plane')
-    """optical imaging plane"""
+    plane_index: int | Literal['_concat', '_all'] = persistence.field(validator=False, filename=True,
+                                                                      filename_prefix='plane')
+    """optical imaging plane, _concat: concat all planes; _all: non-imaging variables"""
     signal_type: BINNED_SIGNAL_TYPE = persistence.field(validator=True, filename=True)
     """{'pupil', 'speed', 'df_f', 'spks'}"""
     value_type: TRIAL_VALUE_TYPE = persistence.field(validator=True, filename=True, filename_prefix='trial_')
@@ -158,7 +159,7 @@ class VisualTuningCache(ETLConcatable):
         )
 
         ret.neuron_idx = np.concatenate([it.neuron_idx for it in data])
-        ret.src_idx = np.concatenate([it.src_neuron_idx for it in data])
+        ret.src_neuron_idx = np.concatenate([it.src_neuron_idx for it in data])
         ret.pre_post = const.pre_post
         ret.stim_pattern = const.stim_pattern
         ret.stim_index = const.stim_index
@@ -322,7 +323,7 @@ def plot_visual_pattern_trace(
     y_val = np.max(y_limit).astype(float)
     sbar = AnchoredScaleBar(ax.transData,
                             sizey=1,
-                            labely=f'{y_val:.2f}%',
+                            labely=f'{y_val:.2f} a.u.',
                             pad=0.1,
                             color=color,
                             color_txt=color)

@@ -1,5 +1,4 @@
 import numpy as np
-from matplotlib.axes import Axes
 
 from argclz import AbstractParser
 from neuralib.plot import plot_figure
@@ -26,7 +25,7 @@ class RunningVisualOptions(AbstractParser,
             animal=self.animal_id,
             signal_type='speed',
             value_type=self.value_type,
-            plane_index=self.plane_index,
+            plane_index='_all',
             direction_invert=self.direction_invert
         )
 
@@ -38,22 +37,26 @@ class RunningVisualOptions(AbstractParser,
 
         return cache
 
-    def plot_speed_trace(self, cache: VisualTuningCache):
+    def get_frame_rate(self) -> float:
+        self.plane_index = 0  # adhoc for non-imaging value
         s2p = self.load_suite_2p()
+        return s2p.fs
+
+    def plot_speed_trace(self, cache: VisualTuningCache):
         rig = self.load_riglog_data()
         pos = self.load_position()
         pattern = GratingPattern.of(rig)
 
-        with plot_figure(None, 1, 3) as ax:
+        with plot_figure(None) as ax:
             signals = plot_visual_pattern_trace(
-                ax[0],
+                ax,
                 pattern,
                 pos.v,
                 pos.t,
                 pre_post=self.pre_post,
                 direction_invert=self.direction_invert,
                 color=self.line_color,
-                sig_type=self.signal_type,
+                sig_type='speed',
                 value_type=self.value_type
             )
 
@@ -66,19 +69,12 @@ class RunningVisualOptions(AbstractParser,
                 sig = sig.rollback_actual_value()
                 stim_pattern.append(tuple([sig.direction, sig.sftf]))
                 act.append(sig.signal)
-                stim_indices.append([sig.stim_epoch_index(self.pre_post, s2p.fs) + pad])
+                stim_indices.append([sig.stim_epoch_index(self.pre_post, self.get_frame_rate()) + pad])
                 pad += sig.n_frames
-
-            self.plot_overall_trace(ax[1], ax[2], np.array(act))
 
         cache.stim_pattern = stim_pattern
         cache.signal = np.array(act)  # (P, F)
         cache.stim_index = np.array(stim_indices)
-
-    @staticmethod
-    def plot_overall_trace(ax1: Axes, ax2: Axes, signal: np.ndarray):
-        ax1.imshow(signal, interpolation='none', aspect='auto')
-        ax2.plot(signal.mean(axis=0))
 
 
 if __name__ == '__main__':

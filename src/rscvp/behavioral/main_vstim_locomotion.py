@@ -7,6 +7,8 @@ from neuralib.plot.psth import peri_onset_1d, plot_peri_onset_1d
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import TreadmillOptions
 
+__all__ = ['LocomotionVstimOptions']
+
 
 @publish_annotation('appendix', project='rscvp', caption='rev')
 class LocomotionVstimOptions(AbstractParser, TreadmillOptions):

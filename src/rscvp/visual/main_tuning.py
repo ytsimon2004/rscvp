@@ -1,8 +1,10 @@
+from typing import TypeVar
+
 import numpy as np
 
 from argclz import AbstractParser
 from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent, Suite2PResult
-from neuralib.persistence.cli_persistence import get_options_and_cache
+from neuralib.persistence.cli_persistence import get_options_and_cache, PersistenceOptions
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import DataOutput, PersistenceRSPOptions
@@ -102,24 +104,38 @@ class VisualTuningOptions(AbstractParser, AbstractVisualTuningOptions, Persisten
         cache.stim_index = np.array(stim_indices)
 
 
+T = TypeVar('T')
+
+
 class ApplyVisualActOptions(AbstractVisualTuningOptions):
     """Apply VisualTuningCache in 2P cellular neural activity"""
 
-    def apply_visual_tuning_cache(self, error_when_missing=True) -> VisualTuningCache:
-        if self.plane_index is not None:
-            return self._apply_single_plane(error_when_missing)
-        else:
-            return self._apply_concat_plane(error_when_missing)
+    def apply_visual_tuning_cache(
+            self,
+            opt_cls: type[PersistenceOptions[T]],
+            error_when_missing: bool = False,
+            imaging: bool = True
+    ) -> VisualTuningCache:
 
-    def _apply_single_plane(self, error_when_missing=True) -> VisualTuningCache:
-        return get_options_and_cache(VisualTuningOptions, self, error_when_missing)
+        match (self.plane_index, imaging):
+            case (None, True):
+                return self._apply_concat_plane(opt_cls, error_when_missing)
+            case (int(), _):
+                return self._apply_single_plane(opt_cls, error_when_missing)
+            case (_, False):
+                return self._apply_single_plane(opt_cls, error_when_missing)
+            case _:
+                raise ValueError('')
 
-    def _apply_concat_plane(self, error_when_missing=True) -> VisualTuningCache:
+    def _apply_single_plane(self, opt_cls, error_when_missing=True) -> VisualTuningCache:
+        return get_options_and_cache(opt_cls, self, error_when_missing)
+
+    def _apply_concat_plane(self, opt_cls, error_when_missing=True) -> VisualTuningCache:
         n_planes = self.load_suite_2p().n_plane
 
         etl_dat = []
         for i in range(n_planes):
-            cache = get_options_and_cache(VisualTuningOptions, self, error_when_missing, plane_index=i)
+            cache = get_options_and_cache(opt_cls, self, error_when_missing, plane_index=i)
             etl_dat.append(cache)
 
         ret = VisualTuningCache.concat_etl(etl_dat)
