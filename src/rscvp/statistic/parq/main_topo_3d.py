@@ -2,8 +2,9 @@ from typing import Final, Literal
 
 import brainrender
 import numpy as np
+import polars as pl
 from brainrender import Scene
-from brainrender.actors import Volume
+from brainrender.actors import Volume, Points
 
 from argclz import argument
 from neuralib.atlas.brainrender.core import CAMERA_ANGLE_TYPE
@@ -11,6 +12,21 @@ from neuralib.atlas.util import allen_to_brainrender_coord
 from rscvp.statistic.core import StatPipeline
 
 __all__ = ['TopoMetricVolumeOptions']
+
+LAYER_COLORS = {
+    'RSPd1': 'lightblue',
+    'RSPd2/3': 'pink',
+    # 'RSPd4': 'lightgreen',
+    'RSPd5': 'turquoise',
+    'RSPd6a': 'green',
+    'RSPd6b': 'orange'
+}
+
+SUBREGION_COLORS = {
+    'RSPd': 'lightblue',
+    'RSPv': 'pink',
+    'RSPagl': 'turquoise'
+}
 
 
 class TopoMetricVolumeOptions(StatPipeline):
@@ -22,6 +38,12 @@ class TopoMetricVolumeOptions(StatPipeline):
         help='projection type'
     )
 
+    region: Literal['aRSC', 'pRSC'] | None = argument(
+        '--roi-region',
+        default=None,
+        help='region for roi rendering'
+    )
+
     camera_3d: CAMERA_ANGLE_TYPE = argument(
         '--camera-3d',
         default='three_quarters',
@@ -30,6 +52,7 @@ class TopoMetricVolumeOptions(StatPipeline):
 
     bin_size: int = argument('--bin', default=50, help='bin size for 3d histogram (um)')
     scaled: bool = argument('--scaled', help='If use scaled coordinates for ap/ml')
+    no_histogram: bool = argument('--no-histogram', help='Directly plot each ROI in 3D space without histogram')
 
     load_source: Final = 'parquet'
 
@@ -54,12 +77,9 @@ class TopoMetricVolumeOptions(StatPipeline):
         self.load_table(to_pandas=False)
         self.plot()
 
-    @property
-    def weight(self) -> np.ndarray:
-        return np.concatenate(self.df[self.header].to_numpy())
-
     def plot(self):
         ap, dv, ml = self._compute_coordinates()
+        brainrender.settings.vsettings.screenshot_transparent_background = True
 
         match self.plot_type:
             case 'top':
@@ -76,28 +96,52 @@ class TopoMetricVolumeOptions(StatPipeline):
             case _:
                 raise ValueError(f'invalid plot type: {self.plot_type}')
 
-        ap_edges, dv_edges, ml_edges = self._compute_edge(ap, dv, ml)
-        w = self.weight
+        if self.no_histogram:
+            self.render_points(ap, dv, ml, camera)
+        else:
+            ap_edges, dv_edges, ml_edges = self._compute_edge(ap, dv, ml)
+            w = np.concatenate(self.df[self.header].to_numpy())
 
-        data, edges = np.histogramdd(
-            (ap, dv, ml),
-            bins=(ap_edges, dv_edges, ml_edges),
-            weights=w,
-        )
+            data, edges = np.histogramdd(
+                (ap, dv, ml),
+                bins=(ap_edges, dv_edges, ml_edges),
+                weights=w,
+            )
 
-        count, _ = np.histogramdd(
-            (ap, dv, ml),
-            bins=(ap_edges, dv_edges, ml_edges),
-        )
+            count, _ = np.histogramdd(
+                (ap, dv, ml),
+                bins=(ap_edges, dv_edges, ml_edges),
+            )
 
-        self.render_3d(data, edges, count, camera)
+            self.render_histogram(data, edges, count, camera)
 
-    def render_3d(self, data: np.ndarray,
-                  edges: tuple[np.ndarray, ...],
-                  count: np.ndarray,
-                  camera: CAMERA_ANGLE_TYPE,
-                  no_value: bool = True,
-                  show_dorsal_layer_only: bool = True):
+    def render_points(self, ap: np.ndarray,
+                      dv: np.ndarray,
+                      ml: np.ndarray,
+                      camera: CAMERA_ANGLE_TYPE,
+                      no_region: bool = False,
+                      show_dorsal_layer_only: bool = False):
+        """Render individual ROI points in 3D space without histogram aggregation"""
+        coords = np.vstack([ap, dv, ml]).T
+
+        brainrender.settings.SHOW_AXES = False
+        scene = Scene(root=False, inset=False)
+
+        actor = Points(coords, radius=10, colors='black')
+        scene.add(actor)
+
+        if not no_region:
+            self._render_region(scene, show_dorsal_layer_only, camera)
+
+        scene.render(camera=camera)
+
+    def render_histogram(self, data: np.ndarray,
+                         edges: tuple[np.ndarray, ...],
+                         count: np.ndarray,
+                         camera: CAMERA_ANGLE_TYPE,
+                         no_region: bool = False,
+                         no_value: bool = True,
+                         show_dorsal_layer_only: bool = False):
         data_mean = np.divide(data, count, where=count > 0)
 
         if no_value:
@@ -113,36 +157,29 @@ class TopoMetricVolumeOptions(StatPipeline):
         actor.shift(ox, oy, oz)
         scene.add(actor)
 
-        a = 0.5
-        if show_dorsal_layer_only:
-            region = {
-                'RSPd1': 'lightblue',
-                'RSPd2/3': 'pink',
-                # 'RSPd4': 'lightgreen',
-                'RSPd5': 'turquoise',
-                'RSPd6a': 'green',
-                'RSPd6b': 'orange'
-            }
-
-            camera = 'sagittal2'
-
-        else:
-            region = {
-                'RSPd': 'lightblue',
-                'RSPv': 'pink',
-                'RSPagl': 'turquoise'
-            }
-
-        for r, c in region.items():
-            scene.add_brain_region(r, alpha=a, color=c, hemisphere='left')
-
-        brainrender.settings.DEFAULT_CAMERA = camera
+        if not no_region:
+            self._render_region(scene, show_dorsal_layer_only, camera)
 
         scene.render(camera=camera)
 
+    def _render_region(self, scene, show_dorsal_layer_only, camera):
+        if show_dorsal_layer_only:
+            region = LAYER_COLORS
+        else:
+            region = SUBREGION_COLORS
+
+        for r, c in region.items():
+            scene.add_brain_region(r, alpha=0.3, color=c, hemisphere='left')
+
+        brainrender.settings.DEFAULT_CAMERA = camera
+
     def _compute_coordinates(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """convert to brainrender coordinates space"""
-        df = self.df[self.header, self.ap_field, self.ml_field, self.dv_field]
+        df = self.df
+        if self.region is not None:
+            df = df.filter(pl.col('region') == self.region)
+
+        df = df[self.header, self.ap_field, self.ml_field, self.dv_field]
         ap = np.concatenate(df[self.ap_field].to_numpy())
         ml = np.concatenate(df[self.ml_field].to_numpy())
         dv = np.concatenate(df[self.dv_field].to_numpy())
