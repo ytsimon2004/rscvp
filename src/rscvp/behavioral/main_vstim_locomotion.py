@@ -6,6 +6,7 @@ from neuralib.plot import plot_figure
 from neuralib.plot.psth import peri_onset_1d, plot_peri_onset_1d
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import TreadmillOptions
+from stimpyp import RiglogData, GratingPattern
 
 __all__ = ['LocomotionVstimOptions']
 
@@ -19,6 +20,12 @@ class LocomotionVstimOptions(AbstractParser, TreadmillOptions):
         help='plot the average speed across all datasets, otherwise plot for each dataset'
     )
 
+    direction: float | None = argument(
+        '--direction',
+        default=None,
+        help='the direction of the visual stimulation'
+    )
+
     pre = 1
     stim = 3
     post = 4
@@ -30,11 +37,21 @@ class LocomotionVstimOptions(AbstractParser, TreadmillOptions):
         else:
             self.plot_foreach()
 
+    def select_stimulus_segment(self, rig: RiglogData) -> np.ndarray:
+        if self.direction is None:
+            return rig.get_stimlog().stimulus_segment[:, 0]
+        else:
+            ret = np.vstack([
+                grating.time for grating in GratingPattern.of(rig).foreach_stimulus(name=True)
+                if grating.direction == self.direction]
+            )
+            return ret[:, 0]
+
     def plot_foreach(self):
         with plot_figure(None) as ax:
             for i, _ in enumerate(self.foreach_dataset()):
                 rig = self.load_riglog_data()
-                t = rig.get_stimlog().stimulus_segment[:, 0]
+                t = self.select_stimulus_segment(rig)
                 pos = self.load_position()
 
                 plot_peri_onset_1d(t, pos.t, pos.v, pre=self.pre, post=self.post, ax=ax,
@@ -51,7 +68,7 @@ class LocomotionVstimOptions(AbstractParser, TreadmillOptions):
 
         for i, _ in enumerate(self.foreach_dataset()):
             rig = self.load_riglog_data()
-            t = rig.get_stimlog().stimulus_segment[:, 0]
+            t = self.select_stimulus_segment(rig)
             pos = self.load_position()
 
             peri_data = peri_onset_1d(
@@ -70,17 +87,16 @@ class LocomotionVstimOptions(AbstractParser, TreadmillOptions):
 
         time = np.linspace(-self.pre, self.post, bins)
         with plot_figure(None) as ax:
-            if all_data:
-                all_data_array = np.array(all_data)
-                mean_speed = np.mean(all_data_array, axis=0)  # average across all datasets
-                sem_speed = np.std(all_data_array, axis=0) / np.sqrt(len(all_data_array))
+            all_data_array = np.array(all_data)
+            mean_speed = np.mean(all_data_array, axis=0)  # average across all datasets
+            sem_speed = np.std(all_data_array, axis=0) / np.sqrt(len(all_data_array))
 
-                ax.plot(time, mean_speed, label=f'Average (n={len(all_data)})', linewidth=2)
-                ax.fill_between(time, mean_speed - sem_speed, mean_speed + sem_speed, alpha=0.3)
+            ax.plot(time, mean_speed, label=f'Average (n={len(all_data)})', linewidth=2)
+            ax.fill_between(time, mean_speed - sem_speed, mean_speed + sem_speed, alpha=0.3)
 
-                ax.axvspan(0, self.stim, alpha=0.3, color='gray')
-                ax.set(xlabel='time to vstim (s)', ylabel='speed (cm/s)')
-                plt.legend()
+            ax.axvspan(0, self.stim, alpha=0.3, color='gray')
+            ax.set(xlabel='time to vstim (s)', ylabel='speed (cm/s)', ylim=(0, 15))
+            plt.legend()
 
 
 if __name__ == '__main__':
