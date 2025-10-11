@@ -2,7 +2,6 @@ from typing import TypeVar
 
 from rscvp.statistic.cli_gspread import CliGspreadGenerator, CliGspreadLUT
 from rscvp.util.cli import Region
-
 from stimpyp import Session
 
 T = TypeVar('T')
@@ -122,18 +121,6 @@ PERSISTENCE_AGG_TYPE: dict[T, CliGspreadLUT] = {
         module_prefix='rscvp.statistic.persistence_agg',
         file='main_si_sorted_occ',
         opt_args=['--top', '500']
-    ),
-    # =========== #
-    # Visual Maps #
-    # =========== #
-
-    'sftf_map': CliGspreadLUT(
-        'apcls_tac',
-        ['Data', 'region', 'n_planes'],
-        module_prefix='rscvp.statistic.persistence_agg',
-        file='main_sftf_tuning',
-        opt_args=['--sftf', '0.04,4',
-                  '--dir-agg', 'max']
     )
 
 }
