@@ -11,11 +11,13 @@ from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
 from neuralib.plot.psth import peri_onset_1d
 from neuralib.util.verbose import publish_annotation
-from rscvp.util.cli import TreadmillOptions, get_neuron_list, Suite2pOptions, PersistenceRSPOptions
+from rscvp.util.cli import get_neuron_list, Suite2pOptions, PersistenceRSPOptions, StimpyOptions
 from rscvp.util.typing import SIGNAL_TYPE
 from stimpyp import RiglogData, GratingPattern, Direction, SFTF
 
-__all__ = ['PatternResponseOptions']
+__all__ = ['VisualPatternCache',
+           'AbstractPatternResponseOptions',
+           'PatternResponseOptions']
 
 
 @persistence.persistence_class
@@ -30,20 +32,16 @@ class VisualPatternCache(ETLConcatable):
     neuron_idx: np.ndarray
     src_neuron_idx: np.ndarray
     data: np.ndarray
+    """Array[float, [N, T]]"""
     time: np.ndarray
+    """Array[float, T]"""
 
     @classmethod
     def concat_etl(cls, data: list[Self]) -> Self:
         pass
 
 
-@publish_annotation('appendix', project='rscvp', caption='rev')
-class PatternResponseOptions(AbstractParser,
-                             TreadmillOptions,
-                             Suite2pOptions,
-                             PersistenceRSPOptions[VisualPatternCache]):
-    DESCRIPTION = 'Plot any activity during different stimulus patterns'
-
+class AbstractPatternResponseOptions(StimpyOptions, Suite2pOptions):
     EX_PATTERN_GROUP = 'pattern'
 
     sftf: SFTF | None = argument(
@@ -61,14 +59,14 @@ class PatternResponseOptions(AbstractParser,
         help='the direction of the visual stimulation'
     )
 
-    non_visual: bool = argument(
-        '--non-visual',
-        help='plot only non-visual cell'
-    )
-
     # peri event t domain
     pre = 1
     post = 4
+
+
+@publish_annotation('appendix', project='rscvp', caption='rev')
+class PatternResponseOptions(AbstractParser, AbstractPatternResponseOptions, PersistenceRSPOptions[VisualPatternCache]):
+    DESCRIPTION = 'Plot any activity during different stimulus patterns'
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)

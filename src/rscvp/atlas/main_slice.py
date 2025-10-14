@@ -37,7 +37,7 @@ class SliceViewOptions(AbstractParser):
                 self.plot_coronal(self.region, index)
             case 'ATN':
                 index = 615
-                self.plot_coronal(['AD', 'AM', 'AV', 'IAD', 'IAM', 'LD'], index)
+                self.plot_coronal(['AD', 'AM', 'AV'], index)
             case 'POST':
                 index = 960
                 self.plot_coronal(self.region, index)
