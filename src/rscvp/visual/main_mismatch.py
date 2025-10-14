@@ -22,6 +22,8 @@ class MismatchActivityOptions(AbstractParser, AbstractPatternResponseOptions):
         help='which group to compare: mismatch (temporal nasal) or ctrl (upper, lower)'
     )
 
+    reuse_output = True
+
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         data = self.get_pair_data()
