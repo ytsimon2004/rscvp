@@ -3,17 +3,16 @@ from typing import Final, Literal
 import numpy as np
 
 from argclz import try_int_type, argument
-from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import diag_histplot, plot_figure
 from rscvp.statistic.persistence_agg.core import AbstractPersistenceAgg
 from rscvp.util.cli import Region
-from rscvp.visual.main_response import AbstractPatternResponseOptions, VisualPatternCache, PatternResponseOptions
+from rscvp.visual.main_response import VisualPatternCache, ApplyPatternResponseCache
 from rscvp.visual.util_plot import mismatch_hist
 
 __all__ = ['MismatchPersistenceAgg']
 
 
-class MismatchPersistenceAgg(AbstractPersistenceAgg, AbstractPatternResponseOptions):
+class MismatchPersistenceAgg(AbstractPersistenceAgg, ApplyPatternResponseCache):
     DESCRIPTION = 'plot the mismatch (nasal-temporal) or control (upper-lower direction) activity pairs in batch data'
 
     paired_group: Literal['mismatch', 'ctrl'] = argument(
@@ -33,7 +32,7 @@ class MismatchPersistenceAgg(AbstractPersistenceAgg, AbstractPatternResponseOpti
         for i, _ in enumerate(self.foreach_dataset(**self.field)):
             self.exp_list.append(self.exp_date)
             self.animal_list.append(self.animal_id)
-            ret.append(get_options_and_cache(PatternResponseOptions, self))
+            ret.append(self.get_pattern_cache())
 
         return ret
 

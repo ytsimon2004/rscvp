@@ -3,17 +3,16 @@ from typing import Literal
 import numpy as np
 
 from argclz import AbstractParser, argument
-from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import diag_histplot, plot_figure
 from neuralib.util.deprecation import deprecated_class
-from rscvp.visual.main_response import PatternResponseOptions, VisualPatternCache, AbstractPatternResponseOptions
+from rscvp.visual.main_response import VisualPatternCache, ApplyPatternResponseCache
 from rscvp.visual.util_plot import mismatch_hist
 
 __all__ = ['MismatchActivityOptions']
 
 
 @deprecated_class(new='rscvp.statistic.persistence_agg.main_mismatch')
-class MismatchActivityOptions(AbstractParser, AbstractPatternResponseOptions):
+class MismatchActivityOptions(AbstractParser, ApplyPatternResponseCache):
     DESCRIPTION = 'plot the mismatch (nasal-temporal) or control (upper-lower direction) activity pairs'
 
     paired_group: Literal['mismatch', 'ctrl'] = argument(
@@ -41,10 +40,10 @@ class MismatchActivityOptions(AbstractParser, AbstractPatternResponseOptions):
         match self.paired_group:
             case 'mismatch':
                 self.direction = 0
-                cache = get_options_and_cache(PatternResponseOptions, self)
+                cache = self.get_pattern_cache()
                 dat1 = self._extract_visual_epoch(cache)
                 self.direction = 180
-                cache = get_options_and_cache(PatternResponseOptions, self)
+                cache = self.get_pattern_cache()
                 dat2 = self._extract_visual_epoch(cache)
                 ret = np.vstack([dat1, dat2])
 
@@ -53,10 +52,10 @@ class MismatchActivityOptions(AbstractParser, AbstractPatternResponseOptions):
 
             case 'ctrl':
                 self.direction = 90
-                cache = get_options_and_cache(PatternResponseOptions, self)
+                cache = self.get_pattern_cache()
                 dat1 = self._extract_visual_epoch(cache)
                 self.direction = 270
-                cache = get_options_and_cache(PatternResponseOptions, self)
+                cache = self.get_pattern_cache()
                 dat2 = self._extract_visual_epoch(cache)
                 ret = np.vstack([dat1, dat2])
 

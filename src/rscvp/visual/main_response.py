@@ -6,7 +6,8 @@ from typing_extensions import Self
 
 from argclz import AbstractParser, argument, float_tuple_type
 from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
-from neuralib.persistence import persistence, ETLConcatable
+from neuralib.persistence import persistence, ETLConcatable, validate_concat_etl_persistence
+from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
 from neuralib.plot.psth import peri_onset_1d
@@ -17,7 +18,8 @@ from stimpyp import RiglogData, GratingPattern, Direction, SFTF
 
 __all__ = ['VisualPatternCache',
            'AbstractPatternResponseOptions',
-           'PatternResponseOptions']
+           'PatternResponseOptions',
+           'ApplyPatternResponseCache']
 
 
 @persistence.persistence_class
@@ -38,7 +40,24 @@ class VisualPatternCache(ETLConcatable):
 
     @classmethod
     def concat_etl(cls, data: list[Self]) -> Self:
-        pass
+        validate_concat_etl_persistence(data, ('signal_type', 'sftf', 'direction'))
+
+        const = data[0]
+        ret = VisualPatternCache(
+            exp_date=const.exp_date,
+            animal=const.animal,
+            plane_index='_concat',
+            signal_type=const.signal_type,
+            sftf=const.sftf,
+            direction=const.direction
+        )
+
+        ret.neuron_idx = np.concatenate([it.neuron_idx for it in data])
+        ret.src_neuron_idx = np.concatenate([it.src_neuron_idx for it in data])
+        ret.data = np.vstack([it.data for it in data])
+        ret.time = const.time
+
+        return ret
 
 
 class AbstractPatternResponseOptions(StimpyOptions, Suite2pOptions):
@@ -163,6 +182,28 @@ class PatternResponseOptions(AbstractParser, AbstractPatternResponseOptions, Per
         delta = stim - baseline
         ax.hist(delta, bins=50, histtype='step', weights=np.ones_like(delta) / len(delta))
         ax.set(xlabel='delta change', ylabel='fraction', xlim=(-0.1, 0.2), ylim=(0, 0.2))
+
+
+class ApplyPatternResponseCache(AbstractPatternResponseOptions):
+
+    def get_pattern_cache(self):
+        if self.plane_index is None:
+            return self._get_cache_concat()
+        else:
+            return self._get_cache_single()
+
+    def _get_cache_single(self, error_when_missing=True):
+        return get_options_and_cache(PatternResponseOptions, self, error_when_missing)
+
+    def _get_cache_concat(self, error_when_missing=True) -> VisualPatternCache:
+        n_planes = self.load_suite_2p().n_plane
+
+        caches = []
+        for i in range(n_planes):
+            cache = get_options_and_cache(PatternResponseOptions, self, error_when_missing, plane_index=i)
+            caches.append(cache)
+
+        return VisualPatternCache.concat_etl(caches)
 
 
 if __name__ == '__main__':
