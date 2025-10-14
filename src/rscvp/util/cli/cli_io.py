@@ -64,6 +64,7 @@ CELLULAR_IO: dict[CodeAlias, CodeInfo] = {
     'st': CodeInfo('st', 'st', 'st', 'st_population',
                    h(*['sftf_amp_' + it
                        for it in ['0.04 1', '0.04 4', '0.08 1', '0.08 4', '0.16 1', '0.16 4']])),
+    'mm': CodeInfo('mm', 'mismatch', None, 'mismatch'),
     # spatial
     'ba': CodeInfo('ba', 'calbelt', 'calbelt', None),
     'sa': CodeInfo('sa', 'calbelt_sort', None, 'sa'),

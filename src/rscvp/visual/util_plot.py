@@ -1,12 +1,13 @@
-from typing import Optional
-
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
+from neuralib.plot.colormap import insert_colorbar
 from neuralib.typing import ArrayLike, ArrayLikeStr
 
-__all__ = ['selective_pie', 'dir_hist']
+__all__ = ['selective_pie',
+           'dir_hist',
+           'mismatch_hist']
 
 
 def selective_pie(n: ArrayLike,
@@ -30,14 +31,14 @@ def selective_pie(n: ArrayLike,
 
 
 def dir_hist(data: np.ndarray,
-             weights: Optional[ArrayLike] = None,
+             weights: ArrayLike | None = None,
              *,
-             label: Optional[str] = None,
+             label: str | None = None,
              thres: float = None,
              bins: int = 10,
              xlim: tuple[int, int] = (0, 1),
              color: str = 'k',
-             ax: Optional[Axes] = None,
+             ax: Axes | None = None,
              **kwargs):
     """
     Generic histogram plotting function for orientation/direction selectivity or preferred degree
@@ -74,3 +75,42 @@ def dir_hist(data: np.ndarray,
 
     if label is not None:
         ax.legend()
+
+
+def mismatch_hist(data: np.ndarray,
+                  bins: int = 60,
+                  ax: Axes | None = None,
+                  **kwargs):
+    """
+    Generate a 2D histogram to visualize mismatches between two direction visual stimulation
+
+    :param data: Array of two datasets to be compared. Array[float, [2, N]]
+    :param bins: Number of bins to use for the histogram along each axis.
+    :param ax: Matplotlib Axes object where the histogram will be rendered.
+        If None, a new figure and axes will be created.
+    :param kwargs: Additional keyword arguments to configure the Axes settings.
+    """
+    if ax is None:
+        _, ax = plt.subplots()
+
+    xmin, xmax = data[0].min(), data[0].max()
+    ymin, ymax = data[1].min(), data[1].max()
+
+    data = np.histogram2d(data[0], data[1], bins=(bins, bins))[0]
+
+    row_sums = np.sum(data, axis=1, keepdims=True)
+    data = np.divide(data, row_sums, where=row_sums != 0, out=np.zeros_like(data))
+
+    im = ax.imshow(
+        data.T,
+        cmap='gray',
+        aspect='equal',
+        origin='lower',
+        extent=(xmin, xmax, ymin, ymax)
+    )
+    cbar = insert_colorbar(ax, im)
+    cbar.ax.set(ylabel='probability')
+
+    lim = [min(xmin, ymin), max(xmax, ymax)]
+    ax.plot(lim, lim, 'w--', alpha=0.5, linewidth=1, zorder=10)
+    ax.set(xlim=(xmin, xmax), ylim=(ymin, ymax), **kwargs)

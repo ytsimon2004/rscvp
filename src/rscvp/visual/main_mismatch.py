@@ -1,17 +1,18 @@
 from typing import Literal
 
 import numpy as np
-from matplotlib.axes import Axes
 
 from argclz import AbstractParser, argument
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import diag_histplot, plot_figure
-from neuralib.plot.colormap import insert_colorbar
+from neuralib.util.deprecation import deprecated_class
 from rscvp.visual.main_response import PatternResponseOptions, VisualPatternCache, AbstractPatternResponseOptions
+from rscvp.visual.util_plot import mismatch_hist
 
 __all__ = ['MismatchActivityOptions']
 
 
+@deprecated_class(new='rscvp.statistic.persistence_agg.main_mismatch')
 class MismatchActivityOptions(AbstractParser, AbstractPatternResponseOptions):
     DESCRIPTION = 'plot the mismatch (nasal-temporal) or control (upper-lower direction) activity pairs'
 
@@ -24,10 +25,12 @@ class MismatchActivityOptions(AbstractParser, AbstractPatternResponseOptions):
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         data = self.get_pair_data()
+        output = self.get_data_output('mm').summary_figure_output(self.paired_group)
 
-        with plot_figure(None, 1, 2, set_square=True) as ax:
-            self.plot_hist(data, ax[0])
-            self.plot_scatter(data, ax[1])
+        with plot_figure(output, 1, 2, set_square=True) as ax:
+            diag_histplot(data[0], data[1], ax=ax[0])
+            ax[0].set(**self._fig_kwargs)
+            mismatch_hist(data, ax=ax[1], **self._fig_kwargs)
 
     _fig_kwargs = dict()
 
@@ -68,33 +71,6 @@ class MismatchActivityOptions(AbstractParser, AbstractPatternResponseOptions):
         v = cache.data
         mx = np.logical_and(t >= 0, t <= int(self.post - self.pre))
         return v[:, mx].max(axis=1)
-
-    def plot_scatter(self, data: np.ndarray, ax: Axes):
-        diag_histplot(data[0], data[1], ax=ax)
-        ax.set(**self._fig_kwargs)
-
-    def plot_hist(self, data: np.ndarray, ax: Axes, n: int = 60):
-        xmin, xmax = data[0].min(), data[0].max()
-        ymin, ymax = data[1].min(), data[1].max()
-
-        data = np.histogram2d(data[0], data[1], bins=(n, n))[0]
-
-        row_sums = np.sum(data, axis=1, keepdims=True)
-        data = np.divide(data, row_sums, where=row_sums != 0, out=np.zeros_like(data))
-
-        im = ax.imshow(
-            data.T,
-            cmap='gray',
-            aspect='equal',
-            origin='lower',
-            extent=(xmin, xmax, ymin, ymax)
-        )
-        cbar = insert_colorbar(ax, im)
-        cbar.ax.set(ylabel='probability')
-
-        lim = [min(xmin, ymin), max(xmax, ymax)]
-        ax.plot(lim, lim, 'w--', alpha=0.5, linewidth=1, zorder=10)
-        ax.set(xlim=(xmin, xmax), ylim=(ymin, ymax), **self._fig_kwargs)
 
 
 if __name__ == '__main__':
