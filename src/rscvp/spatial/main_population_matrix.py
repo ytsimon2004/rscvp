@@ -4,7 +4,7 @@ import numpy as np
 
 from argclz import AbstractParser, argument
 from neuralib.plot import plot_figure
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_selection import SelectionOptions
 from rscvp.util.util_trials import TRIAL_CV_TYPE
@@ -13,7 +13,7 @@ from stimpyp import Session, SessionInfo
 __all__ = ['PopulationMTXOptions']
 
 
-class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
+class PopulationMTXOptions(AbstractParser, ApplyPosBinCache, SelectionOptions):
     DESCRIPTION = 'Plot the population (selected neurons) correlation matrix in different behavioral session (trial-averaged)'
 
     x_cond: TRIAL_CV_TYPE = argument(
@@ -37,7 +37,7 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
         from scipy.stats import pearsonr
         rig = self.load_riglog_data()
 
-        signal_all = self.apply_binned_act_cache().occ_activity
+        signal_all = self.get_occ_cache().occ_activity
 
         # neuron selection
         cell_mask = self.get_selected_neurons()
@@ -112,7 +112,7 @@ class PopulationMTXOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptio
 
             ax.set(xlabel=f'Position(cm) - {self.x_cond}', ylabel=f'Position(cm) - {self.y_cond}')
             ax.set_title(f'signal: {self.signal_type} \n'
-                         f'num of neurons used: {self.n_selected_neurons} / {self.apply_binned_act_cache().n_neurons}')
+                         f'num of neurons used: {self.n_selected_neurons} / {self.get_occ_cache().n_neurons}')
 
             cbar = ax.figure.colorbar(im)
             cbar.ax.set_ylabel('Corr. Coef.')

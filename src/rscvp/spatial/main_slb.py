@@ -16,7 +16,7 @@ from neuralib.io import csv_header
 from neuralib.plot import plot_figure
 from neuralib.util.tqdm import tqdm_joblib
 from neuralib.util.verbose import publish_annotation
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.spatial.util import PositionSignal
 from rscvp.spatial.util_plot import plot_tuning_heatmap
 from rscvp.util.cli import MultiProcOptions, DataOutput, PlotOptions, FIG_MODE, SelectionOptions, ShuffleBaseOptions
@@ -28,7 +28,7 @@ __all__ = ['PositionLowerBoundOptions']
 
 @publish_annotation('sup', project='rscvp', figure='fig.S1', as_doc=True)
 class PositionLowerBoundOptions(AbstractParser,
-                                ApplyPosBinActOptions,
+                                ApplyPosBinCache,
                                 ShuffleBaseOptions,
                                 SelectionOptions,
                                 PlotOptions,
@@ -101,7 +101,7 @@ class PositionLowerBoundOptions(AbstractParser,
         )
 
         neuron_list = get_neuron_list(s2p, neuron_ids)
-        signal_all = self.apply_binned_act_cache().occ_activity
+        signal_all = self.get_occ_cache().occ_activity
         signal_all[np.isnan(signal_all)] = 0.0  # exclude nan points that generated after speed filter
 
         if self.do_signal_smooth:

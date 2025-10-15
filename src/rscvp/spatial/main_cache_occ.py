@@ -13,7 +13,7 @@ from rscvp.util.typing import SIGNAL_TYPE
 __all__ = [
     'PosBinActCache',
     'PosBinActCacheBuilder',
-    'ApplyPosBinActOptions',
+    'ApplyPosBinCache',
     'AbstractPosBinActOptions'
 ]
 
@@ -147,14 +147,14 @@ class PosBinActCacheBuilder(AbstractParser, AbstractPosBinActOptions, Persistenc
         return cache
 
 
-class ApplyPosBinActOptions(AbstractPosBinActOptions):
+class ApplyPosBinCache(AbstractPosBinActOptions):
     """Apply `PosBinActOptions` after *PosBinActCache Generated*"""
 
-    def apply_binned_act_cache(self, error_when_missing=False) -> PosBinActCache:
+    def get_occ_cache(self, error_when_missing=False) -> PosBinActCache:
         if self.plane_index is not None:
-            ret = self._apply_binned_act_cache_plane(error_when_missing)
+            ret = self._get_cache_single(error_when_missing)
         else:
-            ret = self._apply_binned_act_cache_concat(error_when_missing)
+            ret = self._get_cache_concat(error_when_missing)
 
         if hasattr(ret, 'smooth'):  # legacy issue check
             if ret.smooth:
@@ -162,10 +162,10 @@ class ApplyPosBinActOptions(AbstractPosBinActOptions):
 
         return ret
 
-    def _apply_binned_act_cache_plane(self, error_when_missing=False) -> PosBinActCache:
+    def _get_cache_single(self, error_when_missing=False) -> PosBinActCache:
         return get_options_and_cache(PosBinActCacheBuilder, self, error_when_missing)
 
-    def _apply_binned_act_cache_concat(self, error_when_missing=False) -> PosBinActCache:
+    def _get_cache_concat(self, error_when_missing=False) -> PosBinActCache:
         data = []
         n_planes = self.load_suite_2p().n_plane
         for i in range(n_planes):

@@ -5,7 +5,7 @@ from argclz import AbstractParser, argument, as_argument
 from neuralib.imaging.suite2p import normalize_signal, get_neuron_signal, sync_s2p_rigevent
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
-from rscvp.spatial.main_cache_sortidx import ApplySortIdxOptions
+from rscvp.spatial.main_cache_sortidx import ApplySortIdxCache
 from rscvp.util.cli import Suite2pOptions
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.typing import SIGNAL_TYPE
@@ -14,7 +14,7 @@ from rscvp.util.util_trials import TrialSelection
 __all__ = ['PositionSortTrialOptions']
 
 
-class PositionSortTrialOptions(AbstractParser, ApplySortIdxOptions):
+class PositionSortTrialOptions(AbstractParser, ApplySortIdxCache):
     DESCRIPTION = 'plot the sorted calcium activities of population neurons in the given laps'
 
     sort_lap: int | None = argument(
@@ -101,7 +101,7 @@ class PositionSortTrialOptions(AbstractParser, ApplySortIdxOptions):
             sorted_idx = np.argsort(m_argmax)
         else:
             # i.e., used the trial average (across laps) neuronal index. refer to rscvp.spatial.main_belt_sort.py
-            sorted_idx = self.apply_sort_idx_cache().sort_idx
+            sorted_idx = self.get_sort_idx_cache().sort_idx
 
         s = s[sorted_idx]
 

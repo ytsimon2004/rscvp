@@ -6,7 +6,7 @@ from typing_extensions import Self
 from argclz import try_int_type
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
-from rscvp.spatial.main_cache_align_peak import ApplyAlignPeakOptions, SISortAlignPeakCache
+from rscvp.spatial.main_cache_align_peak import ApplyAlignPeakCache, SISortAlignPeakCache
 from rscvp.spatial.util_plot import plot_alignment_map
 from rscvp.statistic.persistence_agg.core import AbstractPersistenceAgg
 from rscvp.util.cli.cli_treadmill import TreadmillOptions
@@ -38,7 +38,7 @@ class SIOccData(NamedTuple):
 
 
 @publish_annotation('test', caption='visualization only')
-class SISortAlignPersistenceAgg(AbstractPersistenceAgg, ApplyAlignPeakOptions, TreadmillOptions):
+class SISortAlignPersistenceAgg(AbstractPersistenceAgg, ApplyAlignPeakCache, TreadmillOptions):
     DESCRIPTION = """
     Align the position-binned data (N, B) with the peak response in batch dataset,
     and sorted by the spatial information
@@ -60,7 +60,7 @@ class SISortAlignPersistenceAgg(AbstractPersistenceAgg, ApplyAlignPeakOptions, T
         for i, _ in enumerate(self.foreach_dataset(**self.field)):
             self.exp_list.append(self.exp_date)
             self.animal_list.append(self.animal_id)
-            ret.append(self.apply_align_peak_cache())
+            ret.append(self.get_si_idx_cache())
 
         return ret
 

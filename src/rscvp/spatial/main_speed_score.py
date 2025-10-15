@@ -11,7 +11,7 @@ from neuralib.io import csv_header
 from neuralib.locomotion import CircularPosition, running_mask1d
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli import DataOutput
 from rscvp.util.position import PositionBinnedSig
 from rscvp.util.util_trials import TrialSelection
@@ -21,7 +21,7 @@ __all__ = ['SpeedScoreOptions']
 
 
 @publish_annotation('appendix', project='rscvp', caption='rev')
-class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
+class SpeedScoreOptions(AbstractParser, ApplyPosBinCache):
     DESCRIPTION = 'Calculate the speed score for each cell (Kropff et al., 2015)'
 
     plot_type: Literal['time_course', 'pos_binned', 'scatter', 'hist_summary'] = argument(
@@ -129,7 +129,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinActOptions):
             )
             trial_range = np.arange(*indices)
 
-            dff = self.apply_binned_act_cache().with_trial(trial_range).occ_activity  # shape (N, L, B)
+            dff = self.get_occ_cache().with_trial(trial_range).occ_activity  # shape (N, L, B)
 
             pbs = PositionBinnedSig(rig, bin_range=(0, self.track_length, self.pos_bins),
                                     use_virtual_space=self.use_virtual_space)

@@ -6,7 +6,7 @@ import numpy as np
 from argclz import try_int_type, argument
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation, fprint, print_load, print_save
-from rscvp.spatial.main_cache_occ import PosBinActCache, ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import PosBinActCache, ApplyPosBinCache
 from rscvp.spatial.util import sort_neuron
 from rscvp.spatial.util_plot import plot_sorted_trial_averaged_heatmap
 from rscvp.statistic.persistence_agg.core import AbstractPersistenceAgg, data_region_dict
@@ -19,7 +19,7 @@ __all__ = ['PositionBinPersistenceAgg']
 
 
 @publish_annotation('main', project='rscvp', figure=['fig.2B', 'fig.S2E'], as_doc=True)
-class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, SelectionOptions):
+class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, SelectionOptions):
     DESCRIPTION = 'Plot the sorted position-binned trial averaged activity heatmap for batch dataset'
 
     sort_session: Session | None = argument(
@@ -99,7 +99,7 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinActOptions, S
             if self._track_landmarks is None:
                 self._track_landmarks = self.track_landmarks
 
-            ret.append(self.apply_binned_act_cache()
+            ret.append(self.get_occ_cache()
                        .with_mask(cell_mask)
                        .with_trial(trial))
 

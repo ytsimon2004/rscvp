@@ -1,14 +1,14 @@
 from argclz import AbstractParser
 from neuralib.plot import plot_figure
-from rscvp.spatial.main_cache_align_peak import ApplyAlignPeakOptions
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_align_peak import ApplyAlignPeakCache
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.spatial.util_plot import plot_alignment_map
 from rscvp.util.cli.cli_output import DataOutput
 
 __all__ = ['AlignPeakMapOptions']
 
 
-class AlignPeakMapOptions(AbstractParser, ApplyPosBinActOptions, ApplyAlignPeakOptions):
+class AlignPeakMapOptions(AbstractParser, ApplyPosBinCache, ApplyAlignPeakCache):
     DESCRIPTION = 'Plot aligned place field location map based on spatial information'
 
     def run(self):
@@ -20,7 +20,7 @@ class AlignPeakMapOptions(AbstractParser, ApplyPosBinActOptions, ApplyAlignPeakO
         """Plot the position alignment map (trial average response for all cells), can be sorted by `si`.
         refer to Esteves et al., 2022. JN paper (McNaughton group)
         """
-        sig = self.apply_align_peak_cache().trial_avg_binned_data
+        sig = self.get_si_idx_cache().trial_avg_binned_data
 
         output_file = output.summary_figure_output(
             'pre' if self.pre_selection else None,

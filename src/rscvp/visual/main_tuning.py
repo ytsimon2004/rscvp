@@ -13,7 +13,7 @@ from rscvp.visual.util_cache import AbstractVisualTuningOptions, VisualTuningCac
 from stimpyp import GratingPattern
 
 __all__ = ['VisualTuningOptions',
-           'ApplyVisualActOptions']
+           'ApplyVisualActCache']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.5A & 5E-H lower & fig.S4', as_doc=True)
@@ -107,10 +107,10 @@ class VisualTuningOptions(AbstractParser, AbstractVisualTuningOptions, Persisten
 T = TypeVar('T')
 
 
-class ApplyVisualActOptions(AbstractVisualTuningOptions):
+class ApplyVisualActCache(AbstractVisualTuningOptions):
     """Apply VisualTuningCache in 2P cellular neural activity"""
 
-    def apply_visual_tuning_cache(
+    def get_visual_tuning_cache(
             self,
             opt_cls: type[PersistenceOptions[T]],
             error_when_missing: bool = False,
@@ -119,18 +119,18 @@ class ApplyVisualActOptions(AbstractVisualTuningOptions):
 
         match (self.plane_index, imaging):
             case (None, True):
-                return self._apply_concat_plane(opt_cls, error_when_missing)
+                return self._get_cache_concat(opt_cls, error_when_missing)
             case (int(), _):
-                return self._apply_single_plane(opt_cls, error_when_missing)
+                return self._get_cache_single(opt_cls, error_when_missing)
             case (_, False):
-                return self._apply_single_plane(opt_cls, error_when_missing)
+                return self._get_cache_single(opt_cls, error_when_missing)
             case _:
                 raise ValueError('')
 
-    def _apply_single_plane(self, opt_cls, error_when_missing=True) -> VisualTuningCache:
+    def _get_cache_single(self, opt_cls, error_when_missing=True) -> VisualTuningCache:
         return get_options_and_cache(opt_cls, self, error_when_missing)
 
-    def _apply_concat_plane(self, opt_cls, error_when_missing=True) -> VisualTuningCache:
+    def _get_cache_concat(self, opt_cls, error_when_missing=True) -> VisualTuningCache:
         n_planes = self.load_suite_2p().n_plane
 
         etl_dat = []

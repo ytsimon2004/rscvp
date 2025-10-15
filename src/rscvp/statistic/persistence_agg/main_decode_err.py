@@ -8,7 +8,7 @@ from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure, grid_subplots
 from neuralib.typing import flatten_arraylike
 from neuralib.util.verbose import publish_annotation
-from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions, BayesDecodeCache
+from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeCache, BayesDecodeCache
 from rscvp.model.bayes_decoding.util_plot import (
     plot_decoding_err_position,
     plot_confusion_scatter,
@@ -20,7 +20,7 @@ __all__ = ['BayesDecodePersistenceAgg']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.3C (batch mode)', caption='@dispatch(confusion_matrix)', as_doc=True)
-class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions, Dispatch):
+class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeCache, Dispatch):
     DESCRIPTION = (
         'Decoding error as a function of position bins from multiple dataset (used mainly for pair comparison,'
         'Either run in foreach or group mode'
@@ -47,7 +47,7 @@ class BayesDecodePersistenceAgg(AbstractPersistenceAgg, ApplyBayesDecodeOptions,
     def get_cache_list(self) -> list[BayesDecodeCache]:
         ret = []
         for i, _ in enumerate(self.foreach_dataset(**self.field)):
-            ret.append(self.apply_bayes_cache(version=self.cache_version))
+            ret.append(self.get_decoding_cache(version=self.cache_version))
 
         return ret
 

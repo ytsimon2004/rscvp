@@ -8,7 +8,7 @@ from argclz import AbstractParser, argument
 from neuralib.plot import plot_figure, grid_subplots
 from neuralib.typing import AxesArray
 from neuralib.util.verbose import publish_annotation
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli import SelectionOptions
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
@@ -19,7 +19,7 @@ __all__ = ['PositionMapOptions']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.2A & fig.S5B-C', as_doc=True)
-class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions):
+class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinCache):
     DESCRIPTION = 'Plot normalized position binned calcium activity across trials'
 
     overview: bool = argument('--overview', help='plot batch overview')
@@ -86,7 +86,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         :return: activity (N', L', B) and neuron indices (N',)
         """
         rig = self.load_riglog_data()
-        signal = self.apply_binned_act_cache().occ_activity
+        signal = self.get_occ_cache().occ_activity
         orig_indices = np.ones(signal.shape[0], dtype=bool)
 
         # neuron selection
@@ -130,7 +130,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinActOptions
         """
         s2p = self.load_suite_2p()
         neuron_list = get_neuron_list(s2p, neuron_ids)
-        signal_all = self.apply_binned_act_cache().occ_activity
+        signal_all = self.get_occ_cache().occ_activity
         if self.binned_smooth:
             signal_all = gaussian_filter1d(signal_all, 3, mode='wrap', axis=2)
 

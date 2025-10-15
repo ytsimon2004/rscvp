@@ -3,7 +3,7 @@ import numpy as np
 from argclz import argument, AbstractParser, int_tuple_type, union_type
 from neuralib.persistence import persistence
 from neuralib.persistence.cli_persistence import get_options_and_cache
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.spatial.util import sort_neuron, normalized_trial_avg
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
@@ -13,7 +13,7 @@ from rscvp.util.util_trials import TRIAL_CV_TYPE, signal_trial_cv_helper
 __all__ = [
     'SortIdxCache',
     'AbstractSortIdxOptions',
-    'ApplySortIdxOptions'
+    'ApplySortIdxCache'
 ]
 
 
@@ -55,7 +55,7 @@ class AbstractSortIdxOptions(SelectionOptions):
     )
 
 
-class SortIdxCacheBuilder(AbstractParser, ApplyPosBinActOptions, AbstractSortIdxOptions,
+class SortIdxCacheBuilder(AbstractParser, ApplyPosBinCache, AbstractSortIdxOptions,
                           PersistenceRSPOptions[SortIdxCache]):
     DESCRIPTION = 'compute the trial average activity sorting idx along position bins'
 
@@ -84,7 +84,7 @@ class SortIdxCacheBuilder(AbstractParser, ApplyPosBinActOptions, AbstractSortIdx
         rig = self.load_riglog_data()
 
         mx = self.get_selected_neurons()
-        signal_all = self.apply_binned_act_cache().occ_activity[mx]
+        signal_all = self.get_occ_cache().occ_activity[mx]
 
         return signal_trial_cv_helper(rig, signal_all, self.use_trial, use_virtual_space=self.use_virtual_space)
 
@@ -125,9 +125,9 @@ class SortIdxCacheBuilder(AbstractParser, ApplyPosBinActOptions, AbstractSortIdx
         return cache
 
 
-class ApplySortIdxOptions(AbstractSortIdxOptions):
+class ApplySortIdxCache(AbstractSortIdxOptions):
 
-    def apply_sort_idx_cache(self, error_when_missing=False) -> SortIdxCache:
+    def get_sort_idx_cache(self, error_when_missing=False) -> SortIdxCache:
         return get_options_and_cache(SortIdxCacheBuilder, self, error_when_missing)
 
 

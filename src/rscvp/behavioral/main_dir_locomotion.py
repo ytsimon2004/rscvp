@@ -6,7 +6,7 @@ from argclz import AbstractParser
 from neuralib.plot import plot_figure
 from neuralib.util.deprecation import deprecated_class
 from rscvp.visual.main_running import RunningVisualOptions
-from rscvp.visual.main_tuning import ApplyVisualActOptions
+from rscvp.visual.main_tuning import ApplyVisualActCache
 from rscvp.visual.util_cache import VisualTuningResult
 from stimpyp import RiglogData, Direction
 
@@ -15,7 +15,7 @@ __all__ = ['LocomotionDirOptions',
 
 
 @deprecated_class(new='behavioral.main_vstim_locomotion')
-class LocomotionDirOptions(AbstractParser, ApplyVisualActOptions):
+class LocomotionDirOptions(AbstractParser, ApplyVisualActCache):
     DESCRIPTION = 'Locomotion analysis for different direction visual stimulation'
 
     signal_type = 'speed'
@@ -23,7 +23,7 @@ class LocomotionDirOptions(AbstractParser, ApplyVisualActOptions):
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         rig = self.load_riglog_data()
-        cache = self.apply_visual_tuning_cache(RunningVisualOptions, imaging=False)
+        cache = self.get_visual_tuning_cache(RunningVisualOptions, imaging=False)
         result = cache.load_result()
 
         dy = pivot_dir_locomotion(result)

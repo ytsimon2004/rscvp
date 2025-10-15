@@ -6,7 +6,7 @@ from argclz import AbstractParser
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli import DataOutput, SelectionOptions, get_neuron_list
 from rscvp.util.util_trials import TrialSelection
 
@@ -14,7 +14,7 @@ __all__ = ['TrialCorrOptions']
 
 
 @publish_annotation('main', project='rscvp', as_doc=True)
-class TrialCorrOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
+class TrialCorrOptions(AbstractParser, ApplyPosBinCache, SelectionOptions):
     DESCRIPTION = 'Calculate median value of pairwise trial to trial activity correlation'
 
     signal_type = 'df_f'
@@ -30,7 +30,7 @@ class TrialCorrOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         rig = self.load_riglog_data()
 
         if self.plane_index is not None:
-            act = self.apply_binned_act_cache().occ_activity
+            act = self.get_occ_cache().occ_activity
         else:
             raise NotImplementedError('')
 

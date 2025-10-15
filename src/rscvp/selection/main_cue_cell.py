@@ -23,7 +23,7 @@ from neuralib.plot import plot_figure
 from neuralib.typing import ArrayLike, array2str
 from neuralib.util.unstable import unstable
 from rscvp.selection.utils import image_time_per_trial
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_selection import SelectionOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID
@@ -32,7 +32,7 @@ __all__ = ['CueCLSOptions']
 
 
 @unstable()
-class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
+class CueCLSOptions(AbstractParser, ApplyPosBinCache, SelectionOptions):
     DESCRIPTION = 'cue cell identification'
 
     peak_threshold: float = argument(
@@ -60,7 +60,7 @@ class CueCLSOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions):
         signal = gaussian_filter1d(signal, 5)
 
         bin_size = self.track_length / self.pos_bins
-        binned_sig = self.apply_binned_act_cache().occ_activity  # (N,L,B)
+        binned_sig = self.get_occ_cache().occ_activity  # (N,L,B)
         binned_sig[np.isnan(binned_sig)] = 0
         binned_sig = gaussian_filter1d(binned_sig, 2, axis=2, mode='wrap')
 

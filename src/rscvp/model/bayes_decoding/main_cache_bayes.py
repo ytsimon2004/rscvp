@@ -15,7 +15,7 @@ from neuralib.persistence import *
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.util.verbose import fprint
 from rscvp.model.bayes_decoding.util import calc_wrap_distance
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions, AbstractPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache, AbstractPosBinActOptions
 from rscvp.util.cli.cli_model import ModelOptions, trial_cross_validate
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
@@ -26,7 +26,7 @@ from stimpyp import RiglogData
 __all__ = ['BayesDecodeData',
            'BayesDecodeCache',
            'BayesDecodeCacheBuilder',
-           'ApplyBayesDecodeOptions']
+           'ApplyBayesDecodeCache']
 
 
 class BayesDecodeData(NamedTuple):
@@ -307,7 +307,7 @@ class AbstractBayesDecodeOptions(SelectionOptions, ModelOptions):
 
 class BayesDecodeCacheBuilder(AbstractParser,
                               AbstractBayesDecodeOptions,
-                              ApplyPosBinActOptions,
+                              ApplyPosBinCache,
                               PersistenceRSPOptions[BayesDecodeCache]):
     DESCRIPTION = "Generate the cache for bayes decoding animal's position, used for further analysis/plotting"
 
@@ -483,7 +483,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
         train, test = self.train_test
 
         # rate_map cache apply
-        rate_map = self.apply_binned_act_cache().occ_activity  # (N, L, X)
+        rate_map = self.get_occ_cache().occ_activity  # (N, L, X)
         rate_map = train.masking_trial_matrix(rate_map, 1)  # (N, L', X)
         rate_map = np.nanmean(rate_map, axis=1)[neuron_list]  # trial average  (N, X)
 
@@ -599,28 +599,24 @@ class BayesDecodeCacheBuilder(AbstractParser,
         return ret
 
 
-# =========== #
-# Apply Cache #
-# =========== #
-
-class ApplyBayesDecodeOptions(AbstractBayesDecodeOptions, AbstractPosBinActOptions):
+class ApplyBayesDecodeCache(AbstractBayesDecodeOptions, AbstractPosBinActOptions):
     cache_version = as_argument(AbstractBayesDecodeOptions.cache_version).with_options(required=True)
 
-    def apply_bayes_cache(self, version: int | tuple = None, error_when_missing=False) -> BayesDecodeCache:
+    def get_decoding_cache(self, version: int | tuple = None, error_when_missing=False) -> BayesDecodeCache:
         if self.plane_index is not None:
             if not isinstance(version, int):
                 raise TypeError('for single plane, cache --load must be int type')
-            return self._apply_bayes_cache_plane(version, error_when_missing)
+            return self._get_cache_single(version, error_when_missing)
         else:
-            return self._apply_bayes_cache_concat()
+            return self._get_cache_concat()
 
-    def _apply_bayes_cache_plane(self, version: int, error_when_missing=False) -> BayesDecodeCache:
+    def _get_cache_single(self, version: int, error_when_missing=False) -> BayesDecodeCache:
         if version is None:
             version = self.cache_version
 
         return get_options_and_cache(BayesDecodeCacheBuilder, self, error_when_missing, version=version)
 
-    def _apply_bayes_cache_concat(self, error_when_missing=False) -> BayesDecodeCache:
+    def _get_cache_concat(self, error_when_missing=False) -> BayesDecodeCache:
         data = []
 
         try:

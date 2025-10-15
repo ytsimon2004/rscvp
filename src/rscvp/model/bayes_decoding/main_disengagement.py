@@ -2,7 +2,7 @@ import numpy as np
 
 from argclz import AbstractParser
 from neuralib.plot.plot import scatter_histplot
-from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions
+from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeCache
 from rscvp.model.bayes_decoding.util import calc_wrap_distance
 from rscvp.util.cli import CameraOptions
 from rscvp.util.util_lick import calc_lick_pos_trial
@@ -10,13 +10,13 @@ from rscvp.util.util_lick import calc_lick_pos_trial
 __all__ = ['DecodeDisengageOptions']
 
 
-class DecodeDisengageOptions(AbstractParser, ApplyBayesDecodeOptions, CameraOptions):
+class DecodeDisengageOptions(AbstractParser, ApplyBayesDecodeCache, CameraOptions):
     DESCRIPTION = 'To see if task engagement (i.e., lick accuracy) affect the decoding error'
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        cache = self.apply_bayes_cache(version=self.cache_version)
+        cache = self.get_decoding_cache(version=self.cache_version)
         result = cache.load_result()
 
         test_mask = result.get_test_trial()

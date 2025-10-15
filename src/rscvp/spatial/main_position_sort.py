@@ -5,8 +5,8 @@ import numpy as np
 
 from argclz import AbstractParser, argument, int_tuple_type
 from neuralib.plot import plot_figure, ax_merge
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.spatial.main_cache_sortidx import ApplySortIdxOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
+from rscvp.spatial.main_cache_sortidx import ApplySortIdxCache
 from rscvp.spatial.util import sort_neuron, normalized_trial_avg
 from rscvp.spatial.util_plot import plot_sorted_trial_averaged_heatmap, plot_fraction_active
 from rscvp.util.cli.cli_output import DataOutput
@@ -15,7 +15,7 @@ from rscvp.util.util_trials import signal_trial_cv_helper
 __all__ = ['PositionSortOptions']
 
 
-class PositionSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOptions):
+class PositionSortOptions(AbstractParser, ApplyPosBinCache, ApplySortIdxCache):
     DESCRIPTION = 'plot the sorted trial-average calcium activities of population neurons along the 1d environment'
     EPILOG = """
     Example:
@@ -60,7 +60,7 @@ class PositionSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOpt
         rig = self.load_riglog_data()
 
         mx = self.get_selected_neurons()
-        signal_all = self.apply_binned_act_cache().occ_activity[mx]
+        signal_all = self.get_occ_cache().occ_activity[mx]
 
         return signal_trial_cv_helper(rig, signal_all, self.use_trial, use_virtual_space=self.use_virtual_space)
 
@@ -80,7 +80,7 @@ class PositionSortOptions(AbstractParser, ApplyPosBinActOptions, ApplySortIdxOpt
 
     def calactivity_belt_sorted(self, output: DataOutput):
         if self.plot_trial is None:
-            index = self.apply_sort_idx_cache().sort_idx
+            index = self.get_sort_idx_cache().sort_idx
 
             if index is None:
                 index = slice(None, None)

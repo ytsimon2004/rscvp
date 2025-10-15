@@ -8,7 +8,7 @@ from argclz import argument, AbstractParser, float_tuple_type
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
-from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeOptions, BayesDecodeData, BayesDecodeCache
+from rscvp.model.bayes_decoding.main_cache_bayes import ApplyBayesDecodeCache, BayesDecodeData, BayesDecodeCache
 from rscvp.model.bayes_decoding.util_plot import (
     plot_decoding_err_position,
     plot_confusion_scatter,
@@ -23,7 +23,7 @@ __all__ = ['DecodeAnalysisOptions']
 
 @publish_annotation('main', project='rscvp', figure='fig.3A-3C', caption='db usage', as_doc=True)
 class DecodeAnalysisOptions(AbstractParser,
-                            ApplyBayesDecodeOptions,
+                            ApplyBayesDecodeCache,
                             PlotOptions,
                             CameraOptions,
                             SQLDatabaseOptions,
@@ -89,7 +89,7 @@ class DecodeAnalysisOptions(AbstractParser,
 
     def run(self):
         self.post_parsing()
-        cache = self.apply_bayes_cache(version=self.cache_version)
+        cache = self.get_decoding_cache(version=self.cache_version)
         output_info = self.get_data_output('bayes_decode')
 
         self.invoke_command(self.analysis_type, cache, output_info)
@@ -107,7 +107,7 @@ class DecodeAnalysisOptions(AbstractParser,
         """Get lick time and lick rate"""
         t, s = self.get_lick_event()
         sig_t, sig = (
-            self.apply_bayes_cache(version=self.cache_version)
+            self.get_decoding_cache(version=self.cache_version)
             .get_signal(self, time=t, value=s)
         )
 
@@ -300,7 +300,7 @@ class DecodeAnalysisOptions(AbstractParser,
             decode_err = result.decode_error
             n = result.n_neurons
         else:
-            cache = self.apply_bayes_cache()
+            cache = self.get_decoding_cache()
             decode_err = cache.decode_error
             n = cache.rate_map.shape[1]
 

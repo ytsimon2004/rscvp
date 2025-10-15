@@ -12,7 +12,7 @@ from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_merge
 from neuralib.util.verbose import fprint
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, get_neuron_list, NeuronID
 from rscvp.util.util_trials import TrialSelection
 
@@ -89,7 +89,7 @@ class PlaceFieldResult(NamedTuple):
         return self._replace(pf=list(pf[x]))
 
 
-class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions, PlotOptions):
+class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, PlotOptions):
     DESCRIPTION = 'Place field properties calculations, including place field width, peak location, numbers'
 
     width_range: tuple[int, int] = argument(
@@ -206,8 +206,8 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinActOptions, SelectionOptions
         neuron_list = get_neuron_list(s2p, neuron_ids)
 
         rig = self.load_riglog_data()
-        sig_all = self.apply_binned_act_cache().occ_activity
-        sig_base = self.apply_binned_act_cache().occ_baseline
+        sig_all = self.get_occ_cache().occ_activity
+        sig_base = self.get_occ_cache().occ_baseline
 
         sig_all[np.isnan(sig_all)] = 0.0  # exclude nan point that generated after speed filter
         sig_base[np.isnan(sig_base)] = 0.0

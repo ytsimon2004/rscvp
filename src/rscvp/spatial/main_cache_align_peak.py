@@ -9,7 +9,7 @@ from typing_extensions import Self
 from argclz import AbstractParser, argument, copy_argument
 from neuralib.persistence import *
 from neuralib.persistence.cli_persistence import get_options_and_cache
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_selection import SelectionOptions
 from rscvp.util.util_trials import TrialSelection
@@ -89,7 +89,7 @@ class AbstractAlignPeakOptions(SelectionOptions):
 
 
 class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
-                                  ApplyPosBinActOptions, PersistenceRSPOptions[SISortAlignPeakCache]):
+                                  ApplyPosBinCache, PersistenceRSPOptions[SISortAlignPeakCache]):
     DESCRIPTION = 'Cache for (N, B) binned calcium data, N idx is sorted by spatial information'
 
     def run(self):
@@ -118,7 +118,7 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
 
     def prepare_align_data(self) -> np.ndarray:
         rig = self.load_riglog_data()
-        binned_sig = self.apply_binned_act_cache().occ_activity
+        binned_sig = self.get_occ_cache().occ_activity
 
         # neuron selection
         cell_mask = self.get_selected_neurons()
@@ -161,18 +161,18 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
         return np.argsort(self.si)[::-1]
 
 
-class ApplyAlignPeakOptions(AbstractAlignPeakOptions):
+class ApplyAlignPeakCache(AbstractAlignPeakOptions):
 
-    def apply_align_peak_cache(self, error_when_missing=False) -> SISortAlignPeakCache:
+    def get_si_idx_cache(self, error_when_missing=False) -> SISortAlignPeakCache:
         if self.plane_index is not None:
-            return self._apply_single_plane(error_when_missing)
+            return self._get_cache_single(error_when_missing)
         else:
-            return self._apply_concat_plane(error_when_missing)
+            return self._get_cache_concat(error_when_missing)
 
-    def _apply_single_plane(self, error_when_missing):
+    def _get_cache_single(self, error_when_missing):
         return get_options_and_cache(SISortAlignPeakCacheBuilder, self, error_when_missing)
 
-    def _apply_concat_plane(self, error_when_missing):
+    def _get_cache_concat(self, error_when_missing):
         data = []
         n_planes = self.load_suite_2p(force_load_plane=0).n_plane
         for i in range(n_planes):

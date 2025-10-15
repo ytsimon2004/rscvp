@@ -1,17 +1,17 @@
 import numpy as np
-from rscvp.spatial.main_cache_occ import ApplyPosBinActOptions
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_suite2p import NeuronID, get_neuron_list
 from tqdm import tqdm
 
 from argclz import AbstractParser, argument
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
+from rscvp.spatial.main_cache_occ import ApplyPosBinCache
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_suite2p import NeuronID, get_neuron_list
 
 __all__ = ['ActivePCOptions']
 
 
-class ActivePCOptions(AbstractParser, ApplyPosBinActOptions):
+class ActivePCOptions(AbstractParser, ApplyPosBinCache):
     DESCRIPTION = 'see spatial active cell by spks and dff cmp'
 
     threshold: float = argument(
@@ -38,9 +38,9 @@ class ActivePCOptions(AbstractParser, ApplyPosBinActOptions):
         neuron_list = get_neuron_list(s2p, neuron_ids)
 
         self.signal_type = 'spks'
-        sig_spk = self.apply_binned_act_cache().occ_activity
+        sig_spk = self.get_occ_cache().occ_activity
         self.signal_type = 'df_f'
-        sig_dff = self.apply_binned_act_cache().occ_activity
+        sig_dff = self.get_occ_cache().occ_activity
 
         session = rig.get_stimlog().session_trials()[self.session]
         lap_mask = session.time_mask_of(rig.lap_event.time[-1])
