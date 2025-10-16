@@ -1,14 +1,10 @@
 import abc
-from typing import Literal, NamedTuple, Iterable
-from typing import Optional
+from typing import Literal, Iterable
 
 import matplotlib.colors as mcolors
 import numpy as np
-import seaborn as sns
 from matplotlib.axes import Axes
-from matplotlib.colors import Colormap
 from matplotlib.image import AxesImage
-from typing_extensions import Self
 
 from argclz import argument, AbstractParser, as_argument
 from neuralib.imaging.registration import CellularCoordinates
@@ -18,44 +14,19 @@ from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar, insert_cyclic_colorbar
 from neuralib.plot.plot import scatter_binx_plot
 from neuralib.typing import AxesArray, ArrayLike
-from neuralib.util.deprecation import deprecated_func
-from neuralib.util.verbose import fprint
 from rscvp.util.cli import PlotOptions, SBXOptions, SelectionOptions
 from rscvp.util.util_ibl import IBLAtlasPlotWrapper
 from .util import RSCObjectiveFOV
 
 __all__ = ['Metric',
-           'TopoPlotArgs',
-           #
            'AbstractTopoPlotOptions',
-           #
            'plot_topo_variable',
+           'plot_topo_histogram',
            'plot_registered_fov']
 
 Metric = str
 """metric for see the topographical difference. i.e., si, tcc, vc, pdire, sftf_0.04_1., etc"""
 
-
-class TopoPlotArgs(NamedTuple):
-    """for plotting order or cmap usage"""
-    metric: Metric
-    dtype: Literal['uniform', 'diverging', 'cyclic']
-    order: int
-    cmap: str | Colormap
-
-    @classmethod
-    def infer(cls, value: ArrayLike, metric: Metric) -> Self:
-        if metric == 'pdir':  # special case
-            return cls(metric, 'cyclic', 2, 'twilight')
-
-        signs = np.sign(value)
-        if -1 in signs and 1 in signs:
-            return cls(metric, 'diverging', 1, 'coolwarm')
-        else:
-            return cls(metric, 'uniform', 1, 'magma')
-
-
-# ===== #
 
 class AbstractTopoPlotOptions(AbstractParser, SelectionOptions, SBXOptions, PlotOptions, metaclass=abc.ABCMeta):
     metric: Metric | None = argument(
@@ -90,12 +61,11 @@ class AbstractTopoPlotOptions(AbstractParser, SelectionOptions, SBXOptions, Plot
         iter_metric = [self.metric] if self.metric is not None else self.foreach_metric
         for met in iter_metric:
             value = self._get_value(met)
-            args = TopoPlotArgs.infer(value, met)
 
             output_file = output.summary_figure_output(met)
             with plot_figure(output_file, 2, 2) as _ax:
                 ax = _ax.ravel()
-                plot_topo_variable(ax, cords, args, value, mask, with_top_view=True)
+                plot_topo_variable(ax, cords, value, self.metric, mask=mask, with_top_view=True)
 
     @property
     @abc.abstractmethod
@@ -111,47 +81,43 @@ class AbstractTopoPlotOptions(AbstractParser, SelectionOptions, SBXOptions, Plot
 
 def plot_topo_variable(ax: AxesArray,
                        cords: CellularCoordinates,
-                       args: TopoPlotArgs,
                        value: np.ndarray,
+                       name: str,
                        mask: np.ndarray | None = None,
                        log2_value: bool = False,
                        with_top_view: bool = True,
                        scatter_size: float = 2.5,
                        scatter_alpha: float = 0.8,
+                       order: int = 1,
                        **kwargs):
     """
     1d domain to see linear (AP, ML for panel 1, 2) and 2d see the whole fov in space
 
     :param ax: AxesArray (4,)
     :param cords: ``CellularCoordinates``
-    :param args: ``TopoPlotArgs``
     :param value: metric value domain
+    :param name: metric name
     :param mask: cell selection mask
     :param log2_value: show value and color bar as log2
     :param with_top_view
     :param scatter_size:
     :param scatter_alpha:
+    :param order:
     :param kwargs: to `plot_topo_scatter` and `plot_topo_histogram`
     """
     if mask is not None:
         value = value[mask]
         cords = cords.with_masking(mask)
 
-    #
-    scatter_binx_plot(ax[0], cords.ap, value,
-                      xlabel='AP distance(um)', order=args.order, ylabel=f'{args.metric}')
-    #
-    scatter_binx_plot(ax[1], cords.ml, value,
-                      xlabel='ML distance(um)', order=args.order, ylabel=f'{args.metric}')
-    #
-    plot_topo_scatter(ax[2], cords, value, args,
+    scatter_binx_plot(ax[0], cords.ap, value, xlabel='AP distance(um)', order=order, ylabel=name)
+    scatter_binx_plot(ax[1], cords.ml, value, xlabel='ML distance(um)', order=order, ylabel=name)
+    plot_topo_scatter(ax[2], cords, value, name,
                       log2_value=log2_value,
                       with_top_view=with_top_view,
                       scatter_size=scatter_size,
                       scatter_alpha=scatter_alpha,
                       **kwargs)
-    #
-    plot_topo_histogram(ax[3], cords, value, args, log2_value=log2_value, with_top_view=with_top_view, **kwargs)
+    plot_topo_histogram(ax[3], cords, value, name, log2_value=log2_value, with_top_view=with_top_view, **kwargs)
     ax[2].sharex(ax[3])
     ax[2].sharey(ax[3])
 
@@ -159,47 +125,31 @@ def plot_topo_variable(ax: AxesArray,
 def plot_topo_scatter(ax: Axes,
                       cords: CellularCoordinates,
                       value: np.ndarray,
-                      args: TopoPlotArgs,
+                      name: str,
                       *,
                       log2_value: bool = True,
-                      cbar_range: Optional[tuple[float, float]] = None,
+                      cbar_range: tuple[float, float] | None = None,
                       with_top_view: bool = True,
                       scatter_size: float = 2.5,
                       scatter_alpha: float = 0.8,
                       **kwargs):
     """Plot the metric value(color) in 2d space (AP, ML) with scatter plot"""
-    if args.dtype == 'diverging':
-        try:
-            # NOTE that not linear cmap
-            norm = mcolors.TwoSlopeNorm(vmin=np.min(value), vmax=np.max(value), vcenter=0)
-        except ValueError as e:
-            print(repr(e), f'{args.metric} >> force use uniform cmap')
-            args = args._replace(cmap='cividis')
-            norm = None
-
-    else:
-        norm = None
-
-    #
-    if log2_value:
-        norm = mcolors.SymLogNorm(linthresh=0.001, base=2)
-
-    #
+    norm = mcolors.SymLogNorm(linthresh=0.001, base=2) if log2_value else None
     im = ax.scatter(cords.ml, cords.ap,
                     s=scatter_size,
                     alpha=scatter_alpha,
                     edgecolors='none',
                     c=value,
-                    cmap=args.cmap,
+                    cmap='magma',
                     norm=norm,
                     **kwargs)
 
     # colorbar
-    if args.metric == 'pdir' and args.dtype == 'cyclic':
+    if name == 'pdir':
         insert_cyclic_colorbar(ax, im, vmin=0, vmax=360)
     else:
         cbar = insert_colorbar(ax, im)
-        cbar.ax.set(ylabel=args.metric)
+        cbar.ax.set(ylabel=name)
 
         if cbar_range is not None:
             cbar.ax.set(ylim=cbar_range)
@@ -217,7 +167,7 @@ def plot_topo_scatter(ax: Axes,
 def plot_topo_histogram(ax: Axes,
                         coords: CellularCoordinates,
                         value: np.ndarray,
-                        args: TopoPlotArgs,
+                        name: str,
                         *,
                         log2_value: bool = False,
                         with_top_view: bool = True,
@@ -230,7 +180,7 @@ def plot_topo_histogram(ax: Axes,
     :param ax:
     :param coords:
     :param value:
-    :param args:
+    :param name:
     :param log2_value
     :param with_top_view:
     :param bins: number of bins,
@@ -254,15 +204,16 @@ def plot_topo_histogram(ax: Axes,
 
     norm = mcolors.SymLogNorm(linthresh=0.001, base=2) if log2_value else None
 
-    im = ax.pcolormesh(xedges, yedges, H_mean, cmap=args.cmap, norm=norm, **kwargs)
+    im = ax.pcolormesh(xedges, yedges, H_mean, cmap='magma', norm=norm, **kwargs)
     vmin, vmax = im.get_clim()
+
     #
-    if args.metric == 'pdir' and args.dtype == 'cyclic':
+    if name == 'pdir':
         insert_cyclic_colorbar(ax, im, vmin=0, vmax=360)
     else:
         cbar = insert_colorbar(ax, im)
         cbar.set_ticks([vmin, vmax])
-        cbar.ax.set(ylabel=args.metric)
+        cbar.ax.set(ylabel=name)
 
     #
     if with_top_view:
@@ -350,31 +301,3 @@ def plot_registered_fov(ax: Axes,
         pix = ax.imshow(neuron_pix, cmap=uni_color, vmin=0, vmax=1, extent=extent, **kwargs)
 
     return pix
-
-
-@deprecated_func(remarks='value domain not determined')
-def plot_topo_kde(ax: Axes,
-                  cords: CellularCoordinates,
-                  value: np.ndarray,
-                  args: TopoPlotArgs, *,
-                  with_top_view: bool = True,
-                  **kwargs):
-    """Plot the metric value(color) in 2d space (AP, ML) with kde plot"""
-    if np.any(value < 0):
-        value[value < 0] = 0
-        fprint(f'{args.metric} not suitable for kde plot, use other view-2d opt', vtype='warning')
-
-    sns.kdeplot(ax=ax, x=cords.ml, y=cords.ap, weights=value,
-                fill=True, cmap=args.cmap, levels=20, **kwargs)  # kde normalized value domain
-
-    if with_top_view:
-        IBLAtlasPlotWrapper().plot_scalar_on_slice(
-            ['root'],
-            ax=ax,
-            coord=-2000,
-            plane='top',
-            background='boundary'
-        )
-
-    ax.set_aspect('equal', adjustable='box')
-    ax.set(xlabel='ML distance(um)', ylabel='AP distance(um)')
