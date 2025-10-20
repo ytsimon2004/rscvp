@@ -1,9 +1,11 @@
+from typing import Literal
+
 import polars as pl
 import seaborn as sns
 from matplotlib.axes import Axes
 from scipy.stats import wilcoxon, mannwhitneyu
 
-from argclz import as_argument
+from argclz import as_argument, argument
 from neuralib.plot import plot_figure
 from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.statistic.core import StatPipeline, print_var
@@ -14,6 +16,12 @@ __all__ = ['SpatialFractionBlankStat']
 
 class SpatialFractionBlankStat(StatPipeline):
     DESCRIPTION = 'Fraction of spatial cells in anterior v.s. posterior RSC in blank belt treadmill'
+
+    analysis: Literal['anterior', 'posterior', 'overall'] = argument(
+        '--analysis',
+        default='overall',
+        help='analysis type',
+    )
 
     header = as_argument(StatPipeline.header).with_options(required=False)
 
@@ -42,16 +50,63 @@ class SpatialFractionBlankStat(StatPipeline):
 
             concat.append(df)
 
-        self.df = pl.concat(concat)
+        if self.analysis == 'overall':
+            self.df = pl.concat(concat)
+        else:
+            self.df = self.pivot_dataframe(pl.concat(concat))
+
+    _ignore_dataset = ('210315_YW006',)
+
+    def pivot_dataframe(self, df):
+        if self.analysis == 'anterior':
+            region = 'aRSC'
+        else:
+            region = 'pRSC'
+
+        animals_in_both = (
+            df.filter(pl.col('region') == region)
+            .with_columns((pl.col('primary_key').str.split('_').list.get(1)).alias('animal'))
+            .group_by('animal')
+            .agg(pl.col('table').n_unique())
+            .filter(pl.col('table') == 2)
+            .select('animal')
+        )
+
+        df = (
+            df.filter(pl.col('region') == region)
+            .filter((~pl.col('primary_key').is_in(self._ignore_dataset)))
+            .with_columns((pl.col('primary_key').str.split('_').list.get(1)).alias('animal'))
+            .join(animals_in_both, on='animal', how='semi')
+            .with_columns(pl.col('animal').rank('dense').cast(pl.Int64).alias('pair_wise_group'))
+            .sort('animal')
+        )
+
+        return df
+
+    @property
+    def x(self) -> str:
+        if self.analysis == 'overall':
+            return 'table'
+        else:
+            return 'region'
+
+    @property
+    def hue(self) -> str:
+        if self.analysis == 'overall':
+            return 'region'
+        else:
+            return 'table'
 
     def plot(self):
         df = self.df
+        x = self.x
+        hue = self.hue
         with plot_figure(None) as ax:
             sns.barplot(
                 data=df,
-                x="table",
+                x=x,
                 y="fraction",
-                hue="region",
+                hue=hue,
                 errorbar="se",
                 capsize=0.2,
                 ax=ax
@@ -59,9 +114,9 @@ class SpatialFractionBlankStat(StatPipeline):
 
             sns.stripplot(
                 data=df,
-                x="table",
+                x=x,
                 y="fraction",
-                hue="region",
+                hue=hue,
                 dodge=True,
                 jitter=False,
                 alpha=0.5,
@@ -69,94 +124,131 @@ class SpatialFractionBlankStat(StatPipeline):
                 ax=ax
             )
 
-            # Add connected lines for paired observations
             self.plot_connect_line(ax)
-
-            # Add legend showing primary keys
             self.add_primary_key_legend(ax)
 
     def plot_connect_line(self, ax: Axes):
-        """Connect pairs with same pair_wise_group within each table"""
+        """Connect pairs with same pair_wise_group - adapts to analysis type"""
         df_filtered = (
             self.df.cast({'pair_wise_group': pl.Int64})
             .filter(pl.col('pair_wise_group') != -1)
         )
 
         # Get all PathCollections (stripplot points) from the axes
-        collections = [child for child in ax.get_children()
-                       if hasattr(child, 'get_offsets') and len(child.get_offsets()) > 0]
+        collections = [
+            child
+            for child in ax.get_children() if
+            hasattr(child, 'get_offsets') and len(child.get_offsets()) > 0
+        ]
 
-        print(f"Found {len(collections)} collections")
-
-        # Match points by their y-values (fraction values) and x-position to positions
         point_positions = {}
 
-        # Define expected x-ranges for each table-region combination
-        # Based on the debug output:
-        # GenericDB: aRSC around x=0.2, pRSC around x=-0.2
-        # BlankBeltGenericDB: aRSC around x=1.2, pRSC around x=0.8
-        expected_positions = {
-            ('GenericDB', 'aRSC'): (0.2, 0.1),  # x=0.2 ± 0.1
-            ('GenericDB', 'pRSC'): (-0.2, 0.1),  # x=-0.2 ± 0.1
-            ('BlankBeltGenericDB', 'aRSC'): (1.2, 0.1),  # x=1.2 ± 0.1
-            ('BlankBeltGenericDB', 'pRSC'): (0.8, 0.1),  # x=0.8 ± 0.1
-        }
+        if self.analysis == 'overall':
+            # For overall: x-axis is table, hue is region
+            # GenericDB: aRSC around x=0.2, pRSC around x=-0.2
+            # BlankBeltGenericDB: aRSC around x=1.2, pRSC around x=0.8
+            expected_positions = {
+                ('GenericDB', 'aRSC'): (0.2, 0.1),
+                ('GenericDB', 'pRSC'): (-0.2, 0.1),
+                ('BlankBeltGenericDB', 'aRSC'): (1.2, 0.1),
+                ('BlankBeltGenericDB', 'pRSC'): (0.8, 0.1),
+            }
 
-        for collection in collections:
-            positions = collection.get_offsets()
-            print(f"Collection has {len(positions)} points")
+            for collection in collections:
+                positions = collection.get_offsets()
 
-            # For each position, find the matching data point by both y-value and x-position
-            for pos in positions:
-                x_pos, y_pos = pos
+                for pos in positions:
+                    x_pos, y_pos = pos
+                    matching_rows = df_filtered.filter(
+                        (pl.col('fraction') - y_pos).abs() < 0.0001
+                    )
 
-                # Find data point with matching fraction value
-                matching_rows = df_filtered.filter(
-                    (pl.col('fraction') - y_pos).abs() < 0.0001  # Small tolerance for float comparison
-                )
+                    if len(matching_rows) >= 1:
+                        best_match = None
+                        best_distance = float('inf')
 
-                # If multiple matches, use x-position to determine table/region
-                if len(matching_rows) >= 1:
-                    best_match = None
-                    best_distance = float('inf')
+                        for row in matching_rows.iter_rows(named=True):
+                            table_region = (row['table'], row['region'])
+                            if table_region in expected_positions:
+                                expected_x, tolerance = expected_positions[table_region]
+                                distance = abs(x_pos - expected_x)
 
-                    for row in matching_rows.iter_rows(named=True):
-                        table_region = (row['table'], row['region'])
-                        if table_region in expected_positions:
-                            expected_x, tolerance = expected_positions[table_region]
-                            distance = abs(x_pos - expected_x)
+                                if distance <= tolerance and distance < best_distance:
+                                    best_match = row
+                                    best_distance = distance
 
-                            if distance <= tolerance and distance < best_distance:
-                                best_match = row
-                                best_distance = distance
+                        if best_match:
+                            key = (best_match['table'], best_match['region'], best_match['pair_wise_group'])
+                            point_positions[key] = pos
 
-                    if best_match:
-                        key = (best_match['table'], best_match['region'], best_match['pair_wise_group'])
-                        point_positions[key] = pos
-                        print(f"Matched point ({x_pos:.2f}, {y_pos:.4f}) to {key}")
+            # Connect aRSC to pRSC within each table
+            tables = df_filtered['table'].unique().sort()
+            for table in tables:
+                table_df = df_filtered.filter(pl.col('table') == table)
 
-        # Connect pairs within each table
-        tables = df_filtered['table'].unique().sort()
+                for group_id in table_df['pair_wise_group'].unique():
+                    pair_df = table_df.filter(pl.col('pair_wise_group') == group_id)
 
-        for table in tables:
-            table_df = df_filtered.filter(pl.col('table') == table)
+                    arsc_data = pair_df.filter(pl.col('region') == 'aRSC')
+                    prsc_data = pair_df.filter(pl.col('region') == 'pRSC')
 
-            for group_id in table_df['pair_wise_group'].unique():
-                pair_df = table_df.filter(pl.col('pair_wise_group') == group_id)
+                    if len(arsc_data) == 1 and len(prsc_data) == 1:
+                        arsc_pos = point_positions.get((table, 'aRSC', group_id))
+                        prsc_pos = point_positions.get((table, 'pRSC', group_id))
 
-                arsc_data = pair_df.filter(pl.col('region') == 'aRSC')
-                prsc_data = pair_df.filter(pl.col('region') == 'pRSC')
+                        if arsc_pos is not None and prsc_pos is not None:
+                            ax.plot([arsc_pos[0], prsc_pos[0]], [arsc_pos[1], prsc_pos[1]],
+                                    color='gray', alpha=0.7, linewidth=2, zorder=10)
 
-                # Connect if we have both regions for this pair
-                if len(arsc_data) == 1 and len(prsc_data) == 1:
-                    arsc_pos = point_positions.get((table, 'aRSC', group_id))
-                    prsc_pos = point_positions.get((table, 'pRSC', group_id))
+        else:
+            # For anterior/posterior: x-axis is region, hue is table
+            # GenericDB around x=-0.2, BlankBeltGenericDB around x=0.2
+            expected_positions = {
+                'GenericDB': (-0.2, 0.15),
+                'BlankBeltGenericDB': (0.2, 0.15),
+            }
 
-                    if arsc_pos is not None and prsc_pos is not None:
-                        ax.plot([arsc_pos[0], prsc_pos[0]], [arsc_pos[1], prsc_pos[1]],
+            for collection in collections:
+                positions = collection.get_offsets()
+
+                for pos in positions:
+                    x_pos, y_pos = pos
+                    matching_rows = df_filtered.filter(
+                        (pl.col('fraction') - y_pos).abs() < 0.0001
+                    )
+
+                    if len(matching_rows) >= 1:
+                        best_match = None
+                        best_distance = float('inf')
+
+                        for row in matching_rows.iter_rows(named=True):
+                            table = row['table']
+                            if table in expected_positions:
+                                expected_x, tolerance = expected_positions[table]
+                                distance = abs(x_pos - expected_x)
+
+                                if distance <= tolerance and distance < best_distance:
+                                    best_match = row
+                                    best_distance = distance
+
+                        if best_match:
+                            key = (best_match['table'], best_match['pair_wise_group'])
+                            point_positions[key] = pos
+
+            # Connect same animal across tables
+            for group_id in df_filtered['pair_wise_group'].unique():
+                pair_df = df_filtered.filter(pl.col('pair_wise_group') == group_id)
+
+                generic_data = pair_df.filter(pl.col('table') == 'GenericDB')
+                blank_data = pair_df.filter(pl.col('table') == 'BlankBeltGenericDB')
+
+                if len(generic_data) == 1 and len(blank_data) == 1:
+                    generic_pos = point_positions.get(('GenericDB', group_id))
+                    blank_pos = point_positions.get(('BlankBeltGenericDB', group_id))
+
+                    if generic_pos is not None and blank_pos is not None:
+                        ax.plot([generic_pos[0], blank_pos[0]], [generic_pos[1], blank_pos[1]],
                                 color='gray', alpha=0.7, linewidth=2, zorder=10)
-                        print(
-                            f"Connected {table} group {group_id}: ({arsc_pos[0]:.2f},{arsc_pos[1]:.4f}) to ({prsc_pos[0]:.2f},{prsc_pos[1]:.4f})")
 
     def add_primary_key_legend(self, ax: Axes):
         """Add text annotations showing primary keys for each data point"""
@@ -214,13 +306,20 @@ class SpatialFractionBlankStat(StatPipeline):
                                     fontsize=8,
                                     alpha=0.7,
                                     ha='left')
-                        print(f"Added annotation '{animal_id}' at ({x_pos:.2f}, {y_pos:.4f})")
 
     def verbose(self):
-        """Run t-tests across regions within same table and across tables within same region"""
-        df_filtered = (
-            self.df.cast({'pair_wise_group': pl.Int64})
-        )
+        if self.analysis == 'overall':
+            self._verbose_overall()
+        else:
+            self._verbose_region()
+
+    def _verbose_region(self):
+        """Run t-tests across same animal and same region (paired t-test with the same animal)"""
+        ...
+
+    def _verbose_overall(self):
+        """Run t-tests across regions within same table and across tables within same region (non-pair)"""
+        df_filtered = self.df.cast({'pair_wise_group': pl.Int64})
 
         # compare regions within same table
         print("\n1. Comparing regions within same table:")
@@ -237,7 +336,6 @@ class SpatialFractionBlankStat(StatPipeline):
             prsc_data = table_data.filter(pl.col('region') == 'pRSC')['fraction'].to_numpy()
 
             if len(arsc_data) > 0 and len(prsc_data) > 0:
-
                 result = wilcoxon(arsc_data, prsc_data)
                 p_value = result.pvalue
 
