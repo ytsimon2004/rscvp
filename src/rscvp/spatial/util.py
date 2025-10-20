@@ -514,7 +514,6 @@ def get_remap_dataframe(opt: SelectionOptions, remap_value: float = 20) -> pl.Da
     if not opt.is_virtual_protocol:
         raise NotImplementedError('currently only support VR protocol')
 
-
     spatial_close = opt.select_place_neurons('slb', force_session='close')
     spatial_open = opt.select_place_neurons('slb', force_session='open')
 

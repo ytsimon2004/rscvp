@@ -7,7 +7,7 @@ from typing import NamedTuple, Annotated, Type, Literal, overload
 
 import polars as pl
 
-from neuralib import sqlp
+import sqlclz
 from neuralib.tools.gspread import upload_dataframe_to_spreadsheet, SpreadSheetName
 from neuralib.util.verbose import fprint
 from rscvp.util.io import IOConfig
@@ -34,13 +34,13 @@ DB_TYPE = Literal[
 ]
 
 
-@sqlp.named_tuple_table_class
+@sqlclz.named_tuple_table_class
 class PhysiologyDB(NamedTuple):
-    date: Annotated[str, sqlp.PRIMARY]
-    animal: Annotated[str, sqlp.PRIMARY]
-    rec: Annotated[str, sqlp.PRIMARY]
-    user: Annotated[str, sqlp.PRIMARY]
-    optic: Annotated[str, sqlp.PRIMARY]
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+    rec: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
+    optic: Annotated[str, sqlclz.PRIMARY]
 
     @property
     def dir_name(self) -> str:
@@ -66,16 +66,15 @@ class PhysiologyDB(NamedTuple):
             return []
 
 
-@sqlp.named_tuple_table_class
+@sqlclz.named_tuple_table_class
 class GenericDB(NamedTuple):
     """Generic Value Data"""
-    date: Annotated[str, sqlp.PRIMARY]
-    animal: Annotated[str, sqlp.PRIMARY]
-    rec: Annotated[str, sqlp.PRIMARY]
-    user: Annotated[str, sqlp.PRIMARY]
-    optic: Annotated[str, sqlp.PRIMARY]
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+    rec: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
+    optic: Annotated[str, sqlclz.PRIMARY]
 
-    # Statistic
     n_planes: int | None = None
     region: str | None = None
     pair_wise_group: int | None = None
@@ -88,19 +87,19 @@ class GenericDB(NamedTuple):
 
     update_time: datetime.datetime | None = None
 
-    @sqlp.foreign(PhysiologyDB)
+    @sqlclz.foreign(PhysiologyDB)
     def _animal(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-@sqlp.named_tuple_table_class
+@sqlclz.named_tuple_table_class
 class BayesDecodeDB(NamedTuple):
     """Bayes Decode Data"""
-    date: Annotated[str, sqlp.PRIMARY]
-    animal: Annotated[str, sqlp.PRIMARY]
-    rec: Annotated[str, sqlp.PRIMARY]
-    user: Annotated[str, sqlp.PRIMARY]
-    optic: Annotated[str, sqlp.PRIMARY]
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+    rec: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
+    optic: Annotated[str, sqlclz.PRIMARY]
 
     region: str | None = None
     pair_wise_group: int | None = None
@@ -114,18 +113,18 @@ class BayesDecodeDB(NamedTuple):
 
     update_time: datetime.datetime | None = None
 
-    @sqlp.foreign(PhysiologyDB)
+    @sqlclz.foreign(PhysiologyDB)
     def _animal(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-@sqlp.named_tuple_table_class
+@sqlclz.named_tuple_table_class
 class VisualSFTFDirDB(NamedTuple):
-    date: Annotated[str, sqlp.PRIMARY]
-    animal: Annotated[str, sqlp.PRIMARY]
-    rec: Annotated[str, sqlp.PRIMARY]
-    user: Annotated[str, sqlp.PRIMARY]
-    optic: Annotated[str, sqlp.PRIMARY]
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+    rec: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
+    optic: Annotated[str, sqlclz.PRIMARY]
 
     region: str | None = None
     pair_wise_group: int | None = None
@@ -155,18 +154,18 @@ class VisualSFTFDirDB(NamedTuple):
 
     update_time: datetime.datetime | None = None
 
-    @sqlp.foreign(PhysiologyDB)
+    @sqlclz.foreign(PhysiologyDB)
     def _animal(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-@sqlp.named_tuple_table_class
+@sqlclz.named_tuple_table_class
 class DarknessGenericDB(NamedTuple):
-    date: Annotated[str, sqlp.PRIMARY]
-    animal: Annotated[str, sqlp.PRIMARY]
-    rec: Annotated[str, sqlp.PRIMARY]
-    user: Annotated[str, sqlp.PRIMARY]
-    optic: Annotated[str, sqlp.PRIMARY]
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+    rec: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
+    optic: Annotated[str, sqlclz.PRIMARY]
 
     n_planes: int | None = None
     region: str | None = None
@@ -178,18 +177,18 @@ class DarknessGenericDB(NamedTuple):
 
     update_time: datetime.datetime | None = None
 
-    @sqlp.foreign(PhysiologyDB)
+    @sqlclz.foreign(PhysiologyDB)
     def _animal(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-@sqlp.named_tuple_table_class
+@sqlclz.named_tuple_table_class
 class BlankBeltGenericDB(NamedTuple):
-    date: Annotated[str, sqlp.PRIMARY]
-    animal: Annotated[str, sqlp.PRIMARY]
-    rec: Annotated[str, sqlp.PRIMARY]
-    user: Annotated[str, sqlp.PRIMARY]
-    optic: Annotated[str, sqlp.PRIMARY]
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+    rec: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
+    optic: Annotated[str, sqlclz.PRIMARY]
 
     region: str | None = None
     pair_wise_group: int | None = None
@@ -199,18 +198,18 @@ class BlankBeltGenericDB(NamedTuple):
 
     update_time: datetime.datetime | None = None
 
-    @sqlp.foreign(PhysiologyDB)
+    @sqlclz.foreign(PhysiologyDB)
     def _animal(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-@sqlp.named_tuple_table_class
+@sqlclz.named_tuple_table_class
 class VRGenericDB(NamedTuple):
-    date: Annotated[str, sqlp.PRIMARY]
-    animal: Annotated[str, sqlp.PRIMARY]
-    rec: Annotated[str, sqlp.PRIMARY]
-    user: Annotated[str, sqlp.PRIMARY]
-    optic: Annotated[str, sqlp.PRIMARY]
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+    rec: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
+    optic: Annotated[str, sqlclz.PRIMARY]
 
     region: str | None = None
     pair_wise_group: int | None = None
@@ -224,7 +223,7 @@ class VRGenericDB(NamedTuple):
     """number of position selective neurons remap in open-loop from closed-loop"""
     update_time: datetime.datetime | None = None
 
-    @sqlp.foreign(PhysiologyDB)
+    @sqlclz.foreign(PhysiologyDB)
     def _animal(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
@@ -232,50 +231,47 @@ class VRGenericDB(NamedTuple):
 DataBaseType = GenericDB | BayesDecodeDB | VisualSFTFDirDB | DarknessGenericDB | BlankBeltGenericDB | VRGenericDB
 
 
-class RSCDatabase(sqlp.Database):
-    _debug_mode = False
+class RSCDatabase(sqlclz.Database):
 
     @property
     def database_file(self) -> Path:
         directory = Path(__file__).parents[3] / 'res' / 'database'
-        if not self._debug_mode:
-            return directory / 'rscvp.db'
-        else:
-            return directory / '_test_rscvp.db'
+        return directory / 'rscvp.db'
 
     @property
     def database_tables(self) -> list[type]:
         return [
             PhysiologyDB,
-            GenericDB, DarknessGenericDB, BlankBeltGenericDB, VRGenericDB,
-            BayesDecodeDB, VisualSFTFDirDB
+            GenericDB,
+            DarknessGenericDB,
+            BlankBeltGenericDB,
+            VRGenericDB,
+            BayesDecodeDB,
+            VisualSFTFDirDB
         ]
-
-    # ========= #
-    # AnimalExp #
-    # ========= #
 
     def list_animal_names(self) -> list[str]:
         with self.open_connection():
-            results = sqlp.select_from(PhysiologyDB.animal, distinct=True).fetchall()
-        return sqlp.util.take(0, results)
+            results = sqlclz.select_from(PhysiologyDB.animal, distinct=True).fetchall()
+        return sqlclz.util.take(0, results)
 
     def list_date_animals(self, date: str) -> list[str]:
         with self.open_connection():
-            results = sqlp.select_from(PhysiologyDB.animal, distinct=True).where(
+            results = sqlclz.select_from(PhysiologyDB.animal, distinct=True).where(
                 PhysiologyDB.date == date
             ).fetchall()
-        return sqlp.util.take(0, results)
+        return sqlclz.util.take(0, results)
 
     def list_animal_dates(self, animal: str) -> list[str]:
         with self.open_connection():
-            results = sqlp.select_from(PhysiologyDB.date, distinct=True).where(
+            results = sqlclz.select_from(PhysiologyDB.date, distinct=True).where(
                 PhysiologyDB.animal == animal
             ).fetchall()
-        return sqlp.util.take(0, results)
+        return sqlclz.util.take(0, results)
 
     @overload
-    def find_physiological_data(self, *, date: str = None,
+    def find_physiological_data(self, *,
+                                date: str = None,
                                 animal: str = None,
                                 rec: str = None,
                                 user: str = None,
@@ -285,18 +281,19 @@ class RSCDatabase(sqlp.Database):
     def find_physiological_data(self, **kwargs) -> list[PhysiologyDB]:
         with self.open_connection():
             return (
-                sqlp.select_from(PhysiologyDB)
+                sqlclz
+                .select_from(PhysiologyDB)
                 .where(*[getattr(PhysiologyDB, k) == v for k, v in kwargs.items()])
                 .fetchall()
             )
 
     def list_dirs(self) -> list[PhysiologyDB]:
         with self.open_connection():
-            return sqlp.select_from(PhysiologyDB).fetchall()
+            return sqlclz.select_from(PhysiologyDB).fetchall()
 
     def import_new_animals(self, animals: list[PhysiologyDB]):
         with self.open_connection():
-            sqlp.insert_into(PhysiologyDB, policy='REPLACE').submit(animals)
+            sqlclz.insert_into(PhysiologyDB, policy='REPLACE').submit(animals)
 
     def import_new_animal_from_directory(self, root: Path):
         animals = []
@@ -305,19 +302,14 @@ class RSCDatabase(sqlp.Database):
 
         self.import_new_animals(animals)
 
-    # ================== #
-    # Calcium Image Data #
-    # ================== #
-
     @staticmethod
-    def select_foreign_from_source(foreign_db: type[DataBaseType],
-                                   source: PhysiologyDB) -> sqlp.Cursor[DataBaseType]:
-        return sqlp.util.pull_foreign(foreign_db, source)
+    def select_foreign_from_source(foreign_db: type[DataBaseType], source: PhysiologyDB) -> sqlclz.Cursor[DataBaseType]:
+        return sqlclz.util.pull_foreign(foreign_db, source)
 
     def add_data(self, data: DataBaseType):
         """add new data"""
         with self.open_connection():
-            sqlp.insert_into(type(data), policy='REPLACE').submit([data])
+            sqlclz.insert_into(type(data), policy='REPLACE').submit([data])
 
     def update_data(self, data: DataBaseType, *args: str):
         """
@@ -332,11 +324,11 @@ class RSCDatabase(sqlp.Database):
         """
         table = type(data)
 
-        primary = [it.name for it in sqlp.table_primary_fields(table)]
+        primary = [it.name for it in sqlclz.table_primary_fields(table)]
 
         if len(args) == 0:
             args = []
-            for field in sqlp.table_fields(table):
+            for field in sqlclz.table_fields(table):
                 if field.name not in primary and not field.not_null and getattr(data, field.name) is not None:
                     args.append(field.name)
         elif len(ill := [it for it in args if it in primary]):
@@ -347,7 +339,7 @@ class RSCDatabase(sqlp.Database):
             with self.open_connection():
                 where = [getattr(table, f) == getattr(data, f) for f in primary]
                 update = [getattr(table, f) == getattr(data, f) for f in args]
-                sqlp.update(table, *update).where(*where).submit()
+                sqlclz.update(table, *update).where(*where).submit()
 
     @overload
     def get_data(self, db: Type[DataBaseType], *,
