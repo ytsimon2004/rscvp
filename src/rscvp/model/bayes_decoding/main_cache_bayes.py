@@ -225,7 +225,7 @@ class BayesDecodeCache(ETLConcatable):
 
     @classmethod
     def concat_etl(cls, data: list[BayesDecodeCache]) -> BayesDecodeCache:
-        validate_concat_etl_persistence(data, ('exp_date', 'animal', 'session', 'window', 'signal_type'))
+        validate_concat_etl_persistence(data, ('exp_date', 'animal', 'session', 'signal_type'))
 
         n_planes = len(data)
 
@@ -393,8 +393,6 @@ class BayesDecodeCacheBuilder(AbstractParser,
         self.image_time = image_time[self.image_mask]
 
     def empty_cache(self) -> BayesDecodeCache:
-        self.setattr()
-
         return BayesDecodeCache(
             exp_date=self.exp_date,
             animal=self.animal_id,
@@ -424,6 +422,8 @@ class BayesDecodeCacheBuilder(AbstractParser,
         return len(self._selected_neurons)
 
     def compute_cache(self, cache: BayesDecodeCache) -> BayesDecodeCache:
+        self.setattr()
+
         cache.neuron_idx = self.select_neurons_handler
         cache.src_neuron_idx = self.get_neuron_plane_idx(self.n_selected_neurons, self.plane_index)
 

@@ -2,11 +2,11 @@ from pathlib import Path
 from typing import Type
 
 import polars as pl
-from rscvp.util.database import RSCDatabase, PhysiologyDB, GenericDB, BayesDecodeDB, VisualSFTFDirDB, DataBaseType
 
+import sqlclz
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
-from neuralib import sqlp
+from rscvp.util.database import RSCDatabase, PhysiologyDB, GenericDB, BayesDecodeDB, VisualSFTFDirDB, DataBaseType
 
 __all__ = ['DatabaseViewOptions']
 
@@ -28,7 +28,7 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
     @dispatch('test-init')
     def init_database_examples(self):
         with self.open_connection():
-            sqlp.insert_into(PhysiologyDB).submit([
+            sqlclz.insert_into(PhysiologyDB).submit([
                 PhysiologyDB('210315', 'YW006', '2P', 'YW', '0'),
                 PhysiologyDB('210315', 'YW006', '2P', 'YW', 'all'),
                 PhysiologyDB('210401', 'YW006', '2P', 'YW', '0'),
@@ -58,7 +58,7 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
             k, _, v = arg.partition('=')
             kwargs[k] = v
         results = super().find_physiological_data(**kwargs)
-        sqlp.util.rich_sql_table(PhysiologyDB, results)
+        sqlclz.util.rich_sql_table(PhysiologyDB, results)
 
     @dispatch('import')
     def import_new_animal_from_directory(self, root: str):
@@ -66,7 +66,7 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
 
     @dispatch('diagram')
     def show_database_diagram(self, output_file: str = None):
-        from neuralib.sqlp.dot import generate_dot
+        from sqlclz.dot import generate_dot
         ret = generate_dot(self, output_file)
         if ret is not None:
             print(ret)
@@ -132,7 +132,7 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
         with self.open_connection():
             for src in sources:
                 results.extend(self.select_foreign_from_source(db, src).fetchall())
-            sqlp.util.rich_sql_table(db, results)
+            sqlclz.util.rich_sql_table(db, results)
 
 
 if __name__ == '__main__':

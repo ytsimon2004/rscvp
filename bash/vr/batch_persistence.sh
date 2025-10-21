@@ -6,12 +6,10 @@
 
 
 python -m rscvp.statistic.persistence_agg.main_trial_avg_position \
-  -D 250916,250918 \
-  -A YW102,YW071 \
-  -P , \
+  -D 250916,250918,251018 \
+  -A YW102,YW071,YW109 \
+  -P ,, \
   --region aRSC,aRSC \
-  --group \
-  --as-group 0,0 \
   --session close \
   --used_session close \
   --sort close \
@@ -21,12 +19,10 @@ python -m rscvp.statistic.persistence_agg.main_trial_avg_position \
 
 
 python -m rscvp.statistic.persistence_agg.main_trial_avg_position \
-  -D 250917,250919 \
-  -A YW102,YW071 \
-  -P , \
+  -D 250917,250919,251019 \
+  -A YW102,YW071,YW109 \
+  -P ,, \
   --region pRSC,pRSC \
-  --group \
-  --as-group 0,0 \
   --session close \
   --used_session close \
   --sort close \
