@@ -67,8 +67,10 @@ class PlaceFieldResult(NamedTuple):
         :return: ``PlaceFieldResult``
         """
         if len(self.pf) != 0:
-            ret = [it for it in self.pf if
-                   place_field_range[0] < self.bin_size * (it[1] - it[0]) < place_field_range[1]]
+            ret = [
+                it for it in self.pf
+                if place_field_range[0] < self.bin_size * (it[1] - it[0]) < place_field_range[1]
+            ]
         else:
             ret = []
         return self._replace(pf=ret)
@@ -88,6 +90,30 @@ class PlaceFieldResult(NamedTuple):
         x = [r > at_least for r in reliability]
         return self._replace(pf=list(pf[x]))
 
+    def with_peak_filter(self, greater_than: float | None, less_than: float | None) -> Self:
+        """
+        Peak location filter
+
+        :param greater_than: If provided, only include peaks greater than this value
+        :param less_than: If provided, only include peaks less than this value
+        :return:
+        """
+        if len(self.pf) != 0:
+            ret = []
+            peaks = self.pf_peak
+            for pf, peak in zip(self.pf, peaks):
+
+                if greater_than is not None and peak < greater_than:
+                    continue
+                if less_than is not None and peak > less_than:
+                    continue
+
+                ret.append(pf)
+        else:
+            ret = []
+
+        return self._replace(pf=ret)
+
 
 class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, PlotOptions):
     DESCRIPTION = 'Place field properties calculations, including place field width, peak location, numbers'
@@ -96,6 +122,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, Plo
         '--pf_range',
         type=int_tuple_type,
         default=(15, 120),
+        help='place field width considered range in cm',
     )
 
     peak_baseline_thres: float = argument(
@@ -110,6 +137,18 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, Plo
         metavar='VALUE',
         default=0.33,
         help='fraction of the trials presented the place field activity'
+    )
+
+    peak_lt: float | None = argument(
+        '--peak-lt',
+        default=None,
+        help='place field peak location less than this value'
+    )
+
+    peak_gt: float | None = argument(
+        '--peak-gt',
+        default=None,
+        help='place field peak location greater than this value'
     )
 
     signal_type: SIGNAL_TYPE = 'spks'
@@ -252,8 +291,10 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, Plo
                     float(np.mean([np.any(sig[i, p] > pf_result.threshold) for i in range(n_trials)]))
                     for p in peak
                 ]
-
                 pf_result = pf_result.with_reliability_filter(pf_reliability, at_least=self.reliability_threshold)
+
+                # peak filter
+                pf_result = pf_result.with_peak_filter(self.peak_gt, self.peak_lt)
 
                 #
                 csv(
@@ -267,7 +308,7 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, Plo
                 )
 
                 with plot_figure(output.figure_output(neuron)) as ax:
-                    plot_place_field(ax, pf_result, self.pos_bins, self.signal_type)
+                    plot_place_field(ax, pf_result, self.pos_bins, self.track_length, self.signal_type)
 
 
 def calc_place_field(signal: np.ndarray,
@@ -344,10 +385,11 @@ def calc_place_field(signal: np.ndarray,
 
 def plot_place_field(ax: Axes,
                      pf_result: PlaceFieldResult,
-                     window: int = 100,
+                     nbins: int = 100,
+                     track_length: int = 150,
                      act_type: SIGNAL_TYPE = 'spks'):
     """plot the place field for individual neurons"""
-    ax.plot(np.linspace(0, 150, window), pf_result.act, color='k', label='mean_act')
+    ax.plot(np.linspace(0, track_length, nbins), pf_result.act, color='k', label='mean_act')
     ax.axhline(pf_result.threshold, color='r', label='threshold')
     ax.axhline(pf_result.baseline, color='b', ls='--', label='baseline')
     ax.set_title(f'width: {pf_result.pf_width} \n n_pf: {pf_result.n_pf}, pf_peak: {pf_result.pf_peak}')
