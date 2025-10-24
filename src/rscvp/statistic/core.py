@@ -455,7 +455,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
         #
         if with_bar:
             import seaborn as sns
-            sns.barplot(data=[value_a, value_b], errorbar=errorbar)
+            sns.barplot(data=[value_a, value_b], errorbar=errorbar, ax=ax)
 
         ax.set_title(f'{name}\np = {p}', fontstyle='italic')
         ax.set_xticks([0, 1])

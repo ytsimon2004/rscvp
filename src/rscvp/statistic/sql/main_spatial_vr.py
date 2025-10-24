@@ -44,7 +44,7 @@ class SpatialFractionVRStat(StatPipeline):
         value_a = df.filter(pl.col('region') == 'aRSC')['fraction'].to_numpy()
         value_b = df.filter(pl.col('region') == 'pRSC')['fraction'].to_numpy()
 
-        self.plot_connect_datapoints(ax, value_a, value_b, with_bar=False)
+        self.plot_connect_datapoints(ax, value_a, value_b, with_bar=True)
 
     def plot_pie(self, axes: AxesArray):
         for i, df in enumerate(self.df.partition_by('region')):
