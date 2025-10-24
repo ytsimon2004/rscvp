@@ -8,7 +8,7 @@ from rscvp.util.cli.cli_output import DataOutput
 __all__ = ['AlignPeakMapOptions']
 
 
-class AlignPeakMapOptions(AbstractParser, ApplyPosBinCache, ApplyAlignPeakCache):
+class AlignPeakMapOptions(AbstractParser, ApplyAlignPeakCache, ApplyPosBinCache):
     DESCRIPTION = 'Plot aligned place field location map based on spatial information'
 
     def run(self):

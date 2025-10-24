@@ -303,7 +303,7 @@ class TestAtlasModule(unittest.TestCase):
     def test_roi_view_hist(self, *args):
         class Opt(RoisViewOptions):
             animal = 'YW043'
-            dispatch_plot = 'histogram'
+            dispatch_plot = 'hist'
             area = 'VIS'
             debug_mode = True
 

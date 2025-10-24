@@ -107,7 +107,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             debug_mode = True
 
         check_attr(Opt, DecodeAnalysisOptions)
-        Opt().main()
+        Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_bayes_median_position_bins_error(self, *args):
@@ -127,7 +127,7 @@ class TestPositionDecodeModule(unittest.TestCase):
             debug_mode = True
 
         check_attr(Opt, DecodeAnalysisOptions)
-        Opt().main()
+        Opt().main([])
 
 
 # ====================== #
@@ -154,7 +154,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             debug_mode = True
 
         check_attr(Opt, BayesDecodePersistenceAgg)
-        Opt().main()
+        Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_bayes_persistence_agg_group_cmtx(self, *args):
@@ -175,7 +175,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             debug_mode = True
 
         check_attr(Opt, BayesDecodePersistenceAgg)
-        Opt().main()
+        Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_bayes_persistence_agg_pb(self, *args):
@@ -194,7 +194,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             debug_mode = True
 
         check_attr(Opt, BayesDecodePersistenceAgg)
-        Opt().main()
+        Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_bayes_persistence_agg_group_pb(self, *args):
@@ -215,7 +215,7 @@ class TestPositionDecodeBatchModule(unittest.TestCase):
             debug_mode = True
 
         check_attr(Opt, BayesDecodePersistenceAgg)
-        Opt().main()
+        Opt().main([])
 
 
 if __name__ == '__main__':

@@ -35,7 +35,7 @@ class TopoCellTypePersistenceAgg(AbstractPersistenceAgg, CellTypeSelectionOption
         for _ in self.foreach_dataset(**self.field):
             name = f'{self.exp_date}_{self.animal_id}'
             region = dy[name]
-            ret[region].append(get_options_and_cache(CellTypeCordCacheBuilder, self, error_when_missing=True))
+            ret[region].append(get_options_and_cache(CellTypeCordCacheBuilder, self, error_when_missing=False))
 
         return ret
 

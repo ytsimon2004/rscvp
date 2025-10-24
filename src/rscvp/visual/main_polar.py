@@ -314,11 +314,7 @@ def _plot_polar(ax: Axes,
     ax.set_title(f'p_ori: {p_ori}° \n OSI: {osi} \n DSI: {dsi}', fontsize=8)
 
 
-# ============ #
-# Summary Plot #
-# ============ #
-
-def plot_osi_dsi_all(ax: Axes,
+def plot_osi_dsi_all(ax: AxesArray,
                      p_dsi: np.ndarray,
                      p_osi: np.ndarray,
                      dire: np.ndarray,

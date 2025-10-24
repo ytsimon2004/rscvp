@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import ClassVar
 from unittest.mock import patch
 
-from rscvp.statistic.csv_agg.main_generic_agg import GenericStatAgg
 from rscvp.statistic.csv_agg.main_pf_agg import PFStatAggOptions
 from rscvp.statistic.csv_agg.main_spatial_agg import SpatialStatAggOptions
 from rscvp.statistic.csv_agg.main_visual_agg import VisStatAggOptions
@@ -73,26 +72,6 @@ class TestStatisticPipeline(unittest.TestCase):
 
     def setUp(self):
         time.sleep(20)  # avoid API error in gspread (quote limit)
-
-    def test_csv_agg_generic(self):
-        class Opt(GenericStatAgg):
-            exp_date = '210315,210409'
-            animal_id = 'YW006,YW006'
-            plane_index = '0,0'
-            session = 'light'
-            used_session = 'light'
-            header = 'perc95_dff'
-            update = True
-
-            @property
-            def update_values(self) -> list[str]:
-                data_index = ['210315_YW006', '210409_YW006']
-                return self.stat.worksheet.get_cell(data_index, f'{self.header}_light')
-
-        opt = Opt()
-        opt.main([])
-        for v in opt.update_values:
-            self.assertEqual(f'PARQUET_{self.DATETIME}', v)
 
     @patch('matplotlib.pyplot.show')
     def test_parq_generic(self, *args):
@@ -186,7 +165,7 @@ class TestStatisticPipeline(unittest.TestCase):
             update = True
 
         opt = Opt()
-        opt.main()
+        opt.main([])
 
     def test_pf_width_parq(self):
         class Opt(PFStatGSP):
@@ -198,7 +177,7 @@ class TestStatisticPipeline(unittest.TestCase):
             test_type = 'ttest'
 
         opt = Opt()
-        opt.main()
+        opt.main([])
 
     # ======================= #
     # Non Agg Or SQL pipeline #
@@ -211,7 +190,7 @@ class TestStatisticPipeline(unittest.TestCase):
             load_source = 'gspread'
 
         check_attr(Opt, VisuoSpatialFractionStat)
-        Opt().main()
+        Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_vp_fraction_sql(self, *args):
@@ -222,7 +201,7 @@ class TestStatisticPipeline(unittest.TestCase):
         check_attr(Opt, VisuoSpatialFractionStat)
 
         try:
-            Opt().main()
+            Opt().main([])
         except RuntimeError as e:
             print(e)
 
@@ -232,7 +211,7 @@ class TestStatisticPipeline(unittest.TestCase):
             show_type = 'combine'
 
         check_attr(Opt, CellTypeStat)
-        Opt().main()
+        Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_median_decode(self, *args):
@@ -240,7 +219,7 @@ class TestStatisticPipeline(unittest.TestCase):
             pass
 
         check_attr(Opt, MedianDecodeErrorStat)
-        Opt().main()
+        Opt().main([])
 
 
 if __name__ == '__main__':

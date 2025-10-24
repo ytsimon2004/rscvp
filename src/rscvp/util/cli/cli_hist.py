@@ -107,6 +107,10 @@ class HistOptions:
     def foreach_ccf_dir(self) -> Iterable[AbstractCCFDir]:
         """Generate :class:`~rscvp.atlas.dir.AbstractCCFDir` instances for each animal."""
         animals = self.animal
+
+        if isinstance(animals, str):
+            animals = (animals,)
+
         if not isinstance(animals, tuple):
             raise TypeError(f'animals should be tuple type: {type(animals)}')
 

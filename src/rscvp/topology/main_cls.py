@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_selection import SelectionOptions
 
 from argclz import AbstractParser, as_argument
 from neuralib.imaging.suite2p.plot import plot_soma_center
 from neuralib.imglib.color import grey2rgb
 from neuralib.imglib.norm import get_percentile_value
 from neuralib.plot import plot_figure
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_selection import SelectionOptions
 from .util_plot import plot_registered_fov
 
 __all__ = ['ClsTopoOptions']
@@ -26,10 +26,8 @@ class ClsTopoOptions(AbstractParser, SelectionOptions):
     pre_selection = True
     reuse_output = True
 
-    def post_parsing(self):
-        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-
     def run(self):
+        self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
         output_info = self.get_data_output('topo')
         self.visual_place_position(output_info)
 

@@ -165,9 +165,14 @@ class ApplyAlignPeakCache(AbstractAlignPeakOptions):
 
     def get_si_idx_cache(self, error_when_missing=False) -> SISortAlignPeakCache:
         if self.plane_index is not None:
-            return self._get_cache_single(error_when_missing)
+            cache = self._get_cache_single(error_when_missing)
         else:
-            return self._get_cache_concat(error_when_missing)
+            cache = self._get_cache_concat(error_when_missing)
+
+        if not isinstance(cache, SISortAlignPeakCache):
+            raise TypeError(f'unexpected cache type: {type(cache)}, check inheritance order')
+
+        return cache
 
     def _get_cache_single(self, error_when_missing):
         return get_options_and_cache(SISortAlignPeakCacheBuilder, self, error_when_missing)

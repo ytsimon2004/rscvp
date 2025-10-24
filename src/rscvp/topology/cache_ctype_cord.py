@@ -85,15 +85,13 @@ class CellTypeCordCacheBuilder(AbstractParser, SelectionOptions, SBXOptions, Per
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        self.s2p = self.load_suite_2p()
-        self.select_mask = self.get_selection_mask()
         cache = self.load_cache()
         output_file = self.get_data_output('topo').summary_figure_output('fraction')
         self.plot_cell_type_histogram(cache, output_file)
 
-    # ==== #
-    # Plot #
-    # ==== #
+    def set_attr(self):
+        self.s2p = self.load_suite_2p()
+        self.select_mask = self.get_selection_mask()
 
     def plot_cell_type_histogram(self, cache: CellTypeCordCache, output: Path):
         with plot_figure(output, 1, 2) as ax:
@@ -138,6 +136,8 @@ class CellTypeCordCacheBuilder(AbstractParser, SelectionOptions, SBXOptions, Per
         )
 
     def compute_cache(self, cache: CellTypeCordCache) -> CellTypeCordCache:
+        self.set_attr()
+
         cache.neuron_idx = np.nonzero(self.select_mask.pre_select_mask)[0]
         cache.ml = self.all_ml
         cache.ap = self.all_ap

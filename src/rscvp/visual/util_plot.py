@@ -10,9 +10,7 @@ __all__ = ['selective_pie',
            'mismatch_hist']
 
 
-def selective_pie(n: ArrayLike,
-                  labels: ArrayLikeStr,
-                  ax: Axes | None = None):
+def selective_pie(n: ArrayLike, labels: ArrayLikeStr, ax: Axes | None = None):
     """
     Plot orientation / direction selective cell proportion
 
@@ -26,7 +24,7 @@ def selective_pie(n: ArrayLike,
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.pie(n, explode=[0.05, 0.05, 0], labels=labels, autopct='%1.1f%%', startangle=90, radius=0.5)
+    ax.pie(n, explode=[0.05] * len(n), labels=labels, autopct='%1.1f%%', startangle=90, radius=0.5)
     ax.axis('equal')
 
 
