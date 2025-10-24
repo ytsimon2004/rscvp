@@ -68,3 +68,61 @@ visual_agg csv_agg.main_visual_agg \
 
 visual_agg csv_agg.main_visual_agg \
   -H ml_cords_scale
+
+
+# ------ Direction/Orientation Selective Index ------ #
+
+visual_agg csv_agg.main_visual_dir_agg \
+  -H dsi
+
+visual_agg csv_agg.main_visual_dir_gsp \
+  -H dsi \
+  --stat-test kstest
+
+visual_agg csv_agg.main_visual_dir_agg \
+  -H osi
+
+visual_agg csv_agg.main_visual_dir_gsp \
+  -H osi \
+  --stat-test kstest
+
+visual_agg csv_agg.main_visual_dir_agg \
+  -H pdir
+
+visual_agg csv_agg.main_visual_dir_gsp \
+  -H pdir \
+  --stat-test kstest
+
+visual_agg csv_agg.main_visual_dir_agg \
+  -H pori
+
+visual_agg csv_agg.main_visual_dir_gsp \
+  -H pori \
+  --stat-test kstest
+
+
+# ------ SF/TF groups ------ #
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H 'sftf_amp_0.04 1'
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H 'sftf_amp_0.04 4'
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H 'sftf_amp_0.08 1'
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H 'sftf_amp_0.08 4'
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H 'sftf_amp_0.16 1'
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H 'sftf_amp_0.16 4'
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H dff
+
+visual_agg csv_agg.main_visual_sftf_agg \
+  -H fraction
