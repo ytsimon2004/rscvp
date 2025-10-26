@@ -10,29 +10,52 @@
 
 ------------------------------
 
+## Analysis Workflow
+
+### Physiological dataset
+
+![physiological_data_analysis_workflow.png](docs/source/_static/physiological_data_analysis_workflow.png)
+
+### Histological dataset
+
+![histology_data_analysis_workflow.png](docs/source/_static/histology_data_analysis_workflow.png)
+
 ## How to set up in a local machine?
 
 ### 1. Clone or download the project locally
 
-### 2. Create conda environment
+### 2. Create uv or conda environment
+
+- uv (recommended)
 
 ```bash
-conda create -n rscvp python~=3.10.0 -y
-conda activate rscvp
+    # Create virtual environment
+    uv venv
+
+    # Activate environment
+    source .venv/bin/activate         # Linux/macOS
+    .venv\Scripts\activate           # Windows
+
+    # Install package in development mode
+    uv pip install -e .
 ```
 
-### 3. Install required packages
-
-- First `cd` to the directory with [pyproject.toml](pyproject.toml)
+- conda
 
 ```bash
-pip install -e .[all]
+    # Create conda environment with Python 3.12
+    conda create -n rscvp python=3.10 -y
+
+    # Activate environment
+    conda activate rscvp
+
+    # Install package in development mode
+    pip install -e .
 ```
 
 
 
 ## See the detail information and Demo in [documentation](https://rscvp.readthedocs.io/en/latest/)
-
 
 
 
