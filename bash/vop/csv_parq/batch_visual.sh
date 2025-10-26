@@ -75,28 +75,28 @@ visual_agg csv_agg.main_visual_agg \
 visual_agg csv_agg.main_visual_dir_agg \
   -H dsi
 
-visual_agg csv_agg.main_visual_dir_gsp \
+python -m rscvp.statistic.parq.main_visual_dir_gsp \
   -H dsi \
   --stat-test kstest
 
 visual_agg csv_agg.main_visual_dir_agg \
   -H osi
 
-visual_agg csv_agg.main_visual_dir_gsp \
+python -m rscvp.statistic.parq.main_visual_dir_gsp \
   -H osi \
   --stat-test kstest
 
 visual_agg csv_agg.main_visual_dir_agg \
   -H pdir
 
-visual_agg csv_agg.main_visual_dir_gsp \
+python -m rscvp.statistic.parq.main_visual_dir_gsp \
   -H pdir \
   --stat-test kstest
 
 visual_agg csv_agg.main_visual_dir_agg \
   -H pori
 
-visual_agg csv_agg.main_visual_dir_gsp \
+python -m rscvp.statistic.parq.main_visual_dir_gsp \
   -H pori \
   --stat-test kstest
 
