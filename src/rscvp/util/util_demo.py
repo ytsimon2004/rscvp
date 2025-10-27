@@ -2,11 +2,10 @@ import zipfile
 from pathlib import Path
 from typing import Type
 
+from argclz import AbstractParser
 from neuralib.util.tqdm import download_with_tqdm
 from neuralib.util.utils import ensure_dir
 from rscvp.util.io import RSCVP_CACHE_DIRECTORY
-
-from argclz import AbstractParser
 
 __all__ = [
     'mkdir_test_dataset',
@@ -21,7 +20,7 @@ def mkdir_test_dataset(token: str, force_download: bool = False) -> Path:
     if CACHED_DEMO_DATASET.exists() and not force_download:
         return CACHED_DEMO_DATASET
     else:
-        data_url = 'https://zenodo.org/records/15363378/files/rscvp_dataset.zip?token='
+        data_url = 'https://zenodo.org/records/17459811/files/rscvp_dataset.zip?token='
         data_url += token
 
         zip_stream = download_with_tqdm(data_url)
@@ -38,7 +37,8 @@ def clean_cache_dataset():
         shutil.rmtree(output_dir)
 
 
-def run_demo(cls: Type[AbstractParser], token: str, *,
+def run_demo(cls: Type[AbstractParser],
+             token: str, *,
              force_download: bool = False,
              clean_cached: bool = False):
     """
