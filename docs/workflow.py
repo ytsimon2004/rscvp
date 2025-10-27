@@ -80,4 +80,3 @@ def histology_workflow():
         registration >> atlas_module
 
 
-histology_workflow()

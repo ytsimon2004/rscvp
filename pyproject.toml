@@ -18,6 +18,7 @@ classifiers = [
 
 dependencies = [
     "argclz>=1.0.0",
+    "sqlclz>=0.0.1",
     "iblatlas>=0.9.0",
     "neura-library[atlas,imaging]",
     "scikit-learn>=1.7.0",
