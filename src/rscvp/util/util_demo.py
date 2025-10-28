@@ -39,7 +39,7 @@ def mkdir_test_dataset(token: str,
     if aria2:
         try:
             import subprocess
-            print('Using aria2c for fast download...')
+            print('Using aria2c for fast download data from zenodo ...')
             subprocess.run(
                 [
                     "aria2c", "-x", "16", "-s", "16", "-k", "1M",
@@ -54,7 +54,7 @@ def mkdir_test_dataset(token: str,
             aria2 = False
 
     if not aria2:
-        print("Downloading with Python (requests + tqdm)...")
+        print("Downloading data from zenodo ...")
         zip_stream: BytesIO = download_with_tqdm(data_url)
         with open(zip_path, "wb") as f:
             f.write(zip_stream.getbuffer())

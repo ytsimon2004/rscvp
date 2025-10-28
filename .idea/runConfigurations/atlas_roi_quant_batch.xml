@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.atlas.main_roi_quant_batch" />
-    <option name="PARAMETERS" value="-A YW043,YW051,YW063,YW064 --plot family_stacked --level 2 --norm channel --top 60 --area SS --debug" />
+    <option name="PARAMETERS" value="-A YW043,YW051,YW063,YW064 --plot bias_index --level 2 --norm channel --top 60 --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

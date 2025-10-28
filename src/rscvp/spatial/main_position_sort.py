@@ -107,7 +107,7 @@ class PositionSortOptions(AbstractParser, ApplyPosBinCache, ApplySortIdxCache):
             self.use_trial
         )
 
-        with plot_figure(output_file, 3, 1, figsize=(6, 12)) as _ax:
+        with plot_figure(output_file, 3, 1, figsize=(4, 8)) as _ax:
             ax = ax_merge(_ax)[:2]
             plot_sorted_trial_averaged_heatmap(
                 signal,

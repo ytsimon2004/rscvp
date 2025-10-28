@@ -8,13 +8,14 @@ from argclz.dispatch import Dispatch, dispatch
 from neuralib.atlas.ccf import ROIS_NORM_TYPE
 from neuralib.atlas.typing import Area, TreeLevel
 from neuralib.plot import plot_figure, dotplot
-from neuralib.util.verbose import printdf, fprint
+from neuralib.util.verbose import printdf, fprint, publish_annotation
 from rscvp.atlas.util_plot import DEFAULT_AREA_SORT
 from rscvp.util.cli import HistOptions, ROIOptions
 
 __all__ = ['RoiQueryBatchOptions']
 
 
+@publish_annotation('main', project='rscvp', figure=['fig.7E', 'fig.8A-8B'], caption='@dispatch(hbar)', as_doc=True)
 class RoiQueryBatchOptions(AbstractParser, ROIOptions, Dispatch):
     DESCRIPTION = 'Dotplot for subareas from a single area (foreach channel, animal)'
 

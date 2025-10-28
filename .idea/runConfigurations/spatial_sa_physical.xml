@@ -23,8 +23,8 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="rscvp.spatial.main_belt_sort" />
-    <option name="PARAMETERS" value="-D 211209 -A YW022 -t light-even --sort light-odd --us light -c slb --debug --signal spks --disk BigDATA --mount /Volumes" />
+    <option name="SCRIPT_NAME" value="rscvp.spatial.main_position_sort" />
+    <option name="PARAMETERS" value="-D 210315 -A YW006 -P 0 -t light-even --us light -c slb --debug --signal spks" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

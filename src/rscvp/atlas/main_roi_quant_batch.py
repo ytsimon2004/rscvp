@@ -25,7 +25,7 @@ __all__ = ['RoiQuantBatchOptions']
 
 @publish_annotation('main',
                     project='rscvp',
-                    figure=['fig.6F', 'fig.6H', 'fig.7A-G bar', 'fig.7H'],
+                    figure=['fig.6F', 'fig.6H', 'fig.7A-7E', 'fig.8D'],
                     as_doc=True)
 class RoiQuantBatchOptions(AbstractParser, ROIOptions, PlotOptions, Dispatch):
     """ROIs analysis for batch animals, see ``@dispatch(...) on method`` for different plot types"""

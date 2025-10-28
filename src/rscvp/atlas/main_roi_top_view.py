@@ -58,12 +58,16 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
     def run(self):
         self.setup_logger(Path(__file__).name)
         df = self.get_roi_dataframe()
+        ibl = IBLAtlasPlotWrapper(res_um=10)
 
-        if self.as_histogram:
-            self.plot_top_view_histogram(df)
-        else:
-            lut = self._get_area_colormap_lut(df)
-            self.plot_top_view_scatter(df, lut, legend_number_limit=self.legend_number_limit)
+        try:
+            if self.as_histogram:
+                self.plot_top_view_histogram(df, ibl)
+            else:
+                lut = self._get_area_colormap_lut(df)
+                self.plot_top_view_scatter(df, lut, ibl, legend_number_limit=self.legend_number_limit)
+        finally:
+            del ibl
 
     @property
     def area_color_lut(self) -> Path:
@@ -106,14 +110,14 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
     # 2D histogram #
     # ============ #
 
-    def plot_top_view_histogram(self, df: pl.DataFrame, bin_size: int = 200):
+    def plot_top_view_histogram(self, df: pl.DataFrame, ibl: IBLAtlasPlotWrapper, bin_size: int = 200):
         """
         Plot the top view roi 2D histogram for each source, with the colormap lookup table for each area.
 
         :param df: ROI dataframe
+        :param ibl: IBLAtlasPlotWrapper instance
         :param bin_size: bin_size in um
         """
-        ibl = IBLAtlasPlotWrapper()
         source = df['source'].unique().to_list()
         lut = {'aRSC': 'YlOrBr', 'pRSC': 'RdPu', 'overlap': 'Greys'}
 
@@ -217,6 +221,7 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
 
     def plot_top_view_scatter(self, df: pl.DataFrame,
                               colormap_lut: dict[Area, str],
+                              ibl: IBLAtlasPlotWrapper,
                               with_legend: bool = True,
                               legend_number_limit: int | None = None):
         """
@@ -224,11 +229,11 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
 
         :param df: ROI dataframe
         :param colormap_lut: brain area:color dict
+        :param ibl: IBLAtlasPlotWrapper instance
         :param with_legend: with legend or not, default True
         :param legend_number_limit: number of roi should larger than how many, then show in legend. If None then show all.
         """
 
-        ibl = IBLAtlasPlotWrapper()
         source = df['source'].unique().to_list()
 
         with plot_figure(None, 3, 3, figsize=(12, 9), sharex=True, sharey=True, dpi=800) as _ax:  # type: AxesArray

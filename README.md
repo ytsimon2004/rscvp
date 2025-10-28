@@ -10,15 +10,7 @@
 
 ------------------------------
 
-## Analysis Workflow
-
-### Physiological dataset
-
-![physiological_data_analysis_workflow.png](docs/source/_static/physiological_data_analysis_workflow.png)
-
-### Histological dataset
-
-![histology_data_analysis_workflow.png](docs/source/_static/histology_data_analysis_workflow.png)
+## See the detail information in [documentation](https://rscvp.readthedocs.io/en/latest/)
 
 ## How to set up in a local machine?
 
@@ -53,11 +45,15 @@
     pip install -e .
 ```
 
+## Run Example in Google Colab
 
+### Physiology Dataset
 
-## See the detail information and Demo in [documentation](https://rscvp.readthedocs.io/en/latest/)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/19CfLB2izsMFZvaanJwkDSIzG8LZNhoAh#scrollTo=VIPD4N6zjWh-)
 
+### Histology Dataset
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Xf8Ukc0PwpyllUyZtD6zhQgzJT40XmQo#scrollTo=_N-nXAvsbVxN)
 
 ## Annotation for published figures in the source code
 
@@ -83,7 +79,15 @@ class FigureClass:
 
 ```
 
+## Analysis Workflow
 
+### Physiological dataset
+
+![physiological_data_analysis_workflow.png](docs/source/_static/physiological_data_analysis_workflow.png)
+
+### Histological dataset
+
+![histology_data_analysis_workflow.png](docs/source/_static/histology_data_analysis_workflow.png)
 
 ## Contact
 
