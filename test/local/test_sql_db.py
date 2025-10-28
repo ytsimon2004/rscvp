@@ -101,7 +101,7 @@ class TestSQLPopulate(unittest.TestCase):
             used_session = 'light'
             db_debug_mode = True
             db_commit = True
-            batch_type = 'fraction'
+            summary_type = 'fraction'
 
         check_attr(Opt, VisualSFTFPrefOptions)
         Opt().main([])
@@ -115,7 +115,7 @@ class TestSQLPopulate(unittest.TestCase):
             used_session = 'light'
             db_debug_mode = True
             db_commit = True
-            batch_type = 'dff'
+            summary_type = 'dff'
 
         check_attr(Opt, VisualSFTFPrefOptions)
         Opt().main([])

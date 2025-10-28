@@ -120,8 +120,7 @@ class VisualPolarOptions(AbstractParser, SelectionOptions, BaseVisPolarOptions, 
 
                 coll = SFTFDirCollections(grating, signal, image_time)
 
-                ret = plot_sftf_dir_polar(coll,
-                                          polar_style=self.polar_style,
+                ret = plot_sftf_dir_polar(coll, polar_style=self.polar_style,
                                           output_file=output.figure_output(neuron_id))
                 csv(neuron_id, *ret)
 
@@ -160,7 +159,8 @@ class VisualPolarOptions(AbstractParser, SelectionOptions, BaseVisPolarOptions, 
         omx = vp.pref_osi >= self.selective_thres
 
         # database
-        self.populate_database(dmx, omx)
+        if not self.db_debug_mode:
+            self.populate_database(dmx, omx)
 
         dire = vp.pref_dir[dmx]
         ori = vp.pref_ori[omx]
@@ -230,7 +230,7 @@ def plot_sftf_dir_polar(coll: SFTFDirCollections,
                      subplot_kw=dict(polar=True)) as ax:
         _plot_sftf_dir_polar(ax, coll, polar_style)
         fig = plt.gcf()
-        fig.suptitle(f'preferred sftf: {coll.pref_sftf}')
+        fig.suptitle(f'preferred sftf: {list(map(float, coll.pref_sftf))}')
         fig.supxlabel(f'SF: {grating.sf_set}')
         fig.supylabel(f'TF: {grating.tf_set}')
 

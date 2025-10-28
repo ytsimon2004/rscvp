@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import polars as pl
 from matplotlib.axes import Axes
-from polars.polars import ColumnNotFoundError
+from polars.exceptions import ColumnNotFoundError
 from rich.pretty import pprint
 from scipy.stats import wilcoxon, mannwhitneyu
 

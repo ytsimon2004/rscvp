@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.visual.main_sftf_pref" />
-    <option name="PARAMETERS" value="-D 211202 -A YW022 -P 0 --used_session light --re --debug --disk BigDATA" />
+    <option name="PARAMETERS" value="-D 210315 -A YW006 -P 0 --used_session light --re --debug --summary fraction --db-debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

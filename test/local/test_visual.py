@@ -85,7 +85,7 @@ class TestVisualModule(unittest.TestCase):
             animal_id = 'YW006'
             plane_index = 0
             used_session = 'light'
-            batch_type = 'dff'
+            summary_type = 'dff'
 
         check_attr(Opt, VisualSFTFPrefOptions)
         Opt().main([])
@@ -95,7 +95,7 @@ class TestVisualModule(unittest.TestCase):
             animal_id = 'YW006'
             plane_index = 0
             used_session = 'light'
-            batch_type = 'fraction'
+            summary_type = 'fraction'
 
         check_attr(Opt, VisualSFTFPrefOptions)
         Opt().main([])

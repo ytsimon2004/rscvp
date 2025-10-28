@@ -31,8 +31,8 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
         help='pick up maximal resp. if not, do the resp. average toward all the direction',
     )
 
-    batch_type: Literal['dff', 'fraction'] | None = argument(
-        '--batch', '--summary',
+    summary_type: Literal['dff', 'fraction'] | None = argument(
+        '--summary',
         default=None,
         help='plot summary from population neurons'
     )
@@ -42,7 +42,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
     def post_parsing(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        if self.batch_type is not None:
+        if self.summary_type is not None:
             self.pre_selection = True
             self.vc_selection = 0.3
             self.reuse_output = True
@@ -54,7 +54,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
         pattern = GratingPattern.of(riglog)
         output_info = self.get_data_output('st')
 
-        match self.batch_type:
+        match self.summary_type:
             case 'dff':
                 self.plot_dff_all(pattern, output_info)
             case 'fraction':
@@ -62,7 +62,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
             case None:
                 self.foreach_sftf_preference(pattern, self.neuron_id, output_info)
             case _:
-                raise ValueError(f'{self.batch_type} unknown')
+                raise ValueError(f'{self.summary_type} unknown')
 
     def foreach_sftf_preference(self, para: GratingPattern, neuron_ids: NeuronID, output: DataOutput):
         """
@@ -165,7 +165,9 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
 
         tmp = pl.DataFrame(dy, strict=False)
         tmp.write_csv(output.mk_subdir('tmp', 'preferred_sftf_fraction', '.csv'))
-        self.populate_database(tmp)
+
+        if not self.db_debug_mode:
+            self.populate_database(tmp)
 
         #
         output_file = output.summary_figure_output(
@@ -197,16 +199,16 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
     def populate_database(self, df: pl.DataFrame) -> None:
         region = self.get_primary_key_field('region') if self.rec_region is None else self.rec_region
 
-        sftf = list(df.row(by_predicate=pl.col('index') == self.batch_type)[1:])
+        sftf = list(df.row(by_predicate=pl.col('index') == self.summary_type)[1:])
 
         update_fields = dict(update_time=self.cur_time)
 
-        if self.batch_type == 'fraction':
+        if self.summary_type == 'fraction':
             kwargs = {f'sftf_frac_group{i + 1}': sftf[i] for i in range(len(sftf))}
-        elif self.batch_type == 'dff':
+        elif self.summary_type == 'dff':
             kwargs = {f'sftf_amp_group{i + 1}': sftf[i] for i in range(len(sftf))}
         else:
-            raise ValueError(f'{self.batch_type}')
+            raise ValueError(f'{self.summary_type}')
 
         update_fields = {**update_fields, **kwargs}
 
