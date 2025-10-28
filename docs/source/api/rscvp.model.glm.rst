@@ -8,5 +8,4 @@ rscvp.model.glm
     :maxdepth: 1
     :caption: Modules:
 
-    rscvp.model.glm.input
     rscvp.model.glm.main_eval

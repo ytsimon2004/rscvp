@@ -11,7 +11,9 @@ rscvp.util.database
    DataBaseType
    PhysiologyDB
    GenericDB
+   DarknessGenericDB
+   BlankBeltGenericDB
+   VRGenericDB
    BayesDecodeDB
    VisualSFTFDirDB
-   DarknessGenericDB
    RSCDatabase

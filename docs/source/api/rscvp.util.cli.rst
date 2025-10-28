@@ -9,6 +9,7 @@ rscvp.util.cli
     :caption: Modules:
 
     rscvp.util.cli.cli_camera
+    rscvp.util.cli.cli_ccf
     rscvp.util.cli.cli_celltype
     rscvp.util.cli.cli_core
     rscvp.util.cli.cli_dbview

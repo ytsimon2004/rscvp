@@ -10,6 +10,7 @@ rscvp.statistic.parq
 
     rscvp.statistic.parq.main_generic_gsp
     rscvp.statistic.parq.main_pf_gsp
+    rscvp.statistic.parq.main_speed_gsp
     rscvp.statistic.parq.main_topo_3d
     rscvp.statistic.parq.main_topo_metric_gsp
     rscvp.statistic.parq.main_value_gsp

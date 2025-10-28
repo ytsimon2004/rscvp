@@ -10,3 +10,4 @@ rscvp.statistic.core
    StatPipeline
    print_pkl
    print_var
+   pval_verbose

@@ -30,9 +30,7 @@
       <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/src/neura_library.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/doc/source/api/_autosummary" />
     </content>
-    <content url="file://$MODULE_DIR$/../sqlclz">
-      <sourceFolder url="file://$MODULE_DIR$/../sqlclz/src" isTestSource="false" />
-    </content>
+    <content url="file://$MODULE_DIR$/../sqlclz" />
     <content url="file://$MODULE_DIR$/../stimpyp">
       <sourceFolder url="file://$MODULE_DIR$/../stimpyp/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../stimpyp/test" isTestSource="true" />

@@ -16,3 +16,4 @@ rscvp.spatial.util
    sort_neuron
    PositionSignal
    normalized_trial_avg
+   get_remap_dataframe

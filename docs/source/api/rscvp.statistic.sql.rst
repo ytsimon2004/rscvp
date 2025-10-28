@@ -12,7 +12,9 @@ rscvp.statistic.sql
     rscvp.statistic.sql.main_decode_err
     rscvp.statistic.sql.main_osds_pie
     rscvp.statistic.sql.main_push_gspread
-    rscvp.statistic.sql.main_spatial_frac_ldl
+    rscvp.statistic.sql.main_spatial_blank
+    rscvp.statistic.sql.main_spatial_dark
+    rscvp.statistic.sql.main_spatial_vr
     rscvp.statistic.sql.main_visual_sftf
     rscvp.statistic.sql.main_vp_fraction
     rscvp.statistic.sql.util

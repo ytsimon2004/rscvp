@@ -9,3 +9,4 @@ rscvp.visual.util_plot
 
    selective_pie
    dir_hist
+   mismatch_hist

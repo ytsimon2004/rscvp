@@ -7,4 +7,4 @@ rscvp.statistic.sql.main_vp_fraction
    :toctree: _autosummary
    :nosignatures:
 
-   VisSpaFracStat
+   VisuoSpatialFractionStat

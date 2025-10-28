@@ -55,18 +55,19 @@ If you prefer using Conda for environment management:
 Analysis Workflow
 -------------------------
 
-- physiology data
+Physiological dataset
+^^^^^^^^^^^^^^^^^^^^^^
 
 |phys workflow|
 
-- anatomy (histology) data
+Anatomical dataset
+^^^^^^^^^^^^^^^^^^^^^^
 
 |hist workflow|
 
 
-.. |phys workflow|:: ../_static/physiological_data_analysis_workflow.png
-.. |hist workflow|:: ../_static/histology_data_analysis_workflow.png
-
+.. |phys workflow| image:: _static/physiological_data_analysis_workflow.png
+.. |hist workflow| image:: _static/histology_data_analysis_workflow.png
 
 
 Data Structure

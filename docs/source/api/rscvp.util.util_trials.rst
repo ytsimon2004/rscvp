@@ -7,6 +7,7 @@ rscvp.util.util_trials
    :toctree: _autosummary
    :nosignatures:
 
+   TRIAL_CV_TYPE
    TrialSelection
    TrialSignal
-   foreach_session_signals
+   signal_trial_cv_helper

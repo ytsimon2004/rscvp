@@ -9,5 +9,5 @@ rscvp.spatial.main_cache_occ
 
    PosBinActCache
    PosBinActCacheBuilder
-   ApplyPosBinActOptions
+   ApplyPosBinCache
    AbstractPosBinActOptions

@@ -8,7 +8,7 @@ rscvp.topology.util_plot
    :nosignatures:
 
    Metric
-   TopoPlotArgs
    AbstractTopoPlotOptions
    plot_topo_variable
+   plot_topo_histogram
    plot_registered_fov

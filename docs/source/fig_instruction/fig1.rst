@@ -1,5 +1,6 @@
 Figure 1
 ==========
+Experimental paradigm for studying functional gradients and long-range connectivity in mouse retrosplenial cortex
 
 figure 1A
 --------------------------

@@ -8,4 +8,4 @@ rscvp.visual.main_tuning
    :nosignatures:
 
    VisualTuningOptions
-   ApplyVisualActOptions
+   ApplyVisualActCache

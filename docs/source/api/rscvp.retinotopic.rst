@@ -9,5 +9,6 @@ rscvp.retinotopic
     :caption: Modules:
 
     rscvp.retinotopic.cache_retinotopic
+    rscvp.retinotopic.main_density
     rscvp.retinotopic.main_retinotopic_map
     rscvp.retinotopic.util

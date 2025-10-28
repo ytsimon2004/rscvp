@@ -11,7 +11,6 @@ rscvp.behavioral.util_plot
    plot_velocity_line
    plot_peri_reward_lick_raster
    plot_peri_reward_lick_hist
-   plot_peri_reward_velocity
    plot_lap_time_interval
    plot_position_and_event_raster
    plot_value_time

@@ -19,5 +19,7 @@ rscvp.atlas
     rscvp.atlas.main_roi_top_view
     rscvp.atlas.main_roi_view
     rscvp.atlas.main_slice
+    rscvp.atlas.main_slice_expr
+    rscvp.atlas.main_slice_transform
     rscvp.atlas.main_ternary
     rscvp.atlas.util_plot

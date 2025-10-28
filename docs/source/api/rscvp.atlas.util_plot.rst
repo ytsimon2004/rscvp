@@ -7,6 +7,7 @@ rscvp.atlas.util_plot
    :toctree: _autosummary
    :nosignatures:
 
+   DEFAULT_AREA_SORT
    plot_categorical_region
    plot_rois_bar
    plot_foreach_channel_pie

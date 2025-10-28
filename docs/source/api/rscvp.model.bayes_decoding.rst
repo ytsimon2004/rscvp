@@ -8,7 +8,7 @@ rscvp.model.bayes_decoding
     :maxdepth: 1
     :caption: Modules:
 
-    rscvp.model.bayes_decoding.cache_bayes
+    rscvp.model.bayes_decoding.main_cache_bayes
     rscvp.model.bayes_decoding.main_decode_analysis
     rscvp.model.bayes_decoding.main_disengagement
     rscvp.model.bayes_decoding.main_posdc_cache

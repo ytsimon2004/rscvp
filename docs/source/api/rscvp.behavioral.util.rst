@@ -7,6 +7,4 @@ rscvp.behavioral.util
    :toctree: _autosummary
    :nosignatures:
 
-   get_velocity_per_trial
-   peri_reward_velocity
-   check_treadmill_trials
+   get_binned_velocity
