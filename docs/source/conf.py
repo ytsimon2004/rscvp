@@ -2,6 +2,13 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('../../src'))
+import traceback
+
+try:
+    import rscvp.util.cli
+except Exception as e:
+    print("####### Import of rscvp.util.cli failed:", e)
+    traceback.print_exc()
 
 # Configuration file for the Sphinx documentation builder.
 #
