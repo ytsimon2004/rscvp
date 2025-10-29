@@ -1,7 +1,7 @@
 version: 2
 
 sphinx:
-  configuration: docs/sources/conf.py
+  configuration: docs/source/conf.py
 
 build:
   os: ubuntu-24.04
@@ -15,4 +15,4 @@ build:
     create_environment:
       - uv venv "${READTHEDOCS_VIRTUALENV_PATH}"
     install:
-      - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --frozen --group doc
+      - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv pip install ".[doc]"
