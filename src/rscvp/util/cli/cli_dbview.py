@@ -101,6 +101,11 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
         data = super().find_physiological_data(**kwargs)
         self.show_foreign_db(data, VisualSFTFDirDB)
 
+    @dispatch('diagram')
+    def show_database_diagram(self, output_file: str = None):
+        from sqlclz.diagram import generate_diagram
+        generate_diagram(self.database_file)
+
     def show_foreign_db(self, sources: list[PhysiologyDB], db: Type[DataBaseType]) -> None:
         if self.show_rich_table:
             self._show_foreign_db_rich(sources, db)

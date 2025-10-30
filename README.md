@@ -35,7 +35,7 @@
 - conda
 
 ```bash
-    # Create conda environment with Python 3.12
+    # Create conda environment with Python 3.10
     conda create -n rscvp python=3.10 -y
 
     # Activate environment
