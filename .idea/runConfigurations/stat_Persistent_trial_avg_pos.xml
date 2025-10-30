@@ -23,8 +23,9 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
+    <option name="RUN_TOOL" value="true" />
     <option name="SCRIPT_NAME" value="rscvp.statistic.persistence_agg.main_trial_avg_position" />
-    <option name="PARAMETERS" value="-D 210315,210401 -A YW006,YW006 --session light -P 0,0 --used_session light" />
+    <option name="PARAMETERS" value="-D 210315,210401 -A YW006,YW006 --session light -P 0,0 --used_session light --page ap_place --cv" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

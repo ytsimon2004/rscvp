@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Final
+from typing import Final, Literal
 
 import numpy as np
 
 from argclz import try_int_type, argument
 from neuralib.plot import plot_figure
-from neuralib.util.verbose import publish_annotation, fprint, print_load, print_save
+from neuralib.util.verbose import publish_annotation, print_load, print_save
 from rscvp.spatial.main_cache_occ import PosBinActCache, ApplyPosBinCache
 from rscvp.spatial.util import sort_neuron
 from rscvp.spatial.util_plot import plot_sorted_trial_averaged_heatmap
@@ -18,14 +18,15 @@ from stimpyp import Session
 __all__ = ['PositionBinPersistenceAgg']
 
 
-@publish_annotation('main', project='rscvp', figure=['fig.2B', 'fig.S2E'], as_doc=True)
+@publish_annotation('main', project='rscvp', figure=['fig.2B', 'fig.S2A-B', 'S3E', 'S4D'], as_doc=True)
 class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, SelectionOptions):
     DESCRIPTION = 'Plot the sorted position-binned trial averaged activity heatmap for batch dataset'
 
     sort_session: Session | None = argument(
         '--sort',
         default=None,
-        help='Sorted index in which session then save cache, If None, then auto save based on `--session`'
+        help='Sorted index in which session then save cache, If None, then auto save based on `--session`, use case:'
+             'different session visualization (darkness)'
     )
 
     force_sort: bool = argument(
@@ -37,6 +38,11 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, Select
         '--page',
         required=True,
         help='Page to validate the region column to be consistent'
+    )
+
+    do_cv: bool = argument(
+        '--cv',
+        help='which cross validation type, only use within single session'
     )
 
     field: Final = dict(plane_index=try_int_type, region=str)
@@ -59,9 +65,20 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, Select
 
     def run(self):
         self.post_parsing()
-        caches = self.get_cache_list()
-        data = self.get_cache_data(caches)
-        self.plot(data)
+
+        if self.do_cv:
+            caches = self.get_cache_list('odd')
+            act = np.vstack([cache.get_trial_avg_occ() for cache in caches])
+            idx = sort_neuron(act)
+
+            caches = self.get_cache_list('even')
+            data = np.vstack([cache.get_trial_avg_occ() for cache in caches])
+            data = data[idx]
+            self.plot(data)
+        else:
+            caches = self.get_cache_list(None)
+            data = self.get_cache_data(caches)
+            self.plot(data)
 
     @property
     def index_cache(self) -> Path:
@@ -79,25 +96,33 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, Select
         else:
             return val[0]
 
-    def get_cache_list(self) -> list[PosBinActCache]:
+    def get_cache_list(self, cv_trial: Literal['odd', 'even'] | None = None) -> list[PosBinActCache]:
         ret = []
         for i, _ in enumerate(self.foreach_dataset(**self.field)):
-            self.exp_list.append(self.exp_date)
-            self.animal_list.append(self.animal_id)
-
-            cell_mask = self.get_selected_neurons()
-
-            trial = np.arange(
-                *TrialSelection(self.load_riglog_data(), self.session, use_virtual_space=self.use_virtual_space)
-                .get_selected_profile()
-                .trial_range
-            )
 
             if self._track_length is None:
                 self._track_length = self.track_length
 
             if self._track_landmarks is None:
                 self._track_landmarks = self.track_landmarks
+
+            self.exp_list.append(self.exp_date)
+            self.animal_list.append(self.animal_id)
+
+            cell_mask = self.get_selected_neurons()
+
+            rig = self.load_riglog_data()
+
+            trial_sel = TrialSelection(rig, self.session, use_virtual_space=self.use_virtual_space)
+
+            if cv_trial is None:
+                trial = trial_sel.selected_trials
+            elif cv_trial == 'odd':
+                trial = trial_sel.select_odd().selected_trials
+            elif cv_trial == 'even':
+                trial = trial_sel.select_even().selected_trials
+            else:
+                raise ValueError(f'Invalid cv_type: {self.cv_type}')
 
             ret.append(self.get_occ_cache()
                        .with_mask(cell_mask)
@@ -111,7 +136,6 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, Select
 
         try:
             act = np.vstack(ret)
-            fprint(f'occ shape: {act.shape}')
         except ValueError as e:
             print(repr(e))
             raise RuntimeError('check bins size are consistent')
