@@ -11,7 +11,7 @@ from argclz import AbstractParser, argument, int_tuple_type
 from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_merge
-from neuralib.util.verbose import fprint
+from neuralib.util.verbose import fprint, publish_annotation
 from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, get_neuron_list, NeuronID
 from rscvp.util.util_trials import TrialSelection
@@ -115,6 +115,7 @@ class PlaceFieldResult(NamedTuple):
         return self._replace(pf=ret)
 
 
+@publish_annotation('main', project='rscvp', caption='criteria for position neurons selection')
 class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, PlotOptions):
     DESCRIPTION = 'Place field properties calculations, including place field width, peak location, numbers'
 

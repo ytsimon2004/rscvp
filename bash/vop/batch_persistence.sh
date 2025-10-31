@@ -51,7 +51,8 @@ anterior_persistence main_trial_avg_position \
   --used_session light \
   --sort light \
   -T spks \
-  --page ap_place
+  --page ap_place \
+  --cv
 
 posterior_persistence main_trial_avg_position \
   --region pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC \
@@ -61,7 +62,8 @@ posterior_persistence main_trial_avg_position \
   --used_session light \
   --sort light \
   -T spks \
-  --page ap_place
+  --page ap_place \
+  --cv
 
 # ------- Alignment Position Bins Sort SI---------- #
 

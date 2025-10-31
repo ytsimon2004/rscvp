@@ -6,7 +6,7 @@ from tifffile import tifffile
 from argclz import AbstractParser
 from neuralib.imglib.io import tif_to_gif
 from neuralib.persistence import persistence
-from neuralib.util.logging import LOGGING_IO_LEVEL
+from neuralib.util.verbose import print_save
 from rscvp.retinotopic.util import compute_wfield_trial_average, combine_cycles_within_trial
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions
 from rscvp.util.cli.cli_wfield import WFieldOptions
@@ -103,9 +103,10 @@ class RetinotopicCacheBuilder(AbstractParser, WFieldOptions, PersistenceRSPOptio
         if not self.trial_averaged_tiff.exists() or force_compute:
             trial_avg = self._compute_trial_averaged()
             tifffile.imwrite(self.trial_averaged_tiff, trial_avg)
-            self.logger.log(LOGGING_IO_LEVEL, f'SAVE trial averaged resp in {self.trial_averaged_tiff}')
+            print_save(self.trial_averaged_tiff)
+
             tif_to_gif(self.trial_averaged_tiff, self.trial_averaged_gif)
-            self.logger.log(LOGGING_IO_LEVEL, f'SAVE trial averaged resp in {self.trial_averaged_gif}')
+            print_save(self.trial_averaged_gif)
 
         return tifffile.imread(self.trial_averaged_tiff)
 

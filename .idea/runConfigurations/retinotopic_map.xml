@@ -23,8 +23,9 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
+    <option name="RUN_TOOL" value="true" />
     <option name="SCRIPT_NAME" value="rscvp.retinotopic.main_retinotopic_map" />
-    <option name="PARAMETERS" value="-D 250916 -A YW102 --mount /Volumes --disk BigDATA --version stimpy-bit --debug" />
+    <option name="PARAMETERS" value="-D 251030 -A YW109 --mount /Volumes --disk BigDATA --version stimpy-bit" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
