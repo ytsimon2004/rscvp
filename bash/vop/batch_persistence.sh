@@ -7,7 +7,7 @@ anterior_persistence() {
   shift 1
   sleep 10
 
-  python -m rscvp.behavioral.$m \
+  python -m rscvp.statistic.persistence_agg.$m\
   -D 210315,210401,210402,210416,210604,210519,211202,211203,211202,221018 \
   -A YW006,YW006,YW008,YW008,YW010,YW017,YW022,YW032,YW033,YW048 \
   -P 0,0,0,0,0,0,,,, \

@@ -167,6 +167,7 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, Select
                 landmarks=self._track_landmarks,
                 ax=ax
             )
+            ax.set_title(data.shape)
 
 
 if __name__ == '__main__':
