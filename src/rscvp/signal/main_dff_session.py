@@ -1,18 +1,16 @@
 import numpy as np
-from rscvp.util.cli.cli_output import DataOutput
-from rscvp.util.cli.cli_stimpy import StimpyOptions
-from rscvp.util.cli.cli_suite2p import Suite2pOptions
-from rscvp.util.util_trials import TrialSignal
 from tqdm import tqdm
 
 from argclz import AbstractParser, argument
 from neuralib.io import csv_header
-from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli.cli_output import DataOutput
+from rscvp.util.cli.cli_stimpy import StimpyOptions
+from rscvp.util.cli.cli_suite2p import Suite2pOptions
+from rscvp.util.util_trials import TrialSignal
 
 __all__ = ['DffSesOption']
 
 
-@publish_annotation('main', project='rscvp', as_doc=True)
 class DffSesOption(AbstractParser, Suite2pOptions, StimpyOptions):
     DESCRIPTION = 'Calculate the mean/median/percentile/max dff in every recording sessions'
 

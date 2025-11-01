@@ -9,7 +9,7 @@ from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent, Suite
 from neuralib.plot import plot_figure
 from neuralib.typing import AxesArray
 from rscvp.util.cli import DataOutput, Suite2pOptions, TreadmillOptions, get_neuron_list
-from rscvp.util.util_trials import TrialSignal, TrialSelection
+from rscvp.util.util_trials import TrialSignal
 
 __all__ = ['TrialActProfile']
 
@@ -25,7 +25,7 @@ class TrialActProfile(AbstractParser, Suite2pOptions, TreadmillOptions):
     trial_numbers: tuple[int, int] = argument(
         '--trange', '-t',
         type=int_tuple_type,
-        required=True,
+        default=(0, 5),
         help='trial range per session, i.e., (0,5) indicates the first 5 laps plot for different sessions',
     )
 
@@ -62,7 +62,7 @@ class TrialActProfile(AbstractParser, Suite2pOptions, TreadmillOptions):
         """(S, N)"""
         ret = []
         for t in trial_sig:
-            s = t.time_profile.session
+            s = t.session
             f = pd.read_csv(self.get_data_output('si', s, latest=True).csv_output)
             ret.append(f[f'si_{s}'].to_numpy())
 
@@ -110,18 +110,18 @@ class TrialActProfile(AbstractParser, Suite2pOptions, TreadmillOptions):
 
         pos = self.load_position().interp_time(image_time)
 
+        lap_event = self.get_lap_event(rig)
+
         session_info = rig.get_stimlog().session_trials()
         session_info.pop('all', None)
         sessions = list(session_info.keys())
 
         for s in sessions:
-            prf = TrialSelection(rig, s, use_virtual_space=self.use_virtual_space).get_selected_profile()
-
-            if self.trial_numbers is not None:
-                prf = prf.with_selected_range(self.trial_numbers)
-
-            t0 = prf.start_time
-            t1 = prf.end_time
+            x = session_info[s].in_slice(lap_event.time, lap_event.value.astype(int))
+            trial0 = x.start + self.trial_numbers[0]
+            trial1 = x.start + self.trial_numbers[1]
+            t0 = lap_event.time[trial0]
+            t1 = lap_event.time[trial1]
 
             # neural activity
             mx = np.logical_and(t0 < image_time, image_time < t1)
@@ -142,7 +142,7 @@ class TrialActProfile(AbstractParser, Suite2pOptions, TreadmillOptions):
                 vtime = None
 
             yield TrialSignal(
-                prf, time, _dff, _spks,
+                s, time, _dff, _spks,
                 position=position,
                 velocity=velocity,
                 vstim_pulse=vpulse,

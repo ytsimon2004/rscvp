@@ -122,11 +122,7 @@ class SpeedScoreOptions(AbstractParser, ApplyPosBinCache):
         """Load trial-averaged activity and speed signals"""
 
         if self.binned_dff is None or self.binned_speed is None:
-            indices = (
-                TrialSelection
-                .from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
-                .get_selected_profile().trial_range
-            )
+            indices = TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space).trial_range
             trial_range = np.arange(*indices)
 
             dff = self.get_occ_cache().with_trial(trial_range).occ_activity  # shape (N, L, B)

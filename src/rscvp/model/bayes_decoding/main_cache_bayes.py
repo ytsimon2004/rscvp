@@ -187,11 +187,7 @@ class BayesDecodeCache(ETLConcatable):
         s2p = opt.load_suite_2p()
 
         #
-        trial = (
-            TrialSelection
-            .from_rig(rig, self.session, use_virtual_space=opt.use_virtual_space)
-            .get_selected_profile()
-        )
+        trial = TrialSelection.from_rig(rig, self.session, use_virtual_space=opt.use_virtual_space)
         start_t = trial.start_time
         end_t = trial.end_time
 
@@ -377,13 +373,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
         return self.train_test_list[self._current_train_test_index % sz]
 
     def _prepare_image_time(self):
-        # trial selection
-        trial = (
-            TrialSelection
-            .from_rig(self.rig, self.session, use_virtual_space=self.use_virtual_space)
-            .get_selected_profile()
-        )
-
+        trial = TrialSelection.from_rig(self.rig, self.session, use_virtual_space=self.use_virtual_space)
         start_time = trial.start_time
         end_time = trial.end_time
 
@@ -469,9 +459,9 @@ class BayesDecodeCacheBuilder(AbstractParser,
                                signal_type=self.signal_type,
                                normalize=normalize)[0][:, self.image_mask]
 
-        index = self.trial_selection.trial_range_in_session
-        start_time = self.trial_selection.trials_time[0]
-        end_time = self.trial_selection.trials_time[-1]
+        index = self.trial_selection.trial_range
+        start_time = self.trial_selection.start_time
+        end_time = self.trial_selection.end_time
 
         # speed filter
         if self.running_epoch:
@@ -494,7 +484,7 @@ class BayesDecodeCacheBuilder(AbstractParser,
                                'spatial bin size should be:'
                                f'{self.track_length / rate_map.shape[1]}')
 
-        assert train.trial_range_in_session == index
+        assert train.trial_range == index
         trial_index = np.zeros((index[1] - index[0]), dtype=int)  # (L')
 
         trial_index[train.selected_trials - index[0]] += 1  # train

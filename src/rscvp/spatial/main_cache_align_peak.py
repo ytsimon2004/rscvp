@@ -128,11 +128,7 @@ class SISortAlignPeakCacheBuilder(AbstractParser, AbstractAlignPeakOptions,
             binned_sig = binned_sig[self.si_sorted_index]
 
         # trial selection
-        trial_range = (
-            TrialSelection(rig, self.session, use_virtual_space=self.use_virtual_space)
-            .get_selected_profile()
-            .trial_slice
-        )
+        trial_range = slice(**TrialSelection(rig, self.session, use_virtual_space=self.use_virtual_space).trial_range)
         binned_sig = binned_sig[:, trial_range, :]
 
         return circular_pos_shift(binned_sig, smooth=False)

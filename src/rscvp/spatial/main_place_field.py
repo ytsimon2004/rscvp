@@ -253,13 +253,11 @@ class PlaceFieldsOptions(AbstractParser, ApplyPosBinCache, SelectionOptions, Plo
         sig_base[np.isnan(sig_base)] = 0.0
         signal_all = gaussian_filter1d(sig_all, 3, mode='wrap', axis=2)
 
-        trial = (
-            TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
-            .get_selected_profile()
-            .trial_slice
-        )
-        signal_all = signal_all[:, trial, :]  # (N, L, B)
-        signal_bas = sig_base[:, trial, :]
+        trial_sel = TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
+        rang = trial_sel.trial_range
+        mx = slice(*rang)
+        signal_all = signal_all[:, mx, :]
+        signal_bas = sig_base[:, mx, :]
 
         headers = [
             'neuron_id',

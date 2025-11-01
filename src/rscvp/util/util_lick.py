@@ -213,9 +213,8 @@ class LickingPosition(NamedTuple):
     """trial index (START, STOP). NOTE index start from 0"""
 
     def with_session(self, rig: RiglogData, session: Session) -> Self:
-        indices = TrialSelection.from_rig(rig, session).get_selected_profile().trial_range
+        indices = TrialSelection.from_rig(rig, session).trial_range
         start, end = indices
-
         return self._replace(lick_position=self.lick_position[start:end], trial_range_index=(start, end))
 
     # ================ #

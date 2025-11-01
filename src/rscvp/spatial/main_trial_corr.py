@@ -34,11 +34,7 @@ class TrialCorrOptions(AbstractParser, ApplyPosBinCache, SelectionOptions):
         else:
             raise NotImplementedError('')
 
-        indices = (
-            TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
-            .get_selected_profile()
-            .trial_range
-        )
+        indices = TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space).trial_range
         act = act[:, slice(*indices), :]
 
         return act

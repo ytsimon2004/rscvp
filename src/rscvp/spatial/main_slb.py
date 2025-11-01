@@ -107,11 +107,7 @@ class PositionLowerBoundOptions(AbstractParser,
         if self.do_signal_smooth:
             signal_all = gaussian_filter1d(signal_all, 3, mode='wrap', axis=2)
 
-        trials = (
-            TrialSelection(rig, self.session, use_virtual_space=self.use_virtual_space)
-            .get_selected_profile()
-            .trial_range
-        )
+        trials = TrialSelection(rig, self.session, use_virtual_space=self.use_virtual_space).trial_range
 
         #
         if self.with_place_field_info:

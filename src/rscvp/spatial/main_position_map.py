@@ -102,12 +102,7 @@ class PositionMapOptions(AbstractParser, SelectionOptions, ApplyPosBinCache):
         signal = signal[orig_indices]
 
         # trial selection
-        indices = (
-            TrialSelection
-            .from_rig(rig, self.session, use_virtual_space=self.use_virtual_space)
-            .get_selected_profile()
-            .trial_range
-        )
+        indices = TrialSelection.from_rig(rig, self.session, use_virtual_space=self.use_virtual_space).trial_range
         signal = signal[:, slice(*indices), :]
         signal = signal / np.max(signal, axis=(1, 2), keepdims=True)
 

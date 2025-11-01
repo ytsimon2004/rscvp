@@ -6,7 +6,6 @@ from attr import field
 from typing_extensions import Self
 
 from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
-from neuralib.util.verbose import fprint
 from rscvp.util.cli.cli_suite2p import NeuronID, get_neuron_list
 from stimpyp import Session, SessionInfo, RiglogData, RigEvent
 
@@ -66,15 +65,15 @@ class TrialSelection:
 
         if selected_trial is None:
             self.session_type = session  # trigger setter checking
+            self._complete_trial_session = True
         else:
             assert len(selected_trial) > 0, 'Empty selected trials'
             self._selected_trials = selected_trial
             self._session = session  # do not overwrite selected_trial
+            self._complete_trial_session = False
 
     @classmethod
-    def from_rig(cls, rig: RiglogData,
-                 session: Session = 'all',
-                 use_virtual_space: bool = False) -> Self:
+    def from_rig(cls, rig: RiglogData, session: Session = 'all', use_virtual_space: bool = False) -> Self:
         return TrialSelection(rig, session, use_virtual_space=use_virtual_space)
 
     @property
@@ -104,6 +103,7 @@ class TrialSelection:
 
     @property
     def session_info(self) -> SessionInfo:
+        """session info for selected session, regardless of selection"""
         return self.session_trial[self.session_type]
 
     @property
@@ -121,30 +121,42 @@ class TrialSelection:
         return self.lap_event.time[self.selected_trials]
 
     @property
-    def trial_range_in_session(self) -> tuple[int, int]:
-        """Range within the session"""
-        session_info = self.session_trial[self.session_type]
-        ret = session_info.in_range(
+    def trial_range(self) -> tuple[int, int]:
+        """Range within the session (full session range, not just selected trials)"""
+        return self.session_info.in_range(
             self.lap_event.time,
             self.lap_event.value_index
         )
-        return ret
+
+    @property
+    def start_time(self) -> float:
+        if self._complete_trial_session:
+            return self.session_info.time[0]
+        else:
+            return self.trials_time[0]
+
+    @property
+    def end_time(self) -> float:
+        if self._complete_trial_session:
+            return self.session_info.time[1]
+        else:
+            return self.trials_time[-1]
 
     # ================ #
     # Cross Validation #
     # ================ #
 
     def invert(self) -> Self:
-        whole = np.arange(*self.trial_range_in_session)
+        whole = np.arange(*self.trial_range)
         ret = np.setdiff1d(whole, self.selected_trials)
         return TrialSelection(self.rig, self.session_type, ret, use_virtual_space=self.use_virtual_space)
 
     def select_odd(self) -> Self:
-        odd_trials = np.arange(self.trial_range_in_session[0] + 1, self.trial_range_in_session[1], 2)
+        odd_trials = np.arange(self.trial_range[0] + 1, self.trial_range[1], 2)
         return TrialSelection(self.rig, self.session_type, odd_trials, use_virtual_space=self.use_virtual_space)
 
     def select_even(self) -> Self:
-        even_trials = np.arange(*self.trial_range_in_session, 2)
+        even_trials = np.arange(*self.trial_range, 2)
         return TrialSelection(self.rig, self.session_type, even_trials, use_virtual_space=self.use_virtual_space)
 
     def select_range(self, trial_range: tuple[int, int],
@@ -233,73 +245,13 @@ class TrialSelection:
         """Select fraction of the trials for training"""
         total = self.selected_numbers
         n_test = int(total * (1 - train_fraction))
-        start = np.random.randint(total - n_test) + self.trial_range_in_session[0]
+        start = np.random.randint(total - n_test) + self.trial_range[0]
         trial_range = (start, start + n_test)
 
         test = self.select_range(trial_range)
         train = test.invert()
 
         return train, test
-
-    def get_selected_profile(self, verbose=True) -> 'SelectedProfile':
-        """
-        Get the time/trial profile for each session
-
-        :param verbose: verbose selection information
-        :return: ``SelectedProfile``
-        """
-        info = self.session_trial[self.session_type]
-
-        trial_range = info.in_range(
-            self.lap_event.time,
-            self.lap_event.value_index
-        )
-
-        start_time = info.time[0]
-        end_time = info.time[1]
-
-        if verbose:
-            fprint(f'select trials in {self.session_type} session: within {tuple(map(int, trial_range))},'
-                   f'from {start_time} to {end_time}')
-
-        return SelectedProfile(
-            self,
-            trial_range,
-            start_time,
-            end_time
-        )
-
-
-# TODO check if simplier way?
-@attrs.define
-class SelectedProfile:
-    selection: TrialSelection
-    trial_range: tuple[int, int]
-    start_time: float
-    end_time: float
-
-    @property
-    def session(self) -> Session:
-        return self.selection.session_type
-
-    @property
-    def trial_slice(self) -> slice:
-        return slice(*self.trial_range)
-
-    def with_selected_range(self, ranging: tuple[int, int]) -> Self:
-        """with only selection trial ranged in this session"""
-        lap_time = self.selection.lap_event.time
-
-        n1 = self.trial_range[0] + ranging[0]
-        n2 = self.trial_range[0] + ranging[1]
-        t0 = lap_time[n1]
-        t1 = lap_time[n2]
-
-        # noinspection PyTypeChecker
-        return attrs.evolve(self,
-                            trial_range=(n1, n2),
-                            start_time=t0,
-                            end_time=t1)
 
 
 # ======================== #
@@ -310,7 +262,8 @@ class SelectedProfile:
 class TrialSignal:
     """Container for selected trial signals"""
 
-    time_profile: SelectedProfile
+    session: Session
+    """session name"""
 
     time: np.ndarray
     """(T,)"""
@@ -339,7 +292,8 @@ class TrialSignal:
             neuron_ids: NeuronID,
             plane_index: int,
             session: Session,
-            normalize: bool = False
+            normalize: bool = False,
+            use_virtual_space: bool = False,
     ) -> Self:
         neuron_list = get_neuron_list(s2p, neuron_ids)
 
@@ -349,16 +303,16 @@ class TrialSignal:
         image_time = rig.imaging_event.time
         image_time = sync_s2p_rigevent(image_time, s2p, plane_index)
 
-        prf = TrialSelection(rig, session).get_selected_profile()
-        t0 = prf.start_time
-        t1 = prf.end_time
+        trial_sel = TrialSelection(rig, session, use_virtual_space=use_virtual_space)
+        t0 = trial_sel.start_time
+        t1 = trial_sel.end_time
 
         it_mask = np.logical_and(t0 < image_time, image_time < t1)
         image_time = image_time[it_mask]
         dff = dff[:, it_mask]
         spks = spks[:, it_mask]
 
-        return TrialSignal(prf, image_time, dff, spks)
+        return TrialSignal(session, image_time, dff, spks)
 
     @property
     def n_neurons(self) -> int:

@@ -44,12 +44,9 @@ class PositionSortTrialOptions(AbstractParser, ApplySortIdxCache):
         lap_time = self.get_lap_event(rig).time
 
         if isinstance(self.use_trial, str):
-            trial_range = (
-                TrialSelection(rig, self.use_trial, use_virtual_space=self.use_virtual_space)
-                .get_selected_profile()
-                .trial_slice
-            )
-            t1, t2 = trial_range.start, trial_range.stop
+            trial_sel = TrialSelection(rig, self.use_trial, use_virtual_space=self.use_virtual_space)
+            trial_range = slice(**trial_sel.trial_range)
+            t1, t2 = trial_sel.start_time, trial_sel.end_time
         elif isinstance(self.use_trial, tuple):
             trial_range = slice(*self.use_trial)
             t1, t2 = self.use_trial

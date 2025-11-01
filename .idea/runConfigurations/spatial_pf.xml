@@ -23,8 +23,9 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
+    <option name="RUN_TOOL" value="true" />
     <option name="SCRIPT_NAME" value="rscvp.spatial.main_place_field" />
-    <option name="PARAMETERS" value="-D 251019 -A YW109 -P 3 --thres 0.3 --vr-s -s close --disk bkrunch-linux-scratch --mount /Volumes --peak-lt 200" />
+    <option name="PARAMETERS" value="-D 210315 -A YW006 -P 0 --thres 0.3 -s light --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

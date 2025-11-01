@@ -332,12 +332,11 @@ class GLMInputData:
         plane_index = opt.plane_index
         signal_type = opt.signal_type
 
-        trial = TrialSelection.from_rig(rig, opt.session, use_virtual_space=opt.use_virtual_space)
-        tprofile = trial.get_selected_profile()
+        trial_sel = TrialSelection.from_rig(rig, opt.session, use_virtual_space=opt.use_virtual_space)
 
         sampling_rate = DEFAULT_DTYPE_PARAMS[dtype].sampling_rate
-        start_time = tprofile.start_time
-        end_time = tprofile.end_time
+        start_time = trial_sel.start_time
+        end_time = trial_sel.end_time
         cov_time = np.linspace(start_time, end_time, int((end_time - start_time) * sampling_rate))
 
         image_time = rig.imaging_event.time
@@ -345,7 +344,7 @@ class GLMInputData:
 
         # signal
         sig, _ = get_neuron_signal(s2p, get_neuron_list(s2p), signal_type=signal_type, normalize=False)
-        imask = trial.masking_time(image_time)
+        imask = trial_sel.masking_time(image_time)
         image_time = image_time[imask]
         sig = sig[:, imask]  # (N, fs*t)
 
@@ -365,7 +364,7 @@ class GLMInputData:
         #
         if dtype in ('pos', 'speed', 'acceleration'):
             pos = opt.load_position()
-            pmask = trial.masking_time(pos.t)
+            pmask = trial_sel.masking_time(pos.t)
             ptime = pos.t[pmask]
 
             if dtype == 'pos':
