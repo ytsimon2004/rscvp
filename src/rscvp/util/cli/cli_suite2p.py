@@ -1,17 +1,22 @@
 from pathlib import Path
 from typing import Literal, ClassVar
 
+import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
 from argclz import argument, try_int_type
 from neuralib.imaging.suite2p import SIGNAL_TYPE, Suite2PResult
+from neuralib.imglib.norm import enhance_blood_vessels
+from neuralib.typing import PathLike
 from .cli_core import CommonOptions
 
 __all__ = [
     'Suite2pOptions',
     'get_neuron_list',
     'NeuronID',
-    'NORMALIZE_TYPE'
+    'NORMALIZE_TYPE',
+    'suite2p_alignment_fov'
 ]
 
 NORMALIZE_TYPE = Literal['global', 'local', 'none']
@@ -106,7 +111,8 @@ class Suite2pOptions(CommonOptions):
             self.plane_index = force_load_plane
 
         frate_check = None if self.disable_ops_check else 30.0
-        ret = Suite2PResult.load(self.suite2p_directory, cell_prob, channel=channel, runtime_check_frame_rate=frate_check)
+        ret = Suite2PResult.load(self.suite2p_directory, cell_prob, channel=channel,
+                                 runtime_check_frame_rate=frate_check)
 
         self._has_chan2 = ret.has_chan2
 
@@ -145,3 +151,28 @@ def get_neuron_list(opt: Suite2pOptions | Suite2PResult,
             return [neuron_ids]
         case _:
             return list(neuron_ids)
+
+
+def suite2p_alignment_fov(ops_file: PathLike, bright_field_file: PathLike) -> None:
+    """
+    Align Suite2P FOV (from .sbx) with bright field FOV.
+
+    :param ops_file: Path to Suite2P ops file
+    :param bright_field_file: Path to bright field image
+    """
+    from neuralib.imaging.suite2p import Suite2pGUIOptions
+
+    ops: Suite2pGUIOptions = np.load(ops_file, allow_pickle=True).tolist()
+    actual_fov = ops['meanImg']
+    bright_field_fov = cv2.imread(bright_field_file)
+
+    actual_fov = cv2.rotate(actual_fov, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    actual_fov = cv2.flip(actual_fov, 0)
+
+    actual_fov = enhance_blood_vessels(actual_fov)
+    bright_field_fov = enhance_blood_vessels(bright_field_fov)
+
+    fig, ax = plt.subplots(1, 2)
+    ax[0].imshow(actual_fov, cmap='gray')
+    ax[1].imshow(bright_field_fov, cmap='gray')
+    plt.show()
