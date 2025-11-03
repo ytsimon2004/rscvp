@@ -17,6 +17,7 @@ __all__ = [
     'DataBaseType',
     #
     'PhysiologyDB',
+    'FieldOfViewDB',
     'GenericDB',
     'DarknessGenericDB',
     'BlankBeltGenericDB',
@@ -29,7 +30,8 @@ __all__ = [
 ]
 
 DB_TYPE = Literal[
-    'GenericDB', 'DarknessGenericDB', 'BlankBeltGenericDB', 'VRGenericDB',
+    'GenericDB', 'FieldOfViewDB',
+    'DarknessGenericDB', 'BlankBeltGenericDB', 'VRGenericDB',
     'BayesDecodeDB', 'VisualSFTFDirDB'
 ]
 
@@ -65,6 +67,37 @@ class PhysiologyDB(NamedTuple):
             fprint(f'{directory.name} invalid', vtype='error')
             return []
 
+
+@sqlclz.named_tuple_table_class
+class FieldOfViewDB(NamedTuple):
+    date: Annotated[str, sqlclz.PRIMARY]
+    animal: Annotated[str, sqlclz.PRIMARY]
+
+    max_depth: str
+    """depth of the most ventral optic plane in um | Literal['ETL']"""
+    n_planes: int
+    """number of optic planes"""
+    objective_rotation: float
+    """objective rotation in degree"""
+    objective_magnification: int
+    """objective magnification"""
+
+    # registration - stored as JSON TEXT '[x, y]'
+    medial_anterior: str
+    """medial anterior coordinate"""
+    medial_posterior: str
+    """medial posterior coordinate"""
+    lateral_posterior: str
+    """lateral posterior coordinate"""
+    lateral_anterior: str
+    """lateral anterior coordinate"""
+
+    @sqlclz.foreign(PhysiologyDB.date, PhysiologyDB.animal)
+    def _foreign(self):
+        return self.date, self.animal
+
+
+# TODO maybe not foreign rec, user,
 
 @sqlclz.named_tuple_table_class
 class GenericDB(NamedTuple):
@@ -306,14 +339,14 @@ class RSCDatabase(sqlclz.Database):
     def select_foreign_from_source(foreign_db: type[DataBaseType], source: PhysiologyDB) -> sqlclz.Cursor[DataBaseType]:
         return sqlclz.util.pull_foreign(foreign_db, source)
 
-    def add_data(self, data: DataBaseType):
-        """add new data"""
+    def replace_data(self, data: DataBaseType):
+        """Replace data (insert if new, replace if exists)"""
         with self.open_connection():
-            sqlclz.insert_into(type(data), policy='REPLACE').submit([data])
+            sqlclz.replace_into(type(data)).submit([data])
 
     def update_data(self, data: DataBaseType, *args: str):
         """
-        update the data in database for those with matched primary keys.
+        Update the data in database for those with matched primary keys.
 
         If you want to change the primary keys for any data, please use
         raw sql statements, because this method does not allow this action.

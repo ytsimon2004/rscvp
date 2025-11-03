@@ -45,11 +45,7 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
             else:
                 raise ValueError('unsupported protocol')
 
-        print('NEW', db)
-        if self.db_commit:
-            self.add_data(db)
-        else:
-            print('use --commit to perform database operations')
+        self.print_replace(db)
 
     def _populate_blankbelt_database(self) -> BlankBeltGenericDB:
         self.vc_selection = 0.2  # for active neuron purpose

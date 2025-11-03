@@ -7,7 +7,7 @@ import polars as pl
 from neuralib.util.verbose import fprint
 from rscvp.statistic.csv_agg.collector import CSVCollector
 from rscvp.util.cli.cli_statistic import StatisticOptions
-from rscvp.util.util_gspread import RSCGoogleWorkSheet, truncate_before_todo_hash, GSPREAD_SHEET_PAGE
+from rscvp.util.util_gspread import RSCGoogleWorkSheet, filter_tdhash, GSPREAD_SHEET_PAGE
 
 __all__ = ['LocalSpreadsheetSync']
 
@@ -176,7 +176,7 @@ class LocalSpreadsheetSync:
     def _init_parquet(sheet: RSCGoogleWorkSheet, error_when_empty: bool = True) -> pl.DataFrame:
         """used to add necessary information in parquet file while first generating"""
         parquet_df = pl.DataFrame(pl.Series(values=sheet.primary_key_list, name='Data'))
-        idx, parquet_df = truncate_before_todo_hash(parquet_df, return_index=True)
+        idx, parquet_df = filter_tdhash(parquet_df, return_index=True)
 
         for default_col in _get_default_header(sheet.title):
             filled = sheet.values(default_col)[:idx]  # gspread existing

@@ -280,11 +280,7 @@ class DecodeAnalysisOptions(AbstractParser,
             update_time=self.cur_time
         )
 
-        print('NEW', db)
-        if self.db_commit:
-            self.add_data(db)
-        else:
-            print('please use --commit to add data to database')
+        self.print_replace(db)
 
     @dispatch('median_decode_error')
     def plot_median_decoding_err(self, cache: BayesDecodeCache, output: DataOutput):

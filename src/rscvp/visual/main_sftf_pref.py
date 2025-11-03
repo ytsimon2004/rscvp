@@ -223,12 +223,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
             **update_fields
         )
 
-        print('NEW', db)
-        print('UPDATE', *update_fields.keys())
-        if self.db_commit:
-            self.update_data(db, *update_fields.keys())
-        else:
-            print('use --commit to perform database operations')
+        self.print_update(db, update_fields)
 
 
 if __name__ == '__main__':

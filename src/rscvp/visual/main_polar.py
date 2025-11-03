@@ -199,11 +199,7 @@ class VisualPolarOptions(AbstractParser, SelectionOptions, BaseVisPolarOptions, 
             **update_fields
         )
 
-        print('NEW', db)
-        if self.db_commit:
-            self.add_data(db)
-        else:
-            print('use --commit to perform database operations')
+        self.print_replace(db)
 
 
 # ========== #

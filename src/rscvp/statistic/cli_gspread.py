@@ -13,7 +13,7 @@ from neuralib.util.verbose import fprint, print_load
 from rscvp.spatial.main_place_field import split_flatten_lter
 from rscvp.util.cli import Region
 from rscvp.util.util_dataframe import check_null, to_numeric
-from rscvp.util.util_gspread import truncate_before_todo_hash, RSCGoogleWorkSheet, skip_comment_primary_key, \
+from rscvp.util.util_gspread import filter_tdhash, RSCGoogleWorkSheet, skip_comment_primary_key, \
     GSPREAD_SHEET_PAGE
 from stimpyp import Session
 
@@ -58,7 +58,7 @@ class GSPExtractor:
         if self._cols is not None:
             df = df.select(*self._cols)
 
-        df = truncate_before_todo_hash(df, primary)
+        df = filter_tdhash(df, primary)
         df = skip_comment_primary_key(df, primary)
         df = self._parse_string_to_numerical_array(df)
 

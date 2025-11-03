@@ -92,12 +92,13 @@ class StimpyOptions(CommonOptions):
     @property
     def gspread_reference(self) -> GSPREAD_SHEET_PAGE:
         """get statistic google spreadsheet reference from the protocol type"""
-        if self.is_vop_protocol:
-            return 'apcls_tac'
-        elif self.is_ldl_protocol:
-            return 'ap_ldl'
-        else:
-            raise ValueError('unsupported protocol')
+        # if self.is_vop_protocol:
+        #     return 'apcls_tac'
+        # elif self.is_ldl_protocol:
+        #     return 'ap_ldl'
+        # else:
+        #     raise ValueError('unsupported protocol')
+        return 'fov_table'
 
     @cached_property
     def is_ldl_protocol(self) -> bool:

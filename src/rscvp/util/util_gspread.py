@@ -15,11 +15,12 @@ __all__ = [
     'GoogleSpreadSheet',
     #
     'get_statistic_key_info',
-    'truncate_before_todo_hash',
+    'filter_tdhash',
     'skip_comment_primary_key',
 ]
 
 GSPREAD_SHEET_PAGE = Literal[
+    'fov_table',
     'apcls_blank', 'apcls_tac', 'ap_vz', 'ap_place', 'ap_ldl', 'ap_generic', 'ap_vr',
     'GenericDB', 'VisualSFTFDirDB', 'BayesDecodeDB', 'DarknessGenericDB', 'BlankBeltGenericDB'
 ]
@@ -49,7 +50,7 @@ class RSCGoogleWorkSheet(GoogleWorkSheet):
 
     @property
     def valid_primary_key(self) -> list[str]:
-        df = truncate_before_todo_hash(self.to_polars(), self.FIRST_COLUMN_NAME)
+        df = filter_tdhash(self.to_polars(), self.FIRST_COLUMN_NAME)
         return df[self.FIRST_COLUMN_NAME].to_list()
 
     def mark_cell(self,
@@ -77,14 +78,14 @@ class RSCGoogleWorkSheet(GoogleWorkSheet):
 
 def get_statistic_key_info(page: GSPREAD_SHEET_PAGE = 'apcls_tac') -> pl.DataFrame:
     df = RSCGoogleWorkSheet.of_work_page(page, primary_key='Data').to_polars()
-    df = truncate_before_todo_hash(df, 'Data')
+    df = filter_tdhash(df, 'Data')
     df = skip_comment_primary_key(df, 'Data')
     return df.select('Data', 'region', 'pair_wise_group')
 
 
-def truncate_before_todo_hash(df: DataFrame,
-                              index_field: str = 'Data',
-                              return_index: bool = False) -> DataFrame | tuple[int, DataFrame]:
+def filter_tdhash(df: DataFrame,
+                  index_field: str = 'Data',
+                  return_index: bool = False) -> DataFrame | tuple[int, DataFrame]:
     """Try truncate the dataframe/gspread before **#TODO** in the first field of dataframe"""
     try:
         idx = df[index_field].to_list().index('#TODO')

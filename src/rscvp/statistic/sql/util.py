@@ -1,10 +1,11 @@
 import pandas as pd
 import polars as pl
+
 from neuralib.typing import DataFrame
 from rscvp.util.util_gspread import (
     GSPREAD_SHEET_PAGE,
     RSCGoogleWorkSheet,
-    truncate_before_todo_hash,
+    filter_tdhash,
     skip_comment_primary_key
 )
 
@@ -23,7 +24,7 @@ def as_validate_sql_table(df: DataFrame, src_page: GSPREAD_SHEET_PAGE) -> pl.Dat
         df = pl.from_pandas(df)
 
     src = RSCGoogleWorkSheet.of_work_page(src_page, primary_key='Data').to_polars()
-    src = truncate_before_todo_hash(src, 'Data')
+    src = filter_tdhash(src, 'Data')
     src = skip_comment_primary_key(src, 'Data')
     valid_keys = src['Data'].to_list()
 
