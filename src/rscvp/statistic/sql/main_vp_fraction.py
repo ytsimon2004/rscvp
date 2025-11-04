@@ -22,8 +22,8 @@ class VisuoSpatialFractionStat(StatPipeline):
     load_source = as_argument(StatPipeline.load_source).with_options(default='gspread', choices=('gspread', 'db'))
 
     #
-    sheet_name: Final[GSPREAD_SHEET_PAGE] = 'GenericDB'
-    db_table: Final[DB_TYPE] = 'GenericDB'
+    sheet_name: Final[GSPREAD_SHEET_PAGE] = 'GenericClassDB'
+    db_table: Final[DB_TYPE] = 'GenericClassDB'
 
     def run(self):
         self.load_table(primary_key='date', to_pandas=False)

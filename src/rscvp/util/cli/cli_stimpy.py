@@ -4,7 +4,6 @@ from typing import ClassVar
 import numpy as np
 
 from argclz import argument
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from stimpyp import (
     STIMPY_SOURCE_VERSION,
     Session,
@@ -88,17 +87,6 @@ class StimpyOptions(CommonOptions):
     # ================== #
     # Protocol Dependent #
     # ================== #
-
-    @property
-    def gspread_reference(self) -> GSPREAD_SHEET_PAGE:
-        """get statistic google spreadsheet reference from the protocol type"""
-        # if self.is_vop_protocol:
-        #     return 'apcls_tac'
-        # elif self.is_ldl_protocol:
-        #     return 'ap_ldl'
-        # else:
-        #     raise ValueError('unsupported protocol')
-        return 'fov_table'
 
     @cached_property
     def is_ldl_protocol(self) -> bool:

@@ -6,10 +6,10 @@ from argclz import AbstractParser, argument
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_set_default_style, VennDiagram
 from neuralib.plot.plot import axvline_histplot
-from neuralib.util.verbose import publish_annotation, printdf
+from neuralib.util.verbose import publish_annotation
 from rscvp.spatial.util import get_remap_dataframe
 from rscvp.util.cli import PlotOptions, SelectionOptions, SelectionMask, SQLDatabaseOptions
-from rscvp.util.database import GenericDB, DarknessGenericDB, BlankBeltGenericDB, VRGenericDB
+from rscvp.util.database import GenericClassDB, DarkClassDB, BlankClassDB, VRClassDB
 
 __all__ = ['ClsCellTypeOptions']
 
@@ -18,7 +18,7 @@ __all__ = ['ClsCellTypeOptions']
 class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatabaseOptions):
     DESCRIPTION = 'Quantification of proportion of visual/spatial/overlap/unclassified RSC neurons'
 
-    blankbelt_db: bool = argument('--blankbelt-db', help='populate to blank belt db instead of protocol based')
+    blank_db: bool = argument('--blank-db', help='populate to blank belt db instead of protocol based')
 
     vr_remap_value: float = argument('--remap', default=20, help='shifted value that define the remap position tuning')
 
@@ -27,109 +27,88 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
 
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
-        self.populate_database()
+        self.write_database()
 
-    def populate_database(self):
-        if self.blankbelt_db:
-            db = self._populate_blankbelt_database()
+    def write_database(self):
+        if self.blank_db:
+            db = self._write_blank()
         else:
             if self.is_ldl_protocol:
                 self.vc_selection = None
-                db = self._populate_database_ldl()
+                db = self._write_darkness()
             elif self.is_virtual_protocol:
-                db = self._populate_database_vr()
+                db = self._write_vr()
             elif self.is_vop_protocol:
                 self.vc_selection = 0.3
-                db = self._populate_database_vop()
+                db = self._write_generic()
                 self.plot_visuospatial_summary()
             else:
                 raise ValueError('unsupported protocol')
 
         self.print_replace(db)
 
-    def _populate_blankbelt_database(self) -> BlankBeltGenericDB:
+    @property
+    def _foreign_key(self) -> dict[str, str]:
+        return dict(
+            date=self.exp_date,
+            animal=self.animal_id,
+            rec=self.daq_type,
+            user=self.username,
+            optic=str(self.plane_index) if self.plane_index is not None else 'all'
+        )
+
+    def _write_blank(self) -> BlankClassDB:
         self.vc_selection = 0.2  # for active neuron purpose
         mask = self.get_selection_mask()
-        region = self.get_primary_key_field('region', page='apcls_blank')
 
-        return BlankBeltGenericDB(
-            date=self.exp_date,
-            animal=self.animal_id,
-            rec=self.daq_type,
-            user=self.username,
-            optic=self.plane_index if self.plane_index is not None else 'all',
-            region=region,
-            pair_wise_group=self.get_primary_key_field('pair_wise_group', page='apcls_blank'),
+        return BlankClassDB(
+            pair_wise_group=self.fetch_gspread('pair_wise_group'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=mask.n_neurons,
             n_spatial_neurons=np.count_nonzero(mask.place_mask),
-            update_time=self.cur_time
+            update_time=self.cur_time,
+            **self._foreign_key
         )
 
-    def _populate_database_vop(self) -> GenericDB:
+    def _write_generic(self) -> GenericClassDB:
         mask = self.get_selection_mask()
-        region = self.get_primary_key_field('region')
-        n_planes = self.get_primary_key_field('n_planes')
-
-        return GenericDB(
-            date=self.exp_date,
-            animal=self.animal_id,
-            rec=self.daq_type,
-            user=self.username,
-            optic=self.plane_index if self.plane_index is not None else 'all',
-            n_planes=n_planes,
-            region=region,
-            pair_wise_group=self.get_primary_key_field('pair_wise_group'),
+        return GenericClassDB(
+            pair_wise_group=self.fetch_gspread('pair_wise_group'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=mask.n_neurons,
-            n_spatial_neurons=np.count_nonzero(mask.place_mask),
             n_visual_neurons=np.count_nonzero(mask.visual_mask),
+            n_spatial_neurons=np.count_nonzero(mask.place_mask),
             n_overlap_neurons=np.count_nonzero(mask.overlap_mask),
-            update_time=self.cur_time
+            update_time=self.cur_time,
+            **self._foreign_key
         )
 
-    def _populate_database_ldl(self) -> DarknessGenericDB:
-        region = self.get_primary_key_field('region', page='ap_ldl')
-        n_planes = self.get_primary_key_field('n_planes')
-
-        return DarknessGenericDB(
-            date=self.exp_date,
-            animal=self.animal_id,
-            rec=self.daq_type,
-            user=self.username,
-            optic=self.plane_index if self.plane_index is not None else 'all',
-            n_planes=n_planes,
-            region=region,
+    def _write_darkness(self) -> DarkClassDB:
+        return DarkClassDB(
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=self.n_selected_neurons,
             n_spatial_neurons_light_bas=np.count_nonzero(self.select_place_neurons('slb', force_session='light_bas')),
             n_spatial_neurons_dark=np.count_nonzero(self.select_place_neurons('slb', force_session='dark')),
             n_spatial_neurons_light_end=np.count_nonzero(self.select_place_neurons('slb', force_session='light_end')),
-            update_time=self.cur_time
+            update_time=self.cur_time,
+            **self._foreign_key
         )
 
-    def _populate_database_vr(self) -> VRGenericDB:
-
+    def _write_vr(self) -> VRClassDB:
         df = get_remap_dataframe(self, remap_value=self.vr_remap_value)
-        printdf(df)
 
-        return VRGenericDB(
-            date=self.exp_date,
-            animal=self.animal_id,
-            rec=self.daq_type,
-            user=self.username,
-            optic=self.plane_index if self.plane_index is not None else 'all',
-            region=self.get_primary_key_field('region', page='ap_vr'),
-            pair_wise_group=self.get_primary_key_field('pair_wise_group', page='ap_vr'),
+        return VRClassDB(
+            pair_wise_group=self.fetch_gspread('pair_wise_group', page='ap_vr'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=self.n_selected_neurons,
             n_spatial_neurons=np.count_nonzero(df['spatial_close']),
             n_spatial_persist=np.count_nonzero(df['persist']),
             n_spatial_remap=np.count_nonzero(df['remap']),
-            update_time=self.cur_time
+            update_time=self.cur_time,
+            **self._foreign_key
         )
 
-    def plot_visuospatial_summary(self, verbose: bool = True):
+    def plot_visuospatial_summary(self, verbose: bool = False):
         output = self.get_data_output('cls')
         mask = self.get_selection_mask()
         n_total = mask.n_neurons

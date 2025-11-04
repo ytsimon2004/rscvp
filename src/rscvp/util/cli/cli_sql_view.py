@@ -6,7 +6,7 @@ import polars as pl
 import sqlclz
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
-from rscvp.util.database import RSCDatabase, PhysiologyDB, GenericDB, BayesDecodeDB, VisualSFTFDirDB, DataBaseType
+from rscvp.util.database import RSCDatabase, PhysiologyDB, GenericClassDB, BayesDecodeDB, VisualSFTFDirDB, ResultDB
 
 __all__ = ['DatabaseViewOptions']
 
@@ -79,7 +79,7 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
             kwargs[k] = v
 
         data = super().find_physiological_data(**kwargs)
-        self.show_foreign_db(data, GenericDB)
+        self.show_foreign_db(data, GenericClassDB)
 
     @dispatch('decode')
     def list_decode_data(self, *args: str):
@@ -106,13 +106,13 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
         from sqlclz.diagram import generate_diagram
         generate_diagram(self.database_file)
 
-    def show_foreign_db(self, sources: list[PhysiologyDB], db: Type[DataBaseType]) -> None:
+    def show_foreign_db(self, sources: list[PhysiologyDB], db: Type[ResultDB]) -> None:
         if self.show_rich_table:
             self._show_foreign_db_rich(sources, db)
         else:
             self._show_foreign_db_polars(sources, db)
 
-    def _show_foreign_db_polars(self, sources, db: Type[DataBaseType]) -> None:
+    def _show_foreign_db_polars(self, sources, db: Type[ResultDB]) -> None:
         results = []
         with self.open_connection():
             for src in sources:
@@ -132,7 +132,7 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
             else:
                 print(ret)
 
-    def _show_foreign_db_rich(self, sources: list[PhysiologyDB], db: Type[DataBaseType]) -> None:
+    def _show_foreign_db_rich(self, sources: list[PhysiologyDB], db: Type[ResultDB]) -> None:
         results = []
         with self.open_connection():
             for src in sources:

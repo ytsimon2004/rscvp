@@ -262,7 +262,7 @@ class DecodeAnalysisOptions(AbstractParser,
     # Median Decoding Error #
     # ===================== #
 
-    def populate_database(self, result: BayesDecodeData):
+    def write_database(self, result: BayesDecodeData):
         # noinspection PyTypeChecker
         db = BayesDecodeDB(
             date=self.exp_date,
@@ -270,8 +270,7 @@ class DecodeAnalysisOptions(AbstractParser,
             rec=self.daq_type,
             user=self.username,
             optic=f'{self.plane_index}' if self.plane_index is not None else 'all',
-            region=(self.get_primary_key_field('region') if self.rec_region is None else self.rec_region),
-            pair_wise_group=self.get_primary_key_field('pair_wise_group'),
+            pair_wise_group=self.fetch_gspread('pair_wise_group'),
             n_neurons=result.n_neurons,
             spatial_bins=result.spatial_bin_size,
             temporal_bins=result.temporal_bin_size,
@@ -288,7 +287,7 @@ class DecodeAnalysisOptions(AbstractParser,
         result = cache.load_result()
 
         if self.is_vop_protocol:
-            self.populate_database(result)
+            self.write_database(result)
 
         output_file = output.summary_figure_output(self.session, 'median_decoding_error', f'#{self.cache_version}')
 

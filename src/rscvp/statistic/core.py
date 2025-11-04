@@ -20,7 +20,7 @@ from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.util.cli.cli_stattest import StatisticTestOptions, StatResults
 from rscvp.util.database import (
     DB_TYPE,
-    GenericDB,
+    GenericClassDB,
     BayesDecodeDB,
     VisualSFTFDirDB,
     RSCDatabase
@@ -161,7 +161,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
     def _load_database(db: DB_TYPE) -> pl.DataFrame:
         func = RSCDatabase().get_data
         if db == 'GenericDB':
-            return func(GenericDB)
+            return func(GenericClassDB)
         elif db == 'BayesDecodeDB':
             return func(BayesDecodeDB)
         elif db == 'VisualSFTFDirDB':

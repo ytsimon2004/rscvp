@@ -2,16 +2,16 @@ import math
 from typing import Literal, Final
 
 import polars as pl
-from rscvp.statistic.core import StatPipeline
-from rscvp.util.cli.cli_statistic import StatisticOptions
-from rscvp.util.database import DB_TYPE
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
 from argclz import as_argument, argument
 from argclz.dispatch import Dispatch, dispatch
 from neuralib.plot import plot_figure
 from neuralib.plot.venn import VennDiagram
 from neuralib.util.verbose import publish_annotation
+from rscvp.statistic.core import StatPipeline
+from rscvp.util.cli.cli_statistic import StatisticOptions
+from rscvp.util.database import DB_TYPE
+from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
 __all__ = ['CellTypeStat']
 
@@ -31,8 +31,8 @@ class CellTypeStat(StatPipeline, Dispatch):
 
     load_source = as_argument(StatPipeline.load_source).with_options(default='gspread', choices=('gspread', 'db'))
 
-    sheet_name: Final[GSPREAD_SHEET_PAGE] = 'GenericDB'
-    db_table: Final[DB_TYPE] = 'GenericDB'
+    sheet_name: Final[GSPREAD_SHEET_PAGE] = 'GenericClassDB'
+    db_table: Final[DB_TYPE] = 'GenericClassDB'
 
     def run(self):
         self.load_table(primary_key='date', to_pandas=False)

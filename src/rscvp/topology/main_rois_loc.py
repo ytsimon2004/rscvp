@@ -1,12 +1,11 @@
-from rscvp.util.cli import StimpyOptions
-from rscvp.util.cli.cli_sbx import SBXOptions
-from rscvp.util.cli.cli_suite2p import Suite2pOptions
-
 from argclz import AbstractParser
 from neuralib.imaging.registration import CellularCoordinates
 from neuralib.imaging.suite2p.core import get_s2p_coords
 from neuralib.io import csv_header
 from neuralib.util.verbose import publish_annotation
+from rscvp.util.cli import StimpyOptions
+from rscvp.util.cli.cli_sbx import SBXOptions
+from rscvp.util.cli.cli_suite2p import Suite2pOptions
 from .util import RSCObjectiveFOV
 
 __all__ = ['RoiLocOptions']
@@ -21,7 +20,7 @@ class RoiLocOptions(AbstractParser, Suite2pOptions, StimpyOptions, SBXOptions):
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, page=self.gspread_reference)
+        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, page='fov_table')
         s2p = self.load_suite_2p()
         neuron_list = self.get_all_neurons()
 

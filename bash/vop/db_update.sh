@@ -14,7 +14,8 @@ else
   nP=$3
 fi
 
-OUTPUT="e:/data/user/yu-ting/analysis/phys"
+#OUTPUT="e:/data/user/yu-ting/analysis/phys"
+OUTPUT="."
 OUTPUT_FILE="$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}/cli.log"
 mkdir -p "$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}"
 
@@ -38,10 +39,15 @@ run_python() {
     "$@"
 }
 
+# ------- FOV ---------- #
 
-# ============= #
-# Visual Module #
-# ============= #
+python -m rscvp.topology.main_fov_db \
+    -D "$ED" \
+    -A "$ID" \
+    --commit
+
+
+# ------- Visual Module ---------- #
 
 run_python visual pa \
   --us light \
@@ -51,20 +57,16 @@ run_python visual pa \
 run_python visual st \
   --summary dff \
   --pre \
-  --vr 0.3 \
   --used_session light \
   --commit
 
 run_python visual st \
   --summary fraction \
   --pre \
-  --vr 0.3 \
   --used_session light \
   --commit
 
-# ============= #
-# Bayes Decode  #
-# ============= #
+# ------- Bayes Decode ---------- #
 
 run_python model.bayes_decoding analysis \
   --analysis median_decode_error \
@@ -77,9 +79,7 @@ run_python model.bayes_decoding analysis \
   --load 0 \
   --commit
 
-# ======= #
-# Generic #
-# ======= #
+# ------- Classification ---------- #
 
 run_python selection cls \
   -s light \

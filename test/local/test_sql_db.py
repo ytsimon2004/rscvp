@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from rscvp.model.bayes_decoding.main_decode_analysis import DecodeAnalysisOptions
 from rscvp.selection.main_cls_summary import ClsCellTypeOptions
-from rscvp.util.cli.cli_dbview import DatabaseViewOptions
+from rscvp.util.cli.cli_sql_view import DatabaseViewOptions
 from rscvp.util.io import get_io_config
 from rscvp.visual.main_polar import VisualPolarOptions
 from rscvp.visual.main_sftf_pref import VisualSFTFPrefOptions

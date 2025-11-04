@@ -119,7 +119,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
         dy.update({sftf: [ret[i]] for i, sftf in enumerate(SFTF_ARRANGEMENT)})
         tmp = pl.DataFrame(dy)
         tmp.write_csv(output.mk_subdir('tmp', 'preferred_sftf_dff', '.csv'))
-        self.populate_database(tmp)
+        self.write_database(tmp)
 
         #
         output_file = output.summary_figure_output(
@@ -167,7 +167,7 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
         tmp.write_csv(output.mk_subdir('tmp', 'preferred_sftf_fraction', '.csv'))
 
         if not self.db_debug_mode:
-            self.populate_database(tmp)
+            self.write_database(tmp)
 
         #
         output_file = output.summary_figure_output(
@@ -196,11 +196,8 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
     # Database #
     # ======== #
 
-    def populate_database(self, df: pl.DataFrame) -> None:
-        region = self.get_primary_key_field('region') if self.rec_region is None else self.rec_region
-
+    def write_database(self, df: pl.DataFrame) -> None:
         sftf = list(df.row(by_predicate=pl.col('index') == self.summary_type)[1:])
-
         update_fields = dict(update_time=self.cur_time)
 
         if self.summary_type == 'fraction':
@@ -218,12 +215,11 @@ class VisualSFTFPrefOptions(AbstractParser, SelectionOptions, SQLDatabaseOptions
             rec=self.daq_type,
             user=self.username,
             optic=f'{self.plane_index}' if self.plane_index is not None else 'all',
-            region=region,
-            pair_wise_group=self.get_primary_key_field('pair_wise_group'),
+            pair_wise_group=self.fetch_gspread('pair_wise_group'),
             **update_fields
         )
 
-        self.print_update(db, update_fields)
+        self.print_update(db, **update_fields)
 
 
 if __name__ == '__main__':

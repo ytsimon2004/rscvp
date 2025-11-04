@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import re
 from pathlib import Path
 from typing import NamedTuple, Annotated, Type, Literal, overload
@@ -14,14 +13,14 @@ from rscvp.util.io import IOConfig
 
 __all__ = [
     'DB_TYPE',
-    'DataBaseType',
+    'ResultDB',
     #
     'PhysiologyDB',
     'FieldOfViewDB',
-    'GenericDB',
-    'DarknessGenericDB',
-    'BlankBeltGenericDB',
-    'VRGenericDB',
+    'GenericClassDB',
+    'DarkClassDB',
+    'BlankClassDB',
+    'VRClassDB',
     #
     'BayesDecodeDB',
     'VisualSFTFDirDB',
@@ -30,8 +29,8 @@ __all__ = [
 ]
 
 DB_TYPE = Literal[
-    'GenericDB', 'FieldOfViewDB',
-    'DarknessGenericDB', 'BlankBeltGenericDB', 'VRGenericDB',
+    'GenericClassDB', 'FieldOfViewDB',
+    'DarkClassDB', 'BlankClassDB', 'VRClassDB',
     'BayesDecodeDB', 'VisualSFTFDirDB'
 ]
 
@@ -70,9 +69,13 @@ class PhysiologyDB(NamedTuple):
 
 @sqlclz.named_tuple_table_class
 class FieldOfViewDB(NamedTuple):
+    """Two-photon field of view imaging parameters and registration coordinates"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
+    user: Annotated[str, sqlclz.PRIMARY]
 
+    region: str
+    """imaging region"""
     max_depth: str
     """depth of the most ventral optic plane in um | Literal['ETL']"""
     n_planes: int
@@ -92,74 +95,67 @@ class FieldOfViewDB(NamedTuple):
     lateral_anterior: str
     """lateral anterior coordinate"""
 
-    @sqlclz.foreign(PhysiologyDB.date, PhysiologyDB.animal)
+    @sqlclz.foreign(PhysiologyDB.date, PhysiologyDB.animal, PhysiologyDB.user)
     def _foreign(self):
-        return self.date, self.animal
+        return self.date, self.animal, self.user
 
-
-# TODO maybe not foreign rec, user,
 
 @sqlclz.named_tuple_table_class
-class GenericDB(NamedTuple):
-    """Generic Value Data"""
+class GenericClassDB(NamedTuple):
+    """Neuron classification database from baseline condition (without manipulation)"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
     rec: Annotated[str, sqlclz.PRIMARY]
     user: Annotated[str, sqlclz.PRIMARY]
     optic: Annotated[str, sqlclz.PRIMARY]
 
-    n_planes: int | None = None
-    region: str | None = None
     pair_wise_group: int | None = None
-
     n_total_neurons: int | None = None
     n_selected_neurons: int | None = None
     n_visual_neurons: int | None = None
     n_spatial_neurons: int | None = None
     n_overlap_neurons: int | None = None
 
-    update_time: datetime.datetime | None = None
+    update_time: str | None = None
 
     @sqlclz.foreign(PhysiologyDB)
-    def _animal(self):
+    def _foreign(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
 @sqlclz.named_tuple_table_class
 class BayesDecodeDB(NamedTuple):
-    """Bayes Decode Data"""
+    """Bayes position decode database"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
     rec: Annotated[str, sqlclz.PRIMARY]
     user: Annotated[str, sqlclz.PRIMARY]
     optic: Annotated[str, sqlclz.PRIMARY]
 
-    region: str | None = None
     pair_wise_group: int | None = None
-
     n_neurons: int | None = None
     spatial_bins: float | None = None
     temporal_bins: float | None = None
     median_decode_error: float | None = None
     cross_validation: str | None = None
-    """CrossValidateType {'odd', 'even', 'random_split', int}"""
+    """{'odd', 'even', 'random_split', int}"""
 
-    update_time: datetime.datetime | None = None
+    update_time: str | None = None
 
     @sqlclz.foreign(PhysiologyDB)
-    def _animal(self):
+    def _foreign(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
 @sqlclz.named_tuple_table_class
 class VisualSFTFDirDB(NamedTuple):
+    """Visual SF/TF/Direction database"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
     rec: Annotated[str, sqlclz.PRIMARY]
     user: Annotated[str, sqlclz.PRIMARY]
     optic: Annotated[str, sqlclz.PRIMARY]
 
-    region: str | None = None
     pair_wise_group: int | None = None
 
     # Order followed by ``SFTF_ARRANGEMENT``
@@ -185,66 +181,68 @@ class VisualSFTFDirDB(NamedTuple):
     os_frac: float | None = None
     """Fraction of orientation selective"""
 
-    update_time: datetime.datetime | None = None
+    update_time: str | None = None
 
     @sqlclz.foreign(PhysiologyDB)
-    def _animal(self):
+    def _foreign(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
 @sqlclz.named_tuple_table_class
-class DarknessGenericDB(NamedTuple):
+class DarkClassDB(NamedTuple):
+    """Neuron classification database from darkness condition"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
     rec: Annotated[str, sqlclz.PRIMARY]
     user: Annotated[str, sqlclz.PRIMARY]
     optic: Annotated[str, sqlclz.PRIMARY]
 
-    n_planes: int | None = None
-    region: str | None = None
     n_total_neurons: int | None = None
     n_selected_neurons: int | None = None
     n_spatial_neurons_light_bas: int | None = None
     n_spatial_neurons_dark: int | None = None
     n_spatial_neurons_light_end: int | None = None
 
-    update_time: datetime.datetime | None = None
+    update_time: str | None = None
 
     @sqlclz.foreign(PhysiologyDB)
-    def _animal(self):
+    def _foreign(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
 @sqlclz.named_tuple_table_class
-class BlankBeltGenericDB(NamedTuple):
+class BlankClassDB(NamedTuple):
+    """Neuron classification database from blank treadmill (without tactile cue) condition"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
     rec: Annotated[str, sqlclz.PRIMARY]
     user: Annotated[str, sqlclz.PRIMARY]
     optic: Annotated[str, sqlclz.PRIMARY]
 
-    region: str | None = None
     pair_wise_group: int | None = None
     n_total_neurons: int | None = None
     n_selected_neurons: int | None = None
     n_spatial_neurons: int | None = None
 
-    update_time: datetime.datetime | None = None
+    update_time: str | None = None
 
     @sqlclz.foreign(PhysiologyDB)
-    def _animal(self):
+    def _foreign(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
 @sqlclz.named_tuple_table_class
-class VRGenericDB(NamedTuple):
+class VRClassDB(NamedTuple):
+    """Neuron classification database from VR environment"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
     rec: Annotated[str, sqlclz.PRIMARY]
     user: Annotated[str, sqlclz.PRIMARY]
     optic: Annotated[str, sqlclz.PRIMARY]
 
-    region: str | None = None
+    virtual_map: str | None = None
+    protocol: str | None = None
+
     pair_wise_group: int | None = None
     n_total_neurons: int | None = None
     n_selected_neurons: int | None = None
@@ -254,31 +252,34 @@ class VRGenericDB(NamedTuple):
     """number of position selective neurons persisted in open-loop from closed-loop"""
     n_spatial_remap: int | None = None
     """number of position selective neurons remap in open-loop from closed-loop"""
-    update_time: datetime.datetime | None = None
+    update_time: str | None = None
 
     @sqlclz.foreign(PhysiologyDB)
-    def _animal(self):
+    def _foreign(self):
         return self.date, self.animal, self.rec, self.user, self.optic
 
 
-DataBaseType = GenericDB | BayesDecodeDB | VisualSFTFDirDB | DarknessGenericDB | BlankBeltGenericDB | VRGenericDB
+SourceDB = PhysiologyDB | FieldOfViewDB
+"""Source database for read"""
+ResultDB = GenericClassDB | BayesDecodeDB | VisualSFTFDirDB | DarkClassDB | BlankClassDB | VRClassDB
+"""Analysis result database for write"""
 
 
 class RSCDatabase(sqlclz.Database):
 
     @property
     def database_file(self) -> Path:
-        directory = Path(__file__).parents[3] / 'res' / 'database'
-        return directory / 'rscvp.db'
+        return Path(__file__).parents[3] / 'res' / 'database' / 'rscvp.db'
 
     @property
     def database_tables(self) -> list[type]:
         return [
             PhysiologyDB,
-            GenericDB,
-            DarknessGenericDB,
-            BlankBeltGenericDB,
-            VRGenericDB,
+            FieldOfViewDB,
+            GenericClassDB,
+            DarkClassDB,
+            BlankClassDB,
+            VRClassDB,
             BayesDecodeDB,
             VisualSFTFDirDB
         ]
@@ -336,15 +337,15 @@ class RSCDatabase(sqlclz.Database):
         self.import_new_animals(animals)
 
     @staticmethod
-    def select_foreign_from_source(foreign_db: type[DataBaseType], source: PhysiologyDB) -> sqlclz.Cursor[DataBaseType]:
+    def select_foreign_from_source(foreign_db: type[ResultDB], source: PhysiologyDB) -> sqlclz.Cursor[ResultDB]:
         return sqlclz.util.pull_foreign(foreign_db, source)
 
-    def replace_data(self, data: DataBaseType):
+    def replace_data(self, data: ResultDB):
         """Replace data (insert if new, replace if exists)"""
         with self.open_connection():
             sqlclz.replace_into(type(data)).submit([data])
 
-    def update_data(self, data: DataBaseType, *args: str):
+    def update_data(self, data: ResultDB, *args: str):
         """
         Update the data in database for those with matched primary keys.
 
@@ -375,7 +376,7 @@ class RSCDatabase(sqlclz.Database):
                 sqlclz.update(table, *update).where(*where).submit()
 
     @overload
-    def get_data(self, db: Type[DataBaseType], *,
+    def get_data(self, db: Type[ResultDB], *,
                  date: str,
                  animal: str,
                  rec: str,
@@ -383,7 +384,7 @@ class RSCDatabase(sqlclz.Database):
                  optic: str) -> pl.DataFrame:
         pass
 
-    def get_data(self, db: Type[DataBaseType], **kwargs: str) -> pl.DataFrame:
+    def get_data(self, db: Type[ResultDB], **kwargs: str) -> pl.DataFrame:
         """
         get db as polars dataframe
 
@@ -406,9 +407,8 @@ class RSCDatabase(sqlclz.Database):
 
         return ret
 
-    def upload_to_gspread(self, db: Type[DataBaseType],
-                          gspread_name: SpreadSheetName,
-                          **kwargs) -> None:
+    def submit_gspread(self, db: Type[ResultDB],
+                       gspread_name: SpreadSheetName, **kwargs):
         """upload db to a spreadsheet"""
         df = self.get_data(db, **kwargs)
         upload_dataframe_to_spreadsheet(

@@ -160,7 +160,7 @@ class VisualPolarOptions(AbstractParser, SelectionOptions, BaseVisPolarOptions, 
 
         # database
         if not self.db_debug_mode:
-            self.populate_database(dmx, omx)
+            self.write_database(dmx, omx)
 
         dire = vp.pref_dir[dmx]
         ori = vp.pref_ori[omx]
@@ -177,16 +177,7 @@ class VisualPolarOptions(AbstractParser, SelectionOptions, BaseVisPolarOptions, 
     # Database #
     # ======== #
 
-    def populate_database(self, dmx: np.ndarray, omx: np.ndarray):
-        region = self.get_primary_key_field('region') if self.rec_region is None else self.rec_region
-
-        update_fields = dict(
-            n_ds_neurons=np.count_nonzero(dmx),
-            n_os_neurons=np.count_nonzero(omx),
-            os_frac=np.mean(omx),
-            ds_frac=np.mean(dmx),
-            update_time=self.cur_time
-        )
+    def write_database(self, dmx: np.ndarray, omx: np.ndarray):
 
         db = VisualSFTFDirDB(
             date=self.exp_date,
@@ -194,9 +185,12 @@ class VisualPolarOptions(AbstractParser, SelectionOptions, BaseVisPolarOptions, 
             rec=self.daq_type,
             user=self.username,
             optic=f'{self.plane_index}' if self.plane_index is not None else 'all',
-            region=region,
-            pair_wise_group=self.get_primary_key_field('pair_wise_group'),
-            **update_fields
+            pair_wise_group=self.fetch_gspread('pair_wise_group'),
+            n_ds_neurons=np.count_nonzero(dmx),
+            n_os_neurons=np.count_nonzero(omx),
+            os_frac=float(np.mean(omx)),
+            ds_frac=float(np.mean(dmx)),
+            update_time=self.cur_time
         )
 
         self.print_replace(db)

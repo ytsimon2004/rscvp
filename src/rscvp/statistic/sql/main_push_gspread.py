@@ -20,22 +20,22 @@ class DBtoGspreadOptions(AbstractParser):
     def run(self):
         match self.db_type:
             case 'generic':
-                db = GenericDB
+                db = GenericClassDB
             case 'bayes':
                 db = BayesDecodeDB
             case 'visual':
                 db = VisualSFTFDirDB
             case 'generic_darkness':
-                db = DarknessGenericDB
+                db = DarkClassDB
             case 'generic_blankbelt':
-                db = BlankBeltGenericDB
+                db = BlankClassDB
             case 'generic_vr':
-                db = VRGenericDB
+                db = VRClassDB
             case _:
                 raise ValueError(f'unknown db type: {self.db_type}')
 
         if self.push:
-            RSCDatabase().upload_to_gspread(db, 'YWAnalysis')
+            RSCDatabase().submit_gspread(db, 'YWAnalysis')
         else:
             print(db)
 
