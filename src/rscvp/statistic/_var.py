@@ -36,24 +36,24 @@ VIS_SFTF_HEADERS = ('dff', 'fraction', *SFTF_ARRANGEMENT)
 
 def var_page_dict() -> dict[str, GSPREAD_SHEET_PAGE]:
     s = {
-        it: 'ap_place'
+        it: 'spatial_parq'
         for it in SPATIAL_HEADERS
         if it not in ('ap_cords', 'ml_cords', 'dv_cords')  # special case (in both stat)
     }
 
     v = {
-        it: 'ap_vz'
+        it: 'visual_parq'
         for it in VIS_HEADERS + VIS_DIR_HEADERS + VIS_SFTF_HEADERS
         if it not in ('ap_cords', 'ml_cords', 'dv_cords')  # special case
     }
 
     g = {
-        it: 'ap_generic'
+        it: 'generic_parq'
         for it in GENERIC_HEADERS
     }
 
     pf = {
-        it: 'ap_place'
+        it: 'spatial_parq'
         for it in PF_HEADERS
     }
 

@@ -17,7 +17,7 @@ class DFFStat(LocalSpreadsheetSync):
             truncate_session_agg=opt.truncate_session_agg
         )
 
-        super().__init__(opt, collector=collector, sheet_page='ap_generic')
+        super().__init__(opt, collector=collector, sheet_page='generic_parq')
 
 
 class SpeedStat(LocalSpreadsheetSync):

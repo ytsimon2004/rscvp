@@ -91,7 +91,7 @@ class SpatialStatAggOptions(AbstractParser, StatisticOptions):
                   'accept for session statistic (ldl protocol)'
 
     header = as_argument(StatisticOptions.header).with_options(choices=SPATIAL_HEADERS)
-    sheet_name: Literal['ap_place', 'ap_ldl']
+    sheet_name: Literal['spatial_parq', 'dark_parq']
 
     pre_selection = True
     pc_selection = 'slb'

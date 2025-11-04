@@ -21,8 +21,11 @@ __all__ = [
 
 GSPREAD_SHEET_PAGE = Literal[
     'fov_table',
-    'apcls_blank', 'apcls_tac', 'ap_vz', 'ap_place', 'ap_ldl', 'ap_generic', 'ap_vr',
-    'GenericDB', 'VisualSFTFDirDB', 'BayesDecodeDB', 'DarknessGenericDB', 'BlankBeltGenericDB'
+    'visual_parq', 'spatial_parq', 'dark_parq', 'generic_parq', 'vr_parq',
+
+    'FieldOfViewDB',
+    'BaseClassDB', 'DarkClassDB', 'BlankClassDB', 'VRClassDB',
+    'BayesDecodeDB', 'VisualSFTFDirDB'
 ]
 
 

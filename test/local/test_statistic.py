@@ -93,7 +93,7 @@ class TestStatisticPipeline(unittest.TestCase):
             animal_id = 'YW006,YW006'
             plane_index = '0,0'
             header = 'ap_cords'
-            sheet_name = 'ap_place'
+            sheet_name = 'spatial_parq'
             used_session = 'light'
             update = True
 

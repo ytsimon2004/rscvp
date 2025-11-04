@@ -30,7 +30,7 @@ class VZDirStatGSP(StatPipeline, BaseVisPolarOptions):
         help='histogram unit. counts(cell counts) or fraction(fraction of neurons)'
     )
 
-    sheet_name = 'ap_vz'
+    sheet_name = 'visual_parq'
 
     dependent = False
     parametric = False

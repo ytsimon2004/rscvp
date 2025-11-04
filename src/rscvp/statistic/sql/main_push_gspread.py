@@ -20,7 +20,7 @@ class DBtoGspreadOptions(AbstractParser):
     def run(self):
         match self.db_type:
             case 'generic':
-                db = GenericClassDB
+                db = BaseClassDB
             case 'bayes':
                 db = BayesDecodeDB
             case 'visual':

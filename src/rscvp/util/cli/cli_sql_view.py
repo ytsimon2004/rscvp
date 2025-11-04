@@ -6,7 +6,7 @@ import polars as pl
 import sqlclz
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
-from rscvp.util.database import RSCDatabase, PhysiologyDB, GenericClassDB, BayesDecodeDB, VisualSFTFDirDB, ResultDB
+from rscvp.util.database import RSCDatabase, PhysiologyDB, BaseClassDB, BayesDecodeDB, VisualSFTFDirDB, ResultDB
 
 __all__ = ['DatabaseViewOptions']
 
@@ -79,7 +79,7 @@ class DatabaseViewOptions(RSCDatabase, AbstractParser, Dispatch):
             kwargs[k] = v
 
         data = super().find_physiological_data(**kwargs)
-        self.show_foreign_db(data, GenericClassDB)
+        self.show_foreign_db(data, BaseClassDB)
 
     @dispatch('decode')
     def list_decode_data(self, *args: str):

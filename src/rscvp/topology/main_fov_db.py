@@ -25,6 +25,7 @@ class InsertFOVDBOptions(AbstractParser, StimpyOptions, SQLDatabaseOptions):
             date=self.exp_date,
             animal=self.animal_id,
             user=self.username,
+            usage=self.fetch_gspread('usage', **self._kwargs),
             region=region,
             max_depth=depth,
             n_planes=n_planes,

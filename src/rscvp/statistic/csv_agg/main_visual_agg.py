@@ -20,7 +20,7 @@ class VisualStat(LocalSpreadsheetSync):
             truncate_session_agg=False
         )
 
-        super().__init__(opt, sheet_page='ap_vz', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', collector=collector)
 
 
 class CordVisualStat(LocalSpreadsheetSync):
@@ -34,7 +34,7 @@ class CordVisualStat(LocalSpreadsheetSync):
             truncate_session_agg=False
         )
 
-        super().__init__(opt, sheet_page='ap_vz', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', collector=collector)
 
 
 # ========== #

@@ -30,7 +30,7 @@ class StatisticOptions(SelectionOptions):
         '--trunc-session',
         group=GROUP_STAT,
         help='whether truncate the session for aggregate the csv'
-             'use case: in csv has session <HEADER>_light, but in gspread only <HEADER> (i.e., ap_ldl)'
+             'use case: in csv has session <HEADER>_light, but in gspread only <HEADER> (i.e., dark_parq)'
     )
 
     # ----SpreadSheet---- #

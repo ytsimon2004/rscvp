@@ -26,7 +26,7 @@ class SpatialFractionBlankStat(StatPipeline):
     header = as_argument(StatPipeline.header).with_options(required=False)
 
     load_source = 'gspread'
-    sheet_name: list[GSPREAD_SHEET_PAGE] = ['GenericDB', 'BlankBeltGenericDB']
+    sheet_name: list[GSPREAD_SHEET_PAGE] = ['BaseClassDB', 'BlankClassDB']
 
     df = None  # overwrite
 
@@ -148,10 +148,10 @@ class SpatialFractionBlankStat(StatPipeline):
             # GenericDB: aRSC around x=0.2, pRSC around x=-0.2
             # BlankBeltGenericDB: aRSC around x=1.2, pRSC around x=0.8
             expected_positions = {
-                ('GenericDB', 'aRSC'): (0.2, 0.1),
-                ('GenericDB', 'pRSC'): (-0.2, 0.1),
-                ('BlankBeltGenericDB', 'aRSC'): (1.2, 0.1),
-                ('BlankBeltGenericDB', 'pRSC'): (0.8, 0.1),
+                ('BaseClassDB', 'aRSC'): (0.2, 0.1),
+                ('BaseClassDB', 'pRSC'): (-0.2, 0.1),
+                ('BlankClassDB', 'aRSC'): (1.2, 0.1),
+                ('BlankClassDB', 'pRSC'): (0.8, 0.1),
             }
 
             for collection in collections:
@@ -204,8 +204,8 @@ class SpatialFractionBlankStat(StatPipeline):
             # For anterior/posterior: x-axis is region, hue is table
             # GenericDB around x=-0.2, BlankBeltGenericDB around x=0.2
             expected_positions = {
-                'GenericDB': (-0.2, 0.15),
-                'BlankBeltGenericDB': (0.2, 0.15),
+                'BaseClassDB': (-0.2, 0.15),
+                'BlankClassDB': (0.2, 0.15),
             }
 
             for collection in collections:
@@ -239,12 +239,12 @@ class SpatialFractionBlankStat(StatPipeline):
             for group_id in df_filtered['pair_wise_group'].unique():
                 pair_df = df_filtered.filter(pl.col('pair_wise_group') == group_id)
 
-                generic_data = pair_df.filter(pl.col('table') == 'GenericDB')
-                blank_data = pair_df.filter(pl.col('table') == 'BlankBeltGenericDB')
+                generic_data = pair_df.filter(pl.col('table') == 'BaseClassDB')
+                blank_data = pair_df.filter(pl.col('table') == 'BlankClassDB')
 
                 if len(generic_data) == 1 and len(blank_data) == 1:
-                    generic_pos = point_positions.get(('GenericDB', group_id))
-                    blank_pos = point_positions.get(('BlankBeltGenericDB', group_id))
+                    generic_pos = point_positions.get(('BaseClassDB', group_id))
+                    blank_pos = point_positions.get(('BlankClassDB', group_id))
 
                     if generic_pos is not None and blank_pos is not None:
                         ax.plot([generic_pos[0], blank_pos[0]], [generic_pos[1], blank_pos[1]],
@@ -263,10 +263,10 @@ class SpatialFractionBlankStat(StatPipeline):
 
         # Define expected x-ranges for each table-region combination
         expected_positions = {
-            ('GenericDB', 'aRSC'): (0.2, 0.1),
-            ('GenericDB', 'pRSC'): (-0.2, 0.1),
-            ('BlankBeltGenericDB', 'aRSC'): (1.2, 0.1),
-            ('BlankBeltGenericDB', 'pRSC'): (0.8, 0.1),
+            ('BaseClassDB', 'aRSC'): (0.2, 0.1),
+            ('BaseClassDB', 'pRSC'): (-0.2, 0.1),
+            ('BlankClassDB', 'aRSC'): (1.2, 0.1),
+            ('BlankClassDB', 'pRSC'): (0.8, 0.1),
         }
 
         # match points and add text annotations
@@ -352,14 +352,14 @@ class SpatialFractionBlankStat(StatPipeline):
 
         for region in regions:
             region_data = df_filtered.filter(pl.col('region') == region)
-            generic_data = region_data.filter(pl.col('table') == 'GenericDB')['fraction'].to_numpy()
-            blank_data = region_data.filter(pl.col('table') == 'BlankBeltGenericDB')['fraction'].to_numpy()
+            generic_data = region_data.filter(pl.col('table') == 'BaseClassDB')['fraction'].to_numpy()
+            blank_data = region_data.filter(pl.col('table') == 'BlankClassDB')['fraction'].to_numpy()
 
             if len(generic_data) > 0 and len(blank_data) > 0:
                 result = mannwhitneyu(generic_data, blank_data)  # non-pair
                 p_value = result.pvalue
 
-                print(f"   {region}: GenericDB vs BlankBeltGenericDB")
+                print(f"   {region}: BaseClassDB vs BlankClassDB")
                 print(f"      p-value: {p_value:.6f}")
                 print(f"      n_generic: {len(generic_data)}, n_blank: {len(blank_data)}")
 

@@ -16,18 +16,15 @@ from .cli_core import CommonOptions
 
 __all__ = ['SQLDatabaseOptions']
 
-
 T = TypeVar('T')
 
 
 class SQLDatabaseOptions(CommonOptions, Generic[T], metaclass=abc.ABCMeta):
-    """Generic T = supporting GenericDB | BayesDecodeDB | VisualSFTFDirDB"""
-
     db_commit: bool = argument('--commit', help='commit database operations')
 
-    db_debug_mode: bool = argument('--db-debug', help='debug mode for database operations')
+    db_debug_mode: bool = argument('--db-debug', help='debug mode for database operations')  # TODO maybe disable
 
-    _gspread_dataframe: pl.DataFrame = None  # cache
+    _gspread_dataframe: pl.DataFrame | None = None  # cache
 
     @property
     def cur_time(self) -> str:

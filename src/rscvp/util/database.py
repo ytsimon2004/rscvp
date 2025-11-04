@@ -17,7 +17,7 @@ __all__ = [
     #
     'PhysiologyDB',
     'FieldOfViewDB',
-    'GenericClassDB',
+    'BaseClassDB',
     'DarkClassDB',
     'BlankClassDB',
     'VRClassDB',
@@ -29,7 +29,7 @@ __all__ = [
 ]
 
 DB_TYPE = Literal[
-    'GenericClassDB', 'FieldOfViewDB',
+    'BaseClassDB', 'FieldOfViewDB',
     'DarkClassDB', 'BlankClassDB', 'VRClassDB',
     'BayesDecodeDB', 'VisualSFTFDirDB'
 ]
@@ -74,6 +74,9 @@ class FieldOfViewDB(NamedTuple):
     animal: Annotated[str, sqlclz.PRIMARY]
     user: Annotated[str, sqlclz.PRIMARY]
 
+    usage: Literal['base', 'dark', 'blank', 'vr']
+    """data usage"""
+
     region: str
     """imaging region"""
     max_depth: str
@@ -101,7 +104,7 @@ class FieldOfViewDB(NamedTuple):
 
 
 @sqlclz.named_tuple_table_class
-class GenericClassDB(NamedTuple):
+class BaseClassDB(NamedTuple):
     """Neuron classification database from baseline condition (without manipulation)"""
     date: Annotated[str, sqlclz.PRIMARY]
     animal: Annotated[str, sqlclz.PRIMARY]
@@ -261,7 +264,7 @@ class VRClassDB(NamedTuple):
 
 SourceDB = PhysiologyDB | FieldOfViewDB
 """Source database for read"""
-ResultDB = GenericClassDB | BayesDecodeDB | VisualSFTFDirDB | DarkClassDB | BlankClassDB | VRClassDB
+ResultDB = BaseClassDB | BayesDecodeDB | VisualSFTFDirDB | DarkClassDB | BlankClassDB | VRClassDB
 """Analysis result database for write"""
 
 
@@ -276,7 +279,7 @@ class RSCDatabase(sqlclz.Database):
         return [
             PhysiologyDB,
             FieldOfViewDB,
-            GenericClassDB,
+            BaseClassDB,
             DarkClassDB,
             BlankClassDB,
             VRClassDB,

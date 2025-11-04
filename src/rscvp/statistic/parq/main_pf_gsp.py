@@ -7,14 +7,14 @@ import scipy
 import seaborn as sns
 from matplotlib import pyplot as plt
 from rich.pretty import pprint
-from rscvp.statistic._var import PF_HEADERS
-from rscvp.statistic.core import StatPipeline
-from rscvp.util.util_plot import REGION_COLORS_HIST
-from rscvp.util.util_stat import DataSetType, CollectDataSet
 
 from argclz import as_argument
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import fprint, publish_annotation
+from rscvp.statistic._var import PF_HEADERS
+from rscvp.statistic.core import StatPipeline
+from rscvp.util.util_plot import REGION_COLORS_HIST
+from rscvp.util.util_stat import DataSetType, CollectDataSet
 
 __all__ = ['PFStatGSP']
 
@@ -223,7 +223,7 @@ class PFStatGSP(StatPipeline):
     # ==================== #
 
     def plot_pf_peak_loc(self, data: DataSetType):
-        bin_range = (0, 210) if self.sheet_name == 'ap_vr' else (0, 150)
+        bin_range = (0, 210) if self.sheet_name == 'vr_parq' else (0, 150)
 
         with plot_figure(self.output_figure) as ax:
             for i, (var, peak_loc) in enumerate(data.items()):

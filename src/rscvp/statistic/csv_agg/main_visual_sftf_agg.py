@@ -28,7 +28,7 @@ class VZSFTFStat(LocalSpreadsheetSync):
             fields=dict(rec_region=str, plane_index=try_int_type)
         )
 
-        super().__init__(opt, sheet_page='ap_vz', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', collector=collector)
 
 
 class VZSFTFAggOption(AbstractParser, StatisticOptions):

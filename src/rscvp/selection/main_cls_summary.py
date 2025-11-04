@@ -9,7 +9,7 @@ from neuralib.plot.plot import axvline_histplot
 from neuralib.util.verbose import publish_annotation
 from rscvp.spatial.util import get_remap_dataframe
 from rscvp.util.cli import PlotOptions, SelectionOptions, SelectionMask, SQLDatabaseOptions
-from rscvp.util.database import GenericClassDB, DarkClassDB, BlankClassDB, VRClassDB
+from rscvp.util.database import BaseClassDB, DarkClassDB, BlankClassDB, VRClassDB
 
 __all__ = ['ClsCellTypeOptions']
 
@@ -70,9 +70,9 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
             **self._foreign_key
         )
 
-    def _write_generic(self) -> GenericClassDB:
+    def _write_generic(self) -> BaseClassDB:
         mask = self.get_selection_mask()
-        return GenericClassDB(
+        return BaseClassDB(
             pair_wise_group=self.fetch_gspread('pair_wise_group'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=mask.n_neurons,
@@ -98,7 +98,7 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
         df = get_remap_dataframe(self, remap_value=self.vr_remap_value)
 
         return VRClassDB(
-            pair_wise_group=self.fetch_gspread('pair_wise_group', page='ap_vr'),
+            pair_wise_group=self.fetch_gspread('pair_wise_group', page='vr_parq'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=self.n_selected_neurons,
             n_spatial_neurons=np.count_nonzero(df['spatial_close']),

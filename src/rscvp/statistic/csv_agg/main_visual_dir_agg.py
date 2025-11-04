@@ -25,7 +25,7 @@ class VZDirStat(LocalSpreadsheetSync):
             fields=dict(rec_region=str, plane_index=try_int_type)
         )
 
-        super().__init__(opt, sheet_page='ap_vz', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', collector=collector)
 
         # sort based on tf order, transform due to different orders as D,OSI_{x}
         self.sftf = sftf or self.SFTF

@@ -1,12 +1,11 @@
 from typing import Literal, Final
 
-from rscvp.statistic.core import StatPipeline
-from rscvp.util.cli.cli_statistic import StatisticOptions
-from rscvp.util.util_plot import REGION_COLORS_PHY
-
 from argclz import as_argument, argument
 from neuralib.plot import plot_figure, violin_boxplot
 from neuralib.util.verbose import publish_annotation
+from rscvp.statistic.core import StatPipeline
+from rscvp.util.cli.cli_statistic import StatisticOptions
+from rscvp.util.util_plot import REGION_COLORS_PHY
 
 __all__ = ['GenericGSP']
 
@@ -24,7 +23,7 @@ class GenericGSP(StatPipeline):
     )
 
     load_source: Final = 'parquet'
-    sheet_name: Final = 'ap_generic'
+    sheet_name: Final = 'generic_parq'
 
     def run(self):
         self.load_table(to_pandas=False)

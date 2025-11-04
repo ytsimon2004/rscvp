@@ -11,15 +11,15 @@ from rscvp.util.util_gspread import RSCGoogleWorkSheet, filter_tdhash, GSPREAD_S
 
 __all__ = ['LocalSpreadsheetSync']
 
-# headers to sync from gspread to parqueted files while init (first time copy), not the pickled cell
+# headers to sync from gspread to parqueted files while init (first time copy)
 # workpage: range
 _INIT_DEFAULT_COLS_GSPREAD_PARQUET = {
-    'ap_vz': 'B1:E1',
-    'ap_place': 'B1:E1',
-    'ap_generic': 'B1:E1',
+    'visual_parq': 'B1:E1',
+    'spatial_parq': 'B1:E1',
+    'generic_parq': 'B1:E1',
     #
-    'ap_ldl': 'B1:E1',
-    'ap_vr': 'B1:G1'
+    'dark_parq': 'B1:E1',
+    'vr_parq': 'B1:G1'
 }
 
 

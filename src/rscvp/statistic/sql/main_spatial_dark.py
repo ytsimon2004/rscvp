@@ -21,12 +21,12 @@ class SpatialFractionDarkStat(StatPipeline):
     load_source = as_argument(StatPipeline.load_source).with_options(default='gspread', choices=('gspread', 'db'))
     rec_region: Literal['aRSC', 'pRSC', 'all'] = as_argument(CommonOptions.rec_region).with_options(default='all')
 
-    sheet_name: Final = 'DarknessGenericDB'
-    db_table: Final = 'DarknessGenericDB'
+    sheet_name: Final = 'DarkClassDB'
+    db_table: Final = 'DarkClassDB'
 
     def run(self):
         self.load_table(primary_key='date', to_pandas=False, concat_plane_only=True)
-        self.df = as_validate_sql_table(self.df, 'ap_ldl')
+        self.df = as_validate_sql_table(self.df, 'dark_parq')
         self.plot()
 
     def plot(self):

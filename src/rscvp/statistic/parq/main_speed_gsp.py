@@ -56,7 +56,7 @@ class SpeedStatGSP(StatPipeline):
             return ret
 
         else:
-            df_vis = GSPExtractor('ap_vz').load_parquet_file(
+            df_vis = GSPExtractor('visual_parq').load_parquet_file(
                 self.statistic_dir,
                 session_melt_header=None,
                 primary_key='Data'

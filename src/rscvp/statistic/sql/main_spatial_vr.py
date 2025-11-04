@@ -17,7 +17,7 @@ class SpatialFractionVRStat(StatPipeline):
     header = as_argument(StatPipeline.header).with_options(required=False)
     load_source = as_argument(StatPipeline.load_source).with_options(default='gspread', choices=('gspread', 'db'))
 
-    sheet_name = 'VRGenericDB'
+    sheet_name = 'VRClassDB'
 
     def run(self):
         self.load_table(primary_key='date', to_pandas=False, concat_plane_only=True)

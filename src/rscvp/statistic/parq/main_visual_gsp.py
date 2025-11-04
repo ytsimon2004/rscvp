@@ -36,7 +36,7 @@ class VisStatGSP(StatPipeline):
 
     header = as_argument(StatisticOptions.header).with_options(choices=VIS_HEADERS)
 
-    sheet_name: Final = 'ap_vz'
+    sheet_name: Final = 'visual_parq'
 
     dependent = False
     ttest_parametric_infer = True
