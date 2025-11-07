@@ -49,10 +49,16 @@ class PhysiologyDB(NamedTuple):
 
     @classmethod
     def parse_dir_structure(cls, directory: Path) -> list[PhysiologyDB]:
-        matches = re.match(r'(\d+)_(\w+)__(\w+)_(\w+)', directory.name)
+        name = directory.name
+        matches = re.match(r'(\d+)_(\w+)__(\w+)_(\w+)', name)
         if matches:
             date, animal, rec, user = matches.groups()
 
+            if '_' in rec:  # 210315_YW006__2P_YW_s2p_16-03-25
+                fprint(f'{name} not analysed yet', vtype='warning')
+                return []
+
+            # find planes
             optics = ['all']  # for concat data
             p = list(directory.glob('suite2p/plane*'))
             if len(p) != 0:
@@ -60,10 +66,10 @@ class PhysiologyDB(NamedTuple):
                     optics.extend(pp.name[5:])
                 return [PhysiologyDB(date, animal, rec, user, o) for o in optics]
             else:
-                fprint(f'no registered file found in {directory.name}', vtype='warning')
+                fprint(f'no suite2p registered file found in {name}', vtype='error')
                 return []
         else:
-            fprint(f'{directory.name} invalid', vtype='error')
+            fprint(f'{name} pattern invalid', vtype='error')
             return []
 
 

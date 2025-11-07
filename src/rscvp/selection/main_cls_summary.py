@@ -99,6 +99,8 @@ class ClsCellTypeOptions(AbstractParser, SelectionOptions, PlotOptions, SQLDatab
 
         return VRClassDB(
             pair_wise_group=self.fetch_gspread('pair_wise_group', page='vr_parq'),
+            virtual_map=self.fetch_gspread('map', page='vr_parq'),
+            protocol=self.fetch_gspread('prot', page='vr_parq'),
             n_total_neurons=self.n_total_neurons,
             n_selected_neurons=self.n_selected_neurons,
             n_spatial_neurons=np.count_nonzero(df['spatial_close']),
