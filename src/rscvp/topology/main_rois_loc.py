@@ -20,7 +20,7 @@ class RoiLocOptions(AbstractParser, Suite2pOptions, StimpyOptions, SBXOptions):
     def run(self):
         self.extend_src_path(self.exp_date, self.animal_id, self.daq_type, self.username)
 
-        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, page='fov_table')
+        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id)
         s2p = self.load_suite_2p()
         neuron_list = self.get_all_neurons()
 

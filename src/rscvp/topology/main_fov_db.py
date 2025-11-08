@@ -43,7 +43,7 @@ class InsertFOVDBOptions(AbstractParser, StimpyOptions, SQLDatabaseOptions):
         region = self.fetch_gspread('region', **self._kwargs)
         depth = self.fetch_gspread('depth', **self._kwargs)
         n_planes = self.fetch_gspread('n_planes', **self._kwargs)
-        rot = self.fetch_gspread('rotation', **self._kwargs)
+        rot = self.fetch_gspread('objective_rotation', **self._kwargs)
         mag = self._default_objective_magnification
 
         return region, depth, n_planes, rot, mag
@@ -51,14 +51,14 @@ class InsertFOVDBOptions(AbstractParser, StimpyOptions, SQLDatabaseOptions):
     def _import_fov_paras(self):
         def _json(cords: str):
             """Convert coordinate string like '0;-1.17' to JSON array [0.0, -1.17]"""
-            coords_str = cords.replace(';', ',')
+            coords_str = cords.strip('[]')
             coords_list = [float(x.strip()) for x in coords_str.split(',')]
             return json.dumps(coords_list)
 
-        ma = self.fetch_gspread('loc_MA', **self._kwargs)
-        mp = self.fetch_gspread('loc_MP', **self._kwargs)
-        lp = self.fetch_gspread('loc_LP', **self._kwargs)
-        la = self.fetch_gspread('loc_LA', **self._kwargs)
+        ma = self.fetch_gspread('medial_anterior', **self._kwargs)
+        mp = self.fetch_gspread('medial_posterior', **self._kwargs)
+        lp = self.fetch_gspread('lateral_posterior', **self._kwargs)
+        la = self.fetch_gspread('lateral_anterior', **self._kwargs)
 
         return _json(ma), _json(mp), _json(lp), _json(la)
 

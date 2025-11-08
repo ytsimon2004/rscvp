@@ -14,8 +14,7 @@ else
   nP=$3
 fi
 
-#OUTPUT="e:/data/user/yu-ting/analysis/phys"
-OUTPUT="."
+OUTPUT="e:/data/user/yu-ting/analysis/phys"
 OUTPUT_FILE="$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}/cli.log"
 mkdir -p "$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}"
 

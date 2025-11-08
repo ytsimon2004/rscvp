@@ -1,10 +1,9 @@
+from argclz import AbstractParser, as_argument, argument
+from neuralib.plot import plot_figure
+from neuralib.util.verbose import publish_annotation
 from rscvp.topology.util import RSCObjectiveFOV
 from rscvp.util.cli import CommonOptions, SBXOptions, StatisticOptions
 from rscvp.util.util_ibl import IBLAtlasPlotWrapper
-
-from argclz import AbstractParser, as_argument
-from neuralib.plot import plot_figure
-from neuralib.util.verbose import publish_annotation
 
 __all__ = ['FieldOfViewOptions']
 
@@ -17,8 +16,13 @@ class FieldOfViewOptions(AbstractParser, SBXOptions):
     animal_id: str = as_argument(CommonOptions.animal_id).with_options(required=False)
     header = as_argument(StatisticOptions.header).with_options(required=False)
 
+    database: bool = argument('--db', help='load from rscvp database, otherwise from gspread')
+
     def run(self):
-        fovs = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, page=self.gspread_page)
+        if self.database:
+            fovs = RSCObjectiveFOV.load_from_database(self.exp_date, self.animal_id)
+        else:
+            fovs = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id)
 
         with plot_figure(None) as ax:
             ibl = IBLAtlasPlotWrapper()

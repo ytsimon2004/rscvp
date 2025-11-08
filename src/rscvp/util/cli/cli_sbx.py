@@ -1,12 +1,11 @@
 from typing import ClassVar
 
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
-
 from argclz import argument
 from neuralib.imaging.scanbox.core import SBXInfo
 from neuralib.imaging.suite2p import Suite2PResult
 from neuralib.util.utils import uglob
 from neuralib.util.verbose import fprint
+from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from .cli_core import CommonOptions
 
 __all__ = ['SBXOptions']
@@ -39,7 +38,7 @@ class SBXOptions(CommonOptions):
         """From theoretical XY(um) to actual brain atlas coordinate (brain size variation from individual animal)"""
         from rscvp.topology.util import RSCObjectiveFOV
 
-        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, page=self.gspread_page).to_um()
+        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id).to_um()
         d = self.scanbox_distance
         fx = fov.ml_distance / d[0]
         fy = fov.ap_distance / d[1]

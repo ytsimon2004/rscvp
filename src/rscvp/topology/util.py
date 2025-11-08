@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import final
 
 import attrs
@@ -6,11 +7,10 @@ import polars as pl
 from typing_extensions import Self
 
 from neuralib.imaging.registration import FieldOfView
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
 __all__ = ['RSCObjectiveFOV']
 
-COORDINATES_FIELD = ['loc_MA', 'loc_MP', 'loc_LA', 'loc_LP']
+COORDINATES_FIELD = ['medial_anterior', 'medial_posterior', 'lateral_anterior', 'lateral_posterior']
 
 
 @final
@@ -18,68 +18,70 @@ COORDINATES_FIELD = ['loc_MA', 'loc_MP', 'loc_LA', 'loc_LP']
 class RSCObjectiveFOV(FieldOfView):
 
     @classmethod
-    def load_from_gspread(cls, exp_date: str | None,
-                          animal_id: str | None,
-                          page: GSPREAD_SHEET_PAGE = 'apcls_tac') -> Self | list[Self]:
-        """Load fov coordinates using gspread record"""
+    def load_from_gspread(cls, exp_date: str | None = None,
+                          animal_id: str | None = None,
+                          usage: str = 'base') -> Self | list[Self]:
+        """Load fov coordinates from google spreadsheet"""
         from rscvp.statistic.cli_gspread import GSPExtractor
 
-        df = GSPExtractor(page).load_from_gspread()
+        df = GSPExtractor('fov_table').load_from_gspread().filter(pl.col('usage') == usage)
 
-        if exp_date is None and animal_id is None:
-            return _load_fov_all(df)
-        elif exp_date is None and animal_id is not None:
-            return _load_fov_animal(df, animal_id)
-        else:
-            return _load_fov_date_animal(df, exp_date, animal_id)
+        return _to_fov(df, exp_date, animal_id, use_db=False)
 
+    @classmethod
+    def load_from_database(cls, exp_date: str | None = None,
+                           animal_id: str | None = None,
+                           usage: str = 'base'):
+        """Load fov coordinates from local project sqlite database"""
+        import sqlite3
+        db_file = Path(__file__).parents[3] / 'res' / 'database' / 'rscvp.db'
+        conn = sqlite3.connect(db_file)
 
-def _load_fov_date_animal(df: pl.DataFrame,
-                          exp_date: str,
-                          animal_id: str) -> RSCObjectiveFOV:
-    """load a specific recording FOV"""
-    data = f'{exp_date}_{animal_id}'
-    df = df.filter(pl.col('Data') == data)
-    region = df.select('region').item()
-    rot = df.select('rotation').item()
+        df = pl.read_database(
+            query='SELECT * FROM "FieldOfViewDB"',
+            connection=conn
+        ).filter(pl.col('usage') == usage)
 
-    loc = (df.select(COORDINATES_FIELD)
-           .to_numpy()
-           .flatten()
-           .astype(str))
-
-    loc = [np.array([x.split(';')[0], x.split(';')[1]], dtype=float)
-           for x in loc]
-
-    corners = np.vstack([*loc])
-
-    return RSCObjectiveFOV(corners, rotation_ml=rot, region_name=region)
+        return _to_fov(df, exp_date, animal_id, use_db=True)
 
 
-def _load_fov_animal(df: pl.DataFrame, animal_id: str) -> list[RSCObjectiveFOV]:
-    """load one animal across different dates FOV"""
-    df = df.filter(pl.col('Data').str.contains(animal_id))
-    region = df['region']
-    rot = df['rotation']
-    points = df.select(COORDINATES_FIELD).to_numpy()
-
-    points = np.array([list(map(lambda x: list(map(float, x.split(';'))), row)) for row in points])
-
-    return [RSCObjectiveFOV(np.vstack([*p]), rotation_ml=rot[i], region_name=region[i])
-            for i, p in enumerate(points)]
-
-
-def _load_fov_all(df: pl.DataFrame) -> list[RSCObjectiveFOV]:
+def _to_fov(df: pl.DataFrame,
+            exp_date: str | None = None,
+            animal_id: str | None = None,
+            use_db: bool = False) -> list[RSCObjectiveFOV]:
     """load all recording FOV"""
     region = df['region'].to_list()
-    rot = df['rotation'].to_list()
+    rot = df['objective_rotation'].to_list()
+
+    #
+    if exp_date is not None:
+        if use_db:
+            df = df.filter(pl.col('date') == exp_date)
+        else:
+            df = df.filter(pl.col('Data').str.contains(exp_date))
+
+    #
+    if animal_id is not None:
+        if use_db:
+            df = df.filter(pl.col('animal') == animal_id)
+        else:
+            df = df.filter(pl.col('Data').str.contains(animal_id))
+
+    #
+    df = df.with_columns([
+        pl.col(c)
+        .str.strip_chars("[]")
+        .str.split(by=",")
+        .list.eval(pl.element().str.strip_chars().cast(pl.Float64))
+        .alias(c)
+        for c in COORDINATES_FIELD
+    ])
+
     points = (
         df.select(COORDINATES_FIELD)
         .drop_nulls()
         .to_numpy()
     )
-
-    points = np.array([list(map(lambda x: list(map(float, x.split(';'))), row)) for row in points])
 
     return [RSCObjectiveFOV(np.vstack([*p]), rotation_ml=rot[i], region_name=region[i])
             for i, p in enumerate(points)]

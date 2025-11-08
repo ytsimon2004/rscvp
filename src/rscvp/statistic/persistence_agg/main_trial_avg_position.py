@@ -11,7 +11,6 @@ from rscvp.spatial.util import sort_neuron
 from rscvp.spatial.util_plot import plot_sorted_trial_averaged_heatmap
 from rscvp.statistic.persistence_agg.core import AbstractPersistenceAgg, data_region_dict
 from rscvp.util.cli import Region, SelectionOptions
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from rscvp.util.util_trials import TrialSelection
 from stimpyp import Session
 
@@ -32,12 +31,6 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, Select
     force_sort: bool = argument(
         '--force-sort',
         help='Force sorting not matter there is index cache'
-    )
-
-    region_validate_page: GSPREAD_SHEET_PAGE = argument(
-        '--page',
-        required=True,
-        help='Page to validate the region column to be consistent'
     )
 
     do_cv: bool = argument(
@@ -89,7 +82,7 @@ class PositionBinPersistenceAgg(AbstractPersistenceAgg, ApplyPosBinCache, Select
         """Validate and get region (region-specific analysis)"""
         data = self.data_identity
 
-        dy = data_region_dict(self.region_validate_page)
+        dy = data_region_dict('fov_table')
         val = [dy[d] for d in data]
         if len(set(val)) != 1:
             raise RuntimeError('not unique region')

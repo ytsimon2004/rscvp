@@ -49,7 +49,7 @@ class AbstractTopoPlotOptions(AbstractParser, SelectionOptions, SBXOptions, Plot
 
     def run(self):
         s2p = self.load_suite_2p()
-        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, page=self.gspread_page)
+        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id)
         cords = (
             get_s2p_coords(s2p, self.get_all_neurons(), self.plane_index, self.pixel2distance_factor(s2p))
             .relative_origin(fov)
