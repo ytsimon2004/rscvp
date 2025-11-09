@@ -33,13 +33,15 @@ class SQLDatabaseOptions(CommonOptions, Generic[T], metaclass=abc.ABCMeta):
 
     def fetch_gspread(self, field: str,
                       auto_cast: bool = True,
-                      page: WorkPageName = 'fov_table') -> Any:
+                      page: WorkPageName = 'fov_table',
+                      default_value: Any | None = None) -> Any:
         """
         Specify a ``field name`` and get a cell from the primary key
 
         :param field: field(header) in the gspread worksheet
         :param auto_cast: auto cast numerical
         :param page: Page name
+        :param default_value: default value if error
         :return:
         """
         if self._gspread_dataframe is None:
@@ -56,8 +58,9 @@ class SQLDatabaseOptions(CommonOptions, Generic[T], metaclass=abc.ABCMeta):
             df = pl.select(to_numeric(s) for s in df)
 
         data = f'{self.exp_date}_{self.animal_id}'
+        ret = df.filter(pl.col('Data') == data)[field].item()
 
-        return df.filter(pl.col('Data') == data)[field].item()
+        return ret or default_value
 
     @abc.abstractmethod
     def write_database(self, *args, **kwargs) -> None:

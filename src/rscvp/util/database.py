@@ -95,13 +95,13 @@ class FieldOfViewDB(NamedTuple):
     """objective magnification"""
 
     # registration - stored as JSON TEXT '[x, y]'
-    medial_anterior: str
+    medial_anterior: str | None = None
     """medial anterior coordinate"""
-    medial_posterior: str
+    medial_posterior: str | None = None
     """medial posterior coordinate"""
-    lateral_posterior: str
+    lateral_posterior: str | None = None
     """lateral posterior coordinate"""
-    lateral_anterior: str
+    lateral_anterior: str | None = None
     """lateral anterior coordinate"""
 
     @sqlclz.foreign(PhysiologyDB.date, PhysiologyDB.animal, PhysiologyDB.user)

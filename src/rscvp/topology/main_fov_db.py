@@ -1,6 +1,7 @@
 import json
 
 from argclz import AbstractParser
+from neuralib.util.verbose import fprint
 from rscvp.util.cli import SQLDatabaseOptions, StimpyOptions
 from rscvp.util.database import FieldOfViewDB
 
@@ -41,9 +42,9 @@ class InsertFOVDBOptions(AbstractParser, StimpyOptions, SQLDatabaseOptions):
 
     def _import_imaging_paras(self):
         region = self.fetch_gspread('region', **self._kwargs)
-        depth = self.fetch_gspread('depth', **self._kwargs)
+        depth = self.fetch_gspread('depth', default_value=100, **self._kwargs)
         n_planes = self.fetch_gspread('n_planes', **self._kwargs)
-        rot = self.fetch_gspread('objective_rotation', **self._kwargs)
+        rot = self.fetch_gspread('objective_rotation', default_value=0, **self._kwargs)
         mag = self._default_objective_magnification
 
         return region, depth, n_planes, rot, mag
@@ -51,6 +52,10 @@ class InsertFOVDBOptions(AbstractParser, StimpyOptions, SQLDatabaseOptions):
     def _import_fov_paras(self):
         def _json(cords: str):
             """Convert coordinate string like '0;-1.17' to JSON array [0.0, -1.17]"""
+            if cords is None:
+                fprint(f'missing registration to dorsal cortex for {self.stimpy_filename}', vtype='warning')
+                return None
+
             coords_str = cords.strip('[]')
             coords_list = [float(x.strip()) for x in coords_str.split(',')]
             return json.dumps(coords_list)
