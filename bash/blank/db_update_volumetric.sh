@@ -1,7 +1,7 @@
-#!/bin/bash
+#! /bin/bash
 
 set -e
-set -x  # Enable shell tracing
+set -x
 
 cd ../..
 
@@ -11,13 +11,10 @@ if [ $# -eq 0 ]; then
 else
   ED=$1
   ID=$2
-  nP=$3
 fi
 
 OUTPUT="e:/data/user/yu-ting/analysis/phys"
-OUTPUT_FILE="$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}/cli.log"
-mkdir -p "$OUTPUT/${ED}_${ID}__2P_YW/plane${nP}"
-
+OUTPUT_FILE="$OUTPUT/${ED}_${ID}__2P_YW/concat_etl.log"
 
 export NO_COLOR=1
 
@@ -30,21 +27,19 @@ run_python() {
   local a=$2
   shift 2
 
-  echo "*** now run ${ED}_${ID}__2P_YW/plane${nP} $m $a ***"
+  echo "*** now run ${ED}_${ID}__2P_YW/concat $m $a ***"
   python -m rscvp.$m $a \
     -D "$ED" \
     -A "$ID" \
-    -P "${nP}" \
     "$@"
 }
 
+echo '# ================================================== #'
+echo 'git commit hash: ' $(git rev-parse --verify HEAD --short)
+date
 
-python -m rscvp.topology.main_fov_db \
-    -D "$ED" \
-    -A "$ID" \
-    --commit
 
 run_python selection cls \
-  -s light_bas \
-  --us light_bas \
+  -s light \
+  --us light \
   --commit
