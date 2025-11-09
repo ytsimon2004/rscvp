@@ -7,10 +7,10 @@ from neuralib.plot import plot_figure
 from neuralib.typing import AxesArray, ArrayLikeStr, ArrayLike
 from rscvp.statistic.core import StatPipeline
 
-__all__ = ['SpatialFractionVRStat']
+__all__ = ['VRClassStat']
 
 
-class SpatialFractionVRStat(StatPipeline):
+class VRClassStat(StatPipeline):
     DESCRIPTION = ('Fraction of position cells, and proportion of persistent place field / remap '
                    'in anterior v.s. posterior RSC in closed-loop VR')
 
@@ -20,7 +20,7 @@ class SpatialFractionVRStat(StatPipeline):
     sheet_name = 'VRClassDB'
 
     def run(self):
-        self.load_table(primary_key='date', to_pandas=False, concat_plane_only=True)
+        self.load_table(primary_key='date', to_pandas=False, concat_plane=True)
         self.plot()
 
     def plot(self):
@@ -90,4 +90,4 @@ class SpatialFractionVRStat(StatPipeline):
 
 
 if __name__ == '__main__':
-    SpatialFractionVRStat().main()
+    VRClassStat().main()

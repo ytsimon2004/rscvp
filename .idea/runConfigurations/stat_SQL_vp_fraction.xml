@@ -23,8 +23,9 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="rscvp.statistic.sql.main_vp_fraction" />
-    <option name="PARAMETERS" value="-H spatial_frac --load gspread" />
+    <option name="RUN_TOOL" value="true" />
+    <option name="SCRIPT_NAME" value="rscvp.statistic.sql.main_base_cls" />
+    <option name="PARAMETERS" value="-H spatial_frac" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

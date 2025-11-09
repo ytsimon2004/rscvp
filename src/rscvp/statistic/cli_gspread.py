@@ -8,6 +8,7 @@ import pandas as pd
 import polars as pl
 
 from neuralib.typing import DataFrame
+from neuralib.util.deprecation import deprecated_class
 from neuralib.util.utils import keys_with_value
 from neuralib.util.verbose import fprint, print_load
 from rscvp.spatial.main_place_field import split_flatten_lter
@@ -25,6 +26,7 @@ __all__ = [
 ]
 
 
+# TODO might not need this layer
 @typing.final
 class GSPExtractor:
     """Extract dataset from gspread OR local parquet file"""
@@ -194,6 +196,7 @@ def _melt_session(df: pl.DataFrame, var: str) -> pl.DataFrame:
 # CLI Generator #
 # ============= #
 
+@deprecated_class()
 @attrs.define
 class CliGspreadLUT:
     page: GSPREAD_SHEET_PAGE
@@ -219,6 +222,7 @@ class CliGspreadLUT:
         return f'{self.module_prefix}.{self.file}'
 
 
+@deprecated_class()
 @typing.final
 class CliGspreadGenerator:
     """Based on info in spreadsheet"""

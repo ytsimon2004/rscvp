@@ -11,10 +11,10 @@ from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.statistic.core import StatPipeline, print_var
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
-__all__ = ['SpatialFractionBlankStat']
+__all__ = ['BlankClassStat']
 
 
-class SpatialFractionBlankStat(StatPipeline):
+class BlankClassStat(StatPipeline):
     DESCRIPTION = 'Fraction of spatial cells in anterior v.s. posterior RSC in blank belt treadmill'
 
     analysis: Literal['anterior', 'posterior', 'overall'] = argument(
@@ -25,7 +25,7 @@ class SpatialFractionBlankStat(StatPipeline):
 
     header = as_argument(StatPipeline.header).with_options(required=False)
 
-    load_source = 'gspread'
+    load_source = as_argument(StatPipeline.load_source).with_options(default='gspread', choices=('gspread', 'db'))
     sheet_name: list[GSPREAD_SHEET_PAGE] = ['BaseClassDB', 'BlankClassDB']
 
     df = None  # overwrite
@@ -40,7 +40,7 @@ class SpatialFractionBlankStat(StatPipeline):
         for name in self.sheet_name:
             df = GSPExtractor(name).load_from_gspread(primary_key='date')
             df = (
-                self._take_concat_planes(df)
+                self._filter_concat_optics(df)
                 .select(['date', 'animal', 'region', 'n_selected_neurons', 'pair_wise_group', 'n_spatial_neurons'])
                 .with_columns((pl.col('date') + '_' + pl.col('animal')).alias('primary_key'))
                 .with_columns((pl.col('n_spatial_neurons') / pl.col('n_selected_neurons')).alias('fraction'))
@@ -144,9 +144,6 @@ class SpatialFractionBlankStat(StatPipeline):
         point_positions = {}
 
         if self.analysis == 'overall':
-            # For overall: x-axis is table, hue is region
-            # GenericDB: aRSC around x=0.2, pRSC around x=-0.2
-            # BlankBeltGenericDB: aRSC around x=1.2, pRSC around x=0.8
             expected_positions = {
                 ('BaseClassDB', 'aRSC'): (0.2, 0.1),
                 ('BaseClassDB', 'pRSC'): (-0.2, 0.1),
@@ -201,8 +198,6 @@ class SpatialFractionBlankStat(StatPipeline):
                                     color='gray', alpha=0.7, linewidth=2, zorder=10)
 
         else:
-            # For anterior/posterior: x-axis is region, hue is table
-            # GenericDB around x=-0.2, BlankBeltGenericDB around x=0.2
             expected_positions = {
                 'BaseClassDB': (-0.2, 0.15),
                 'BlankClassDB': (0.2, 0.15),
@@ -367,4 +362,4 @@ class SpatialFractionBlankStat(StatPipeline):
 
 
 if __name__ == '__main__':
-    SpatialFractionBlankStat().main()
+    BlankClassStat().main()

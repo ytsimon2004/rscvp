@@ -13,7 +13,7 @@ spatial_agg() {
   -P 0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,, \
   --region aRSC,aRSC,pRSC,pRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC \
   --used_session light \
-  --page ap_place \
+  --page spatial_parq \
   --update \
   "$@"
 }
@@ -28,7 +28,7 @@ spatial_agg csv_agg.main_spatial_agg \
 
 python -m rscvp.statistic.parq.main_value_gsp \
   -H si \
-  --page ap_place \
+  --page spatial_parq \
   --stat-test ttest
 
 
@@ -54,7 +54,7 @@ spatial_agg csv_agg.main_spatial_agg \
 
 python -m rscvp.statistic.parq.main_value_gsp \
   -H trial_cc \
-  --page ap_place \
+  --page spatial_parq \
   --stat-test ttest
 
 
@@ -67,7 +67,7 @@ spatial_agg csv_agg.main_spatial_agg \
 
 python -m rscvp.statistic.parq.main_value_gsp \
   -H ev_trial_avg \
-  --page ap_place \
+  --page spatial_parq \
   --stat-test ttest
 
 
@@ -80,7 +80,7 @@ spatial_agg csv_agg.main_spatial_agg \
 
 python -m rscvp.statistic.parq.main_value_gsp \
   -H liability \
-  --page ap_place \
+  --page spatial_parq \
   --stat-test ttest
 
 

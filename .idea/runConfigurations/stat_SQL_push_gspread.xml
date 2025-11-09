@@ -23,8 +23,9 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
+    <option name="RUN_TOOL" value="true" />
     <option name="SCRIPT_NAME" value="rscvp.statistic.sql.main_push_gspread" />
-    <option name="PARAMETERS" value="--db generic --push" />
+    <option name="PARAMETERS" value="--db base --push" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

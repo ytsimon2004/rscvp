@@ -7,29 +7,29 @@ __all__ = ['DBtoGspreadOptions']
 
 
 class DBtoGspreadOptions(AbstractParser):
-    DESCRIPTION = 'Push a DB table to a gspread'
+    DESCRIPTION = 'Push a local sql database to a self gspread'
 
-    db_type: Literal['generic', 'bayes', 'visual', 'generic_darkness', 'generic_blankbelt', 'generic_vr'] = argument(
+    db_type: Literal['base', 'bayes', 'sftf', 'dark', 'blank', 'vr'] = argument(
         '--db',
         required=True,
         help='push db type'
     )
 
-    push: bool = argument('--push', help='Push to the spreadsheet, otherwise print')
+    push: bool = argument('--push', help='Push to the gspread, otherwise print')
 
     def run(self):
         match self.db_type:
-            case 'generic':
+            case 'base':
                 db = BaseClassDB
             case 'bayes':
                 db = BayesDecodeDB
-            case 'visual':
+            case 'sftf':
                 db = VisualSFTFDirDB
-            case 'generic_darkness':
+            case 'dark':
                 db = DarkClassDB
-            case 'generic_blankbelt':
+            case 'blank':
                 db = BlankClassDB
-            case 'generic_vr':
+            case 'vr':
                 db = VRClassDB
             case _:
                 raise ValueError(f'unknown db type: {self.db_type}')

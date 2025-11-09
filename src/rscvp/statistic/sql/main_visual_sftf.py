@@ -36,7 +36,7 @@ class SFTFPerfStat(StatPipeline):
     test_type = 'ttest'
 
     def run(self):
-        self.load_table(primary_key='date', to_pandas=False, concat_plane_only=True)
+        self.load_table(primary_key='date', to_pandas=False, concat_plane=True)
         self.replace_col()
         self.run_pipeline()
 

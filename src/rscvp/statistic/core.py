@@ -1,4 +1,5 @@
 import abc
+import sqlite3
 from pathlib import Path
 from typing import Literal, Optional
 
@@ -20,9 +21,6 @@ from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.util.cli.cli_stattest import StatisticTestOptions, StatResults
 from rscvp.util.database import (
     DB_TYPE,
-    BaseClassDB,
-    BayesDecodeDB,
-    VisualSFTFDirDB,
     RSCDatabase
 )
 from rscvp.util.util_gspread import get_statistic_key_info, GSPREAD_SHEET_PAGE
@@ -116,7 +114,8 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
 
     def load_table(self, primary_key: str | tuple[str, ...] = 'Data',
                    to_pandas: bool = True,
-                   concat_plane_only: bool = True) -> None:
+                   concat_plane: bool = True,
+                   join_regions: bool = True) -> None:
         """
         Load table from source
 
@@ -127,7 +126,8 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
         :param primary_key: used in preprocess (i.e., remove # for statistic...).
             only useful in ``gspread``, ``parquet`` load source
         :param to_pandas: polars to pandas dataframe
-        :param concat_plane_only: in ETL dataset, only filter ``optic`` with ``all``(i.e., db pipeline)
+        :param concat_plane: in ETL dataset, only filter ``optic`` with ``all``(i.e., db pipeline)
+        :param join_regions: find region table to join with
         :return:
         """
         if self.group_header == 'session':
@@ -139,17 +139,30 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
         match self.load_source:
             case 'gspread':
                 df = GSPExtractor(self.sheet_name).load_from_gspread(primary_key=primary_key)
+                if 'region' not in df.columns and join_regions:
+                    df_fov = GSPExtractor('fov_table').load_from_gspread().select('Data', 'region')
+                    df_fov = df_fov.alter.split_primary(drop=True)
+                    df = df.join(df_fov, on=['date', 'animal'], how='inner')
+
             case 'parquet':
-                df = GSPExtractor(self.sheet_name).load_parquet_file(self.statistic_dir, melt_session_vars,
-                                                                     primary_key=primary_key)
+                df = GSPExtractor(self.sheet_name).load_parquet_file(
+                    self.statistic_dir,
+                    melt_session_vars,
+                    primary_key=primary_key
+                )
+
             case 'db':
                 df = self._load_database(self.db_table)
+                if 'region' not in df.columns and join_regions:
+                    df_fov = self._load_database('FieldOfViewDB').select('date', 'animal', 'region')
+                    df = df.join(df_fov, on=['date', 'animal'], how='inner')
+
             case _:
                 raise ValueError(f'Unknown load source: {self.load_source}')
 
         #
-        if concat_plane_only:
-            df = self._take_concat_planes(df)
+        if concat_plane:
+            df = self._filter_concat_optics(df)
 
         #
         if to_pandas:
@@ -159,18 +172,14 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
 
     @staticmethod
     def _load_database(db: DB_TYPE) -> pl.DataFrame:
-        func = RSCDatabase().get_data
-        if db == 'BaseClassDB':
-            return func(BaseClassDB)
-        elif db == 'BayesDecodeDB':
-            return func(BayesDecodeDB)
-        elif db == 'VisualSFTFDirDB':
-            return func(VisualSFTFDirDB)
-        else:
-            raise ValueError('')
+        file = RSCDatabase().database_file
+        return pl.read_database(
+            query=f'SELECT * FROM "{db}"',
+            connection=(sqlite3.connect(file))
+        )
 
     @staticmethod
-    def _take_concat_planes(df: pl.DataFrame) -> pl.DataFrame:
+    def _filter_concat_optics(df: pl.DataFrame) -> pl.DataFrame:
         try:
             expr = pl.struct('date', 'animal', 'rec', 'user')
             df = df.with_columns(expr.alias('primary'))
@@ -405,14 +414,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
             .sort('pair_wise_group', 'region')
             .with_columns(pl.col(h).list.len().alias('n_neurons'))
             .with_columns(pl.col(h).list.mean())
-            .with_columns(
-                pl.when(pl.col('Data').str.contains('|'.join(self._mouseline_thy1)))
-                .then(pl.lit('thy1'))
-                .when(pl.col('Data').str.contains('|'.join(self._mouseline_camk2)))
-                .then(pl.lit('camk2'))
-                .otherwise(pl.lit('other'))
-                .alias('mouseline')
-            )
+            .atler.with_mouseline(col='Data')
         )
 
         value_a = df.filter(pl.col('region') == 'aRSC')[h].to_list()

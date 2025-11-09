@@ -79,7 +79,7 @@ class RSCGoogleWorkSheet(GoogleWorkSheet):
 
 # ============== #
 
-def get_statistic_key_info(page: GSPREAD_SHEET_PAGE = 'apcls_tac') -> pl.DataFrame:
+def get_statistic_key_info(page: GSPREAD_SHEET_PAGE = 'fov_table') -> pl.DataFrame:
     df = RSCGoogleWorkSheet.of_work_page(page, primary_key='Data').to_polars()
     df = filter_tdhash(df, 'Data')
     df = skip_comment_primary_key(df, 'Data')

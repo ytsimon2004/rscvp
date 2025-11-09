@@ -14,7 +14,7 @@ generic_agg() {
   --region aRSC,aRSC,pRSC,pRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC \
   -s light \
   --used_session light \
-  --page ap_generic \
+  --page generic_parq \
   --update \
   "$@"
 }
@@ -28,7 +28,7 @@ generic_agg csv_agg.main_generic_agg \
 
 python -m rscvp.statistic.parq.main_speed_gsp \
   -H speed_score \
-  --page ap_generic \
+  --page generic_parq \
   --vis
 
 

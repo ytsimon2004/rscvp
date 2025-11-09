@@ -1,15 +1,15 @@
 from typing import Literal, Final
 
 import polars as pl
+
+from argclz import argument, as_argument
+from neuralib.plot import plot_figure
+from neuralib.util.verbose import publish_annotation
 from rscvp.statistic.core import StatPipeline
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.database import DB_TYPE
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from rscvp.visual.util_plot import selective_pie
-
-from argclz import argument, as_argument
-from neuralib.plot import plot_figure
-from neuralib.util.verbose import publish_annotation
 
 __all__ = ['OriDirPieStat']
 
@@ -32,7 +32,7 @@ class OriDirPieStat(StatPipeline):
     db_table: Final[DB_TYPE] = 'VisualSFTFDirDB'
 
     def run(self):
-        self.load_table(primary_key='date', to_pandas=False, concat_plane_only=True)
+        self.load_table(primary_key='date', to_pandas=False, concat_plane=True)
         self.plot()
 
     def plot(self):

@@ -14,9 +14,9 @@ from rscvp.statistic.main_normality import NormTestOption
 from rscvp.statistic.main_para_mtx import ParaCorrMatOptions
 from rscvp.statistic.parq.main_generic_gsp import GenericGSP
 from rscvp.statistic.parq.main_pf_gsp import PFStatGSP
+from rscvp.statistic.sql.main_base_cls import BaseClassStat
 from rscvp.statistic.sql.main_cell_type import CellTypeStat
 from rscvp.statistic.sql.main_decode_err import MedianDecodeErrorStat
-from rscvp.statistic.sql.main_vp_fraction import VisuoSpatialFractionStat
 from .util import check_attr
 
 
@@ -185,20 +185,20 @@ class TestStatisticPipeline(unittest.TestCase):
 
     @patch('matplotlib.pyplot.show')
     def test_vp_fraction_gspread(self, *args):
-        class Opt(VisuoSpatialFractionStat):
+        class Opt(BaseClassStat):
             header = 'visual_frac'
             load_source = 'gspread'
 
-        check_attr(Opt, VisuoSpatialFractionStat)
+        check_attr(Opt, BaseClassStat)
         Opt().main([])
 
     @patch('matplotlib.pyplot.show')
     def test_vp_fraction_sql(self, *args):
-        class Opt(VisuoSpatialFractionStat):
+        class Opt(BaseClassStat):
             header = 'spatial_frac'
             load_source = 'db'
 
-        check_attr(Opt, VisuoSpatialFractionStat)
+        check_attr(Opt, BaseClassStat)
 
         try:
             Opt().main([])

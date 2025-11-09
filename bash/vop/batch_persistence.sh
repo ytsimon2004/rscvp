@@ -51,7 +51,7 @@ anterior_persistence main_trial_avg_position \
   --used_session light \
   --sort light \
   -T spks \
-  --page ap_place \
+  --page fov_table \
   --cv
 
 posterior_persistence main_trial_avg_position \
@@ -62,7 +62,7 @@ posterior_persistence main_trial_avg_position \
   --used_session light \
   --sort light \
   -T spks \
-  --page ap_place \
+  --page fov_table \
   --cv
 
 # ------- Alignment Position Bins Sort SI---------- #
@@ -96,7 +96,7 @@ anterior_persistence main_decode_err \
   --session light \
   --used_session light \
   -w 100 \
-  --page ap_place
+  --page fov_table
 
 posterior_persistence main_decode_err \
   --region pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC \
@@ -106,7 +106,7 @@ posterior_persistence main_decode_err \
   --session light \
   --used_session light \
   -w 100 \
-  --page ap_place
+  --page fov_table
 
 posterior_persistence main_decode_err \
   --region pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC \
@@ -118,7 +118,7 @@ posterior_persistence main_decode_err \
   --session light \
   --used_session light \
   -w 100 \
-  --page ap_place
+  --page fov_table
 
 
 # ------- Decoding position bins ---------- #
@@ -131,7 +131,7 @@ anterior_persistence main_decode_err \
   --session light \
   --used_session light \
   -w 100 \
-  --page ap_place
+  --page fov_table
 
 anterior_persistence main_decode_err \
   --region aRSC,aRSC,aRSC,aRSC,aRSC,aRSC,aRSC,aRSC,aRSC,aRSC \
@@ -143,7 +143,7 @@ anterior_persistence main_decode_err \
   --session light \
   --used_session light \
   -w 100 \
-  --page ap_place
+  --page fov_table
 
 posterior_persistence main_decode_err \
   --region pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC \
@@ -153,7 +153,7 @@ posterior_persistence main_decode_err \
   --session light \
   --used_session light \
   -w 100 \
-  --page ap_place
+  --page fov_table
 
 posterior_persistence main_decode_err \
   --region pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC,pRSC \
@@ -165,7 +165,7 @@ posterior_persistence main_decode_err \
   --session light \
   --used_session light \
   -w 100 \
-  --page ap_place
+  --page fov_table
 
 
 # ------- Topographical cell type ---------- #

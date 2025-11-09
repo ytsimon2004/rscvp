@@ -10,11 +10,11 @@ from rscvp.statistic.core import StatPipeline, print_var
 from rscvp.statistic.sql.util import as_validate_sql_table
 from rscvp.util.cli import CommonOptions
 
-__all__ = ['SpatialFractionDarkStat']
+__all__ = ['DarkClassStat']
 
 
 @publish_annotation('sup', project='rscvp', figure='fig.S2C', as_doc=True)
-class SpatialFractionDarkStat(StatPipeline):
+class DarkClassStat(StatPipeline):
     DESCRIPTION = 'Compare fraction of spatial cells across behavioral sessions from multiple animals'
 
     header = as_argument(StatPipeline.header).with_options(required=False)
@@ -25,7 +25,7 @@ class SpatialFractionDarkStat(StatPipeline):
     db_table: Final = 'DarkClassDB'
 
     def run(self):
-        self.load_table(primary_key='date', to_pandas=False, concat_plane_only=True)
+        self.load_table(primary_key='date', to_pandas=False, concat_plane=True)
         self.df = as_validate_sql_table(self.df, 'dark_parq')
         self.plot()
 
@@ -78,4 +78,4 @@ class SpatialFractionDarkStat(StatPipeline):
 
 
 if __name__ == '__main__':
-    SpatialFractionDarkStat().main()
+    DarkClassStat().main()

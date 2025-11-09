@@ -13,7 +13,7 @@ visual_agg() {
   -P 0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,, \
   --region aRSC,aRSC,pRSC,pRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC \
   --used_session light \
-  --page ap_vz \
+  --page visual_parq \
   --update \
   "$@"
 }

@@ -13,7 +13,7 @@ pf_agg() {
   -P 0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,, \
   --region aRSC,aRSC,pRSC,pRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC \
   --used_session light \
-  --page ap_place \
+  --page spatial_parq \
   --update \
   "$@"
 }
@@ -27,7 +27,7 @@ pf_agg csv_agg.main_pf_agg \
 
 python -m rscvp.statistic.parq.main_pf_gsp \
   -H pf_width \
-  --page ap_place \
+  --page spatial_parq \
   --stat-test ttest
 
 
@@ -40,7 +40,7 @@ pf_agg csv_agg.main_pf_agg \
 
 python -m rscvp.statistic.parq.main_pf_gsp \
   -H pf_peak \
-  --page ap_place \
+  --page spatial_parq \
   --stat-test ttest
 
 
@@ -53,5 +53,5 @@ pf_agg csv_agg.main_pf_agg \
 
 python -m rscvp.statistic.parq.main_pf_gsp \
   -H n_pf \
-  --page ap_place \
+  --page spatial_parq \
   --stat-test ttest

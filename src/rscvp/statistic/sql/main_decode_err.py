@@ -23,7 +23,7 @@ class MedianDecodeErrorStat(StatPipeline):
     db_table: Final[DB_TYPE] = 'BayesDecodeDB'
 
     def run(self):
-        self.load_table(primary_key='date', to_pandas=False, concat_plane_only=True)
+        self.load_table(primary_key='date', to_pandas=False, concat_plane=True)
         self.plot()
 
     def plot(self):
