@@ -40,6 +40,6 @@ date
 
 
 run_python selection cls \
-  -s light \
-  --us light \
+  -s light_bas \
+  --us light_bas \
   --commit

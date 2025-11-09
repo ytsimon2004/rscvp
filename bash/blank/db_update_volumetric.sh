@@ -42,4 +42,5 @@ date
 run_python selection cls \
   -s light \
   --us light \
+  --blank-db \
   --commit
