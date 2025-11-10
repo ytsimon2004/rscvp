@@ -49,6 +49,11 @@ run_python() {
     "$@"
 }
 
+python -m rscvp.topology.main_fov_db \
+    -D "$ED" \
+    -A "$ID" \
+    --commit
+
 run_python selection cls \
   --session close \
   --used_session close \

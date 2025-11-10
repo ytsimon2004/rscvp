@@ -7,13 +7,14 @@ from scipy.stats import wilcoxon, mannwhitneyu
 
 from argclz import as_argument, argument
 from neuralib.plot import plot_figure
-from rscvp.statistic.cli_gspread import GSPExtractor
+from neuralib.util.verbose import publish_annotation
 from rscvp.statistic.core import StatPipeline, print_var
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 
 __all__ = ['BlankClassStat']
 
 
+@publish_annotation('sup', project='rscvp', figure='fig.S2C', as_doc=True)
 class BlankClassStat(StatPipeline):
     DESCRIPTION = 'Fraction of spatial cells in anterior v.s. posterior RSC in blank belt treadmill'
 
@@ -26,7 +27,7 @@ class BlankClassStat(StatPipeline):
     header = as_argument(StatPipeline.header).with_options(required=False)
 
     load_source = as_argument(StatPipeline.load_source).with_options(default='gspread', choices=('gspread', 'db'))
-    sheet_name: list[GSPREAD_SHEET_PAGE] = ['BaseClassDB', 'BlankClassDB']
+    sheet_list: list[GSPREAD_SHEET_PAGE] = ['BaseClassDB', 'BlankClassDB']
 
     df = None  # overwrite
 
@@ -37,10 +38,13 @@ class BlankClassStat(StatPipeline):
 
     def get_dataframe(self):
         concat = []
-        for name in self.sheet_name:
-            df = GSPExtractor(name).load_from_gspread(primary_key='date')
+        for name in self.sheet_list:
+            self.sheet_name = name
+            self.db_table = name
+            self.load_table(to_pandas=False)
+
             df = (
-                self._filter_concat_optics(df)
+                self._filter_concat_optics(self.df)
                 .select(['date', 'animal', 'region', 'n_selected_neurons', 'pair_wise_group', 'n_spatial_neurons'])
                 .with_columns((pl.col('date') + '_' + pl.col('animal')).alias('primary_key'))
                 .with_columns((pl.col('n_spatial_neurons') / pl.col('n_selected_neurons')).alias('fraction'))

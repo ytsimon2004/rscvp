@@ -23,6 +23,7 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
+    <option name="RUN_TOOL" value="true" />
     <option name="SCRIPT_NAME" value="rscvp.statistic.sql.main_osds_pie" />
     <option name="PARAMETERS" value="--load db --pool sum --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />

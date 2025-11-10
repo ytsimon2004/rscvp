@@ -32,16 +32,12 @@ class BaseClassStat(StatPipeline):
     def plot(self):
         df = (
             self.df
-            .with_columns(
-                (pl.col('n_spatial_neurons') / pl.col('n_selected_neurons')).alias('spatial_frac'),
-                (pl.col('n_visual_neurons') / pl.col('n_selected_neurons')).alias('visual_frac')
-            )
+            .with_columns((pl.col('n_spatial_neurons') / pl.col('n_selected_neurons')).alias('spatial_frac'),
+                          (pl.col('n_visual_neurons') / pl.col('n_selected_neurons')).alias('visual_frac'))
             .alter.with_mouseline()
             .sort('pair_wise_group', 'region')
         )
 
-
-        # statistic
         value_a = df.filter(pl.col('region') == 'aRSC')[self.header].to_list()
         value_b = df.filter(pl.col('region') == 'pRSC')[self.header].to_list()
         with plot_figure(None, figsize=(3, 6)) as ax:

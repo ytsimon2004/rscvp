@@ -5,11 +5,13 @@ from matplotlib.axes import Axes
 from argclz import as_argument
 from neuralib.plot import plot_figure
 from neuralib.typing import AxesArray, ArrayLikeStr, ArrayLike
+from neuralib.util.verbose import publish_annotation
 from rscvp.statistic.core import StatPipeline
 
 __all__ = ['VRClassStat']
 
 
+@publish_annotation('sup', project='rscvp', figure='fig.S4H', as_doc=True)
 class VRClassStat(StatPipeline):
     DESCRIPTION = ('Fraction of position cells, and proportion of persistent place field / remap '
                    'in anterior v.s. posterior RSC in closed-loop VR')

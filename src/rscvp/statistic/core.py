@@ -113,7 +113,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
         self.plot()
 
     def load_table(self, primary_key: str | tuple[str, ...] = 'Data',
-                   to_pandas: bool = True,
+                   to_pandas: bool = False,
                    concat_plane: bool = True,
                    join_regions: bool = True) -> None:
         """

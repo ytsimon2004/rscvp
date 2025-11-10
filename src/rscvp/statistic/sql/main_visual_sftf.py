@@ -3,10 +3,10 @@ from typing import Literal, Final
 
 import numpy as np
 import seaborn as sns
+from matplotlib import pyplot as plt
 from rich.pretty import pprint
 
 from argclz import as_argument
-from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
 from rscvp.statistic.core import StatPipeline
 from rscvp.util.cli import StatResults
@@ -22,7 +22,7 @@ __all__ = ['SFTFPerfStat']
 class SFTFPerfStat(StatPipeline):
     DESCRIPTION = 'See the sftf preference across animals, either in dff amplitude or preferred fraction'
 
-    header: Literal['amp', 'frac'] = as_argument(StatPipeline.header).with_options(...)
+    header: Literal['amp', 'frac'] = as_argument(StatPipeline.header).with_options(default='frac')
 
     load_source = as_argument(StatPipeline.load_source).with_options(default='gspread', choices=('gspread', 'db'))
 
@@ -102,13 +102,17 @@ class SFTFPerfStat(StatPipeline):
         cols = [col for col in self.df.columns if col.startswith(f'sftf_{self.header}')]
         df = self.df.unpivot(on=cols, index='region')
 
-        with plot_figure(self.output_figure, 5, 10) as _:
-            g = sns.catplot(data=df, kind='bar', x='variable', y='value', hue='region',
-                            errorbar=('se', 1), alpha=0.7)
-            ax = g.ax
-            sns.swarmplot(ax=ax, data=df, x='variable', y='value', hue='region', dodge=0.2)
-            ax.set(ylabel=self.header, xlabel='SFTF')
-            ax.tick_params(axis='x', labelrotation=45)
+        g = sns.catplot(data=df, kind='bar', x='variable', y='value', hue='region',
+                        errorbar=('se', 1), alpha=0.7)
+        ax = g.ax
+        sns.swarmplot(ax=ax, data=df, x='variable', y='value', hue='region', dodge=0.2)
+        ax.set(ylabel=self.header, xlabel='SFTF')
+        ax.tick_params(axis='x', labelrotation=45)
+
+        if self.debug_mode:
+            plt.show()
+        else:
+            plt.savefig(self.output_figure)
 
 
 if __name__ == '__main__':
