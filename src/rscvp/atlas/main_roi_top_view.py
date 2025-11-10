@@ -55,10 +55,17 @@ class RoiTopViewOptions(AbstractParser, ROIOptions):
         help='plot individual dots as the 2D histogram, otherwise, show individual dots'
     )
 
+    ibl_res: int = argument(
+        '--res',
+        default=10,
+        choices=(10, 25, 50),
+        help='resolution of IBL atlas dorsal map'
+    )
+
     def run(self):
         self.setup_logger(Path(__file__).name)
         df = self.get_roi_dataframe()
-        ibl = IBLAtlasPlotWrapper(res_um=10)
+        ibl = IBLAtlasPlotWrapper(res_um=self.ibl_res)
 
         try:
             if self.as_histogram:

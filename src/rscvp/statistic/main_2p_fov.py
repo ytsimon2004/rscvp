@@ -16,6 +16,7 @@ class FieldOfViewOptions(AbstractParser, SBXOptions):
     animal_id: str = as_argument(CommonOptions.animal_id).with_options(required=False)
     header = as_argument(StatisticOptions.header).with_options(required=False)
 
+    ibl_res: int = argument('--res', default=10, choices=(10, 25, 50), help='resolution of IBL atlas dorsal map')
     database: bool = argument('--db', help='load from rscvp database, otherwise from gspread')
 
     def run(self):
@@ -25,7 +26,7 @@ class FieldOfViewOptions(AbstractParser, SBXOptions):
             fovs = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id)
 
         with plot_figure(None) as ax:
-            ibl = IBLAtlasPlotWrapper()
+            ibl = IBLAtlasPlotWrapper(res_um=self.ibl_res)
             ibl.plot_scalar_on_slice(
                 ['root'],
                 plane='top',

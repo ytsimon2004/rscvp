@@ -132,6 +132,7 @@ def plot_topo_scatter(ax: Axes,
                       with_top_view: bool = True,
                       scatter_size: float = 2.5,
                       scatter_alpha: float = 0.8,
+                      ibl_res: int = 10,
                       **kwargs):
     """Plot the metric value(color) in 2d space (AP, ML) with scatter plot"""
     norm = mcolors.SymLogNorm(linthresh=0.001, base=2) if log2_value else None
@@ -157,7 +158,7 @@ def plot_topo_scatter(ax: Axes,
 
     #
     if with_top_view:
-        ibl = IBLAtlasPlotWrapper()
+        ibl = IBLAtlasPlotWrapper(res_um=ibl_res)
         ibl.plot_scalar_on_slice(['root'], ax=ax, coord=-2000, plane='top', background='boundary')
 
     ax.set_aspect('equal', adjustable='box')
@@ -173,6 +174,7 @@ def plot_topo_histogram(ax: Axes,
                         with_top_view: bool = True,
                         bins: int | ArrayLike | None = None,
                         bin_size: int = 50,
+                        ibl_res: int = 10,
                         **kwargs):
     """
     Plot the metric value(color) in 2d space (AP, ML) with 2d histogram plot
@@ -188,6 +190,7 @@ def plot_topo_histogram(ax: Axes,
             Or ArrayLike [x, y],
             Or None, then inferred by `bin size` args
     :param bin_size:  bins size in micron (um)
+    :param ibl_res
     :param kwargs:
     :return:
     """
@@ -217,7 +220,7 @@ def plot_topo_histogram(ax: Axes,
 
     #
     if with_top_view:
-        IBLAtlasPlotWrapper().plot_scalar_on_slice(
+        IBLAtlasPlotWrapper(res_um=ibl_res).plot_scalar_on_slice(
             ['root'],
             ax=ax,
             coord=-2000,

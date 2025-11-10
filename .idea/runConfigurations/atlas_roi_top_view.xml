@@ -23,6 +23,7 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </EXTENSION>
+    <option name="RUN_TOOL" value="true" />
     <option name="SCRIPT_NAME" value="rscvp.atlas.main_roi_top_view" />
     <option name="PARAMETERS" value="-A YW043,YW051,YW063,YW064 --limit 80 --level 0 --family ISOCORTEX" />
     <option name="SHOW_COMMAND_LINE" value="false" />

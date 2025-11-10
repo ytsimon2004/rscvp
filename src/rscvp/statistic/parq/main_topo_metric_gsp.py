@@ -26,6 +26,13 @@ class TopoMetricOptions(StatPipeline, BaseVisPolarOptions):
         help='plot type',
     )
 
+    ibl_res: int = argument(
+        '--res',
+        default=10,
+        choices=(10, 25, 50),
+        help='resolution of IBL atlas dorsal map'
+    )
+
     load_source: Final = 'parquet'
 
     ap_field: str
@@ -147,7 +154,7 @@ class TopoMetricOptions(StatPipeline, BaseVisPolarOptions):
         ap_centers = (ap_edges[:-1] + ap_edges[1:]) / 2
 
         with plot_figure(None) as ax:
-            plot_topo_histogram(ax, cords, val, self.gspread_field)
+            plot_topo_histogram(ax, cords, val, self.gspread_field, ibl_res=self.ibl_res)
 
             if self.restrict_rsc:
                 ax.set(xlim=(-1500, 50), ylim=(-4200, -500))
@@ -162,7 +169,7 @@ class TopoMetricOptions(StatPipeline, BaseVisPolarOptions):
         with plot_figure(None, 2, 2, figsize=(6, 8), tight_layout=False) as ax:
             ax = ax.ravel()
 
-            kwargs = {}
+            kwargs = {'ibl_res': self.ibl_res}
             cmap_range = (0, 97.5) if 'si' in self.header else None
             if cmap_range is not None:
                 vmin, vmax = cmap_range
