@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import final
 
 import attrs
@@ -34,7 +33,9 @@ class RSCObjectiveFOV(FieldOfView):
                            usage: str = 'base'):
         """Load fov coordinates from local project sqlite database"""
         import sqlite3
-        db_file = Path(__file__).parents[3] / 'res' / 'database' / 'rscvp.db'
+        from rscvp.util.database import RSCDatabase
+
+        db_file = RSCDatabase().database_file
         conn = sqlite3.connect(db_file)
 
         df = pl.read_database(
