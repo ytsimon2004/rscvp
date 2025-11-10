@@ -89,6 +89,20 @@ class FigureClass:
 
 ![histology_data_analysis_workflow.png](docs/source/_static/histology_data_analysis_workflow.png)
 
+## Data availability
+
+### SQLite database
+
+![rscvp_sql_schema.png](docs/source/_static/rscvp_sql_schema.png)
+
+- Processed table-like data
+- Token request needed (not published yet)
+
+### Zenodo
+
+- Contain example raw data + processed aggregated parquet data
+- Token request needed (not published yet)
+
 ## Contact
 
 Yu-Ting Wei (ytsimon2004@gmail.com)
