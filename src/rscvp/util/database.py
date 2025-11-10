@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 import shutil
 from pathlib import Path
@@ -280,7 +281,14 @@ class RSCDatabase(sqlclz.Database):
 
     @property
     def database_file(self) -> Path:
-        return Path(__file__).parents[3] / 'res' / 'database' / 'rscvp.db'
+        # check environment variable first
+        if env_path := os.getenv('RSCVP_DATABASE_PATH'):
+            return Path(env_path)
+
+        if Path(__file__).parents[2].name == 'src':  # Development environment
+            return Path(__file__).parents[3] / 'res' / 'database' / 'rscvp.db'
+        else:  # Installed package: dist-packages/rscvp
+            return Path(__file__).parents[1] / 'res' / 'database' / 'rscvp.db'
 
     @property
     def database_tables(self) -> list[type]:
