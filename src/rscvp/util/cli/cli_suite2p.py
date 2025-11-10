@@ -7,7 +7,6 @@ from matplotlib import pyplot as plt
 
 from argclz import argument, try_int_type
 from neuralib.imaging.suite2p import SIGNAL_TYPE, Suite2PResult
-from neuralib.imglib.norm import enhance_blood_vessels
 from neuralib.typing import PathLike
 from .cli_core import CommonOptions
 
@@ -161,6 +160,7 @@ def suite2p_alignment_fov(ops_file: PathLike, bright_field_file: PathLike) -> No
     :param bright_field_file: Path to bright field image
     """
     from neuralib.imaging.suite2p import Suite2pGUIOptions
+    from neuralib.imglib.norm import enhance_blood_vessels
 
     ops: Suite2pGUIOptions = np.load(ops_file, allow_pickle=True).tolist()
     actual_fov = ops['meanImg']
