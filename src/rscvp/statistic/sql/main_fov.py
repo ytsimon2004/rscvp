@@ -44,7 +44,7 @@ class FieldOfViewOptions(AbstractParser, SBXOptions):
             for i, fov in enumerate(fovs):
                 fov = fov.to_um()
                 ax.add_patch(fov.to_polygon(ec=cy.get(fov.region_name, 'k'), alpha=0.8))
-                ax.set(xlim=(-1500, 50), ylim=(-4200, -500))
+                ax.set(xlim=(-1500, 50), ylim=(-4200, -500), xlabel='ML (um)', ylabel='AP (um)')
 
 
 if __name__ == '__main__':
