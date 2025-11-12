@@ -89,15 +89,13 @@ class GSPExtractor:
     # ======================= #
 
     def load_from_gspread(self, primary_key: str = 'Data',
-                          auto_cast: bool = True,
-                          verbose: bool = False) -> pl.DataFrame:
+                          auto_cast: bool = True) -> pl.DataFrame:
         """
         load from the gspread
         ** Note that each columns in spreadsheet used either str/numeric type. other auto-casting problem
 
         :param primary_key
         :param auto_cast: cast str to numeric
-        :param verbose:
         :return:
         """
         work_sheet = RSCGoogleWorkSheet.of_work_page(self.sheet_name, primary_key=primary_key)
@@ -122,9 +120,6 @@ class GSPExtractor:
             if isinstance(df[primary_key].dtype, pl.Float64):
                 df = df.cast({primary_key: pl.Int64}).cast({primary_key: pl.Utf8})
 
-        if verbose:
-            print(df)
-
         return df
 
     def load_parquet_file(self, output: Path,
@@ -133,7 +128,7 @@ class GSPExtractor:
         """
         Load directly from the local parquet files
 
-        :param output: for the pickle file for gspread (page-dependent)
+        :param output: for the parquet file for gspread (page-dependent)
         :param session_melt_header: specify if melt_session is True, headers(vars) to be melted
         :param primary_key:
         :return:

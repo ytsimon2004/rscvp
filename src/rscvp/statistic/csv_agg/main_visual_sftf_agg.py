@@ -10,25 +10,24 @@ from neuralib.plot import dotplot
 from neuralib.plot import plot_figure
 from neuralib.util.verbose import fprint
 from rscvp.statistic._var import VIS_SFTF_HEADERS
-from rscvp.statistic.csv_agg.collector import CSVCollector
-from rscvp.statistic.csv_agg.core import LocalSpreadsheetSync
+from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.visual.util import SFTF_ARRANGEMENT, get_sftf_mesh_order
 
 __all__ = ['VZSFTFAggOption']
 
 
-class VZSFTFStat(LocalSpreadsheetSync):
+class VZSFTFStat(ParquetSheetSync):
     """visual SFTF preference properties statistic"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='st',
             stat_col=SFTF_ARRANGEMENT,
             fields=dict(rec_region=str, plane_index=try_int_type)
         )
 
-        super().__init__(opt, sheet_page='visual_parq', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', aggregator=collector)
 
 
 class VZSFTFAggOption(AbstractParser, StatisticOptions):
@@ -52,7 +51,7 @@ class VZSFTFAggOption(AbstractParser, StatisticOptions):
                 self.plot_dot_dff(vzsftf.df)
             case s if s.startswith('sftf_amp_'):
                 if self.update:
-                    vzsftf.update_spreadsheet(self.variable)
+                    vzsftf.run_sync(self.variable)
 
     def plot_dot_dff(self, df: pl.DataFrame):
         """

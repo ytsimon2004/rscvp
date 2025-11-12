@@ -36,6 +36,7 @@ class PFStatGSP(StatPipeline):
     def run(self):
         self.post_parsing()
 
+        # TODO check both cases
         if self.animal_based_comp:
             self.load_table(to_pandas=False)
             self.plot_pairwise_mean()
@@ -123,6 +124,7 @@ class PFStatGSP(StatPipeline):
                      on=['n_pf_1', 'n_pf_2', 'n_pf_3', 'n_pf_4'],
                      variable_name='n_pf',
                      value_name='fraction')
+            .drop_nans()
         )
 
         stat_result = pg.pairwise_tests(

@@ -161,7 +161,7 @@ class TestStatisticPipeline(unittest.TestCase):
             header = 'pf_width'
             session = 'light'
             used_session = 'light'
-            truncate_session_agg = True
+            truncate_session = True
             update = True
 
         opt = Opt()

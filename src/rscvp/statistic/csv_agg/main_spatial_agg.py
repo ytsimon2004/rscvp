@@ -2,86 +2,84 @@ from typing import Literal
 
 from argclz import AbstractParser, as_argument, try_int_type
 from rscvp.statistic._var import SPATIAL_HEADERS
-from rscvp.statistic.csv_agg.collector import CSVCollector
-from rscvp.statistic.csv_agg.core import LocalSpreadsheetSync
+from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 
 
-class SIStat(LocalSpreadsheetSync):
+class SIStat(ParquetSheetSync):
     """spatial information"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='si',
             stat_col=['si'],
             exclude_col=[f'shuffled_si', 'place_cell_si'],
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
+            truncate_session=opt.truncate_session
         )
 
-        super().__init__(opt, collector=collector, sheet_page=opt.sheet_name)
+        super().__init__(opt, aggregator=collector, sheet_page=opt.sheet_name)
 
 
-
-class TCCStat(LocalSpreadsheetSync):
+class TCCStat(ParquetSheetSync):
     """median trial correlation coefficient"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='tcc',
             stat_col=['trial_cc'],
             exclude_col=None,
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
+            truncate_session=opt.truncate_session
         )
 
-        super().__init__(opt, sheet_page=opt.sheet_name, collector=collector)
+        super().__init__(opt, sheet_page=opt.sheet_name, aggregator=collector)
 
 
-class EVStat(LocalSpreadsheetSync):
+class EVStat(ParquetSheetSync):
     """explained variance"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='ev',
             stat_col=['ev_trial_avg'],
             exclude_col=None,
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
+            truncate_session=opt.truncate_session
         )
 
-        super().__init__(opt, sheet_page=opt.sheet_name, collector=collector)
+        super().__init__(opt, sheet_page=opt.sheet_name, aggregator=collector)
 
 
-class TrStat(LocalSpreadsheetSync):
+class TrStat(ParquetSheetSync):
     """trial reliability"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='tr',
             stat_col=['trial_reliability'],
             exclude_col=['is_active*'],
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
+            truncate_session=opt.truncate_session
         )
 
-        super().__init__(opt, sheet_page=opt.sheet_name, collector=collector)
+        super().__init__(opt, sheet_page=opt.sheet_name, aggregator=collector)
 
 
-class CordSpatialStat(LocalSpreadsheetSync):
+class CordSpatialStat(ParquetSheetSync):
 
     def __init__(self, opt: StatisticOptions):
         opt.session = None
 
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='cord',
             stat_col=['ap_cords', 'ml_cords', 'ap_cords_scale', 'ml_cords_scale', 'dv_cords'],
             exclude_col=None,
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=False
+            truncate_session=False
         )
 
-        super().__init__(opt, sheet_page=opt.sheet_name, collector=collector)
+        super().__init__(opt, sheet_page=opt.sheet_name, aggregator=collector)
 
 
 # ====== #
@@ -113,7 +111,7 @@ class SpatialStatAggOptions(AbstractParser, StatisticOptions):
                 raise ValueError(f'unknown header: {self.header}')
 
         if self.update:
-            stat.update_spreadsheet(self.variable)
+            stat.run_sync(self.variable)
 
 
 if __name__ == '__main__':

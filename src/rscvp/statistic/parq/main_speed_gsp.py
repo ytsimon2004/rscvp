@@ -33,9 +33,8 @@ class SpeedStatGSP(StatPipeline):
 
     def plot(self):
         data = self.post_processing()
-        output = self.get_output_figure_type()
 
-        with plot_figure(output) as ax:
+        with plot_figure(self.output_figure) as ax:
             for k, v in data.items():
                 n = len(v)
                 weights = np.ones_like(v) * (100.0 / n)  # each value contributes equally to total 100%

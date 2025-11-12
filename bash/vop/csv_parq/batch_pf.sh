@@ -7,11 +7,10 @@ pf_agg() {
   shift 1
   sleep 10
 
-   python -m rscvp.statistic.$m \
+  python -m rscvp.statistic.$m \
   -D 210315,210401,210402,210409,210402,210407,210409,210416,210604,210610,210514,210519,211202,211209,211203,211208,211202,211208,221018,221019 \
   -A YW006,YW006,YW006,YW006,YW008,YW008,YW008,YW008,YW010,YW010,YW017,YW017,YW022,YW022,YW032,YW032,YW033,YW033,YW048,YW048 \
   -P 0,0,0,0,0,0,0,0,0,0,0,0,,,,,,,, \
-  --region aRSC,aRSC,pRSC,pRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,pRSC,aRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC,aRSC,pRSC \
   --used_session light \
   --page spatial_parq \
   --update \

@@ -1,9 +1,8 @@
+from argclz import AbstractParser, argument
 from rscvp.statistic._var import var_page_dict, var_module_dict
 from rscvp.statistic.cli_gspread import CliGspreadLUT, CliGspreadGenerator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
-
-from argclz import AbstractParser, argument
 
 __all__ = ['AutoCLIAgg']
 
@@ -68,7 +67,7 @@ class AutoCLIAgg(AbstractParser, StatisticOptions):
 
     def _option_args(self) -> list[str]:
         ret = []
-        if self.truncate_session_agg:
+        if self.truncate_session:
             ret.extend(['--trunc-session'])
 
         ret.extend(['-H', self.header])

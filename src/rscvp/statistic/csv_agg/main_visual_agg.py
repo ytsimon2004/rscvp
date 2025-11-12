@@ -1,40 +1,39 @@
 from argclz import AbstractParser, as_argument, try_int_type
 from rscvp.statistic._var import VIS_HEADERS
-from rscvp.statistic.csv_agg.collector import CSVCollector
-from rscvp.statistic.csv_agg.core import LocalSpreadsheetSync
+from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_io import HEADER
 from rscvp.util.cli.cli_statistic import StatisticOptions
 
 __all__ = ['VisStatAggOptions']
 
 
-class VisualStat(LocalSpreadsheetSync):
+class VisualStat(ParquetSheetSync):
     """used for general visual properties statistic"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='vc',
             stat_col=[HEADER('reliability'), HEADER('max_vis_resp'), HEADER('perc95_vis_resp')],
             exclude_col=['visual_cell'],
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=False
+            truncate_session=False
         )
 
-        super().__init__(opt, sheet_page='visual_parq', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', aggregator=collector)
 
 
-class CordVisualStat(LocalSpreadsheetSync):
+class CordVisualStat(ParquetSheetSync):
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='cord',
             stat_col=['ap_cords', 'ml_cords', 'ap_cords_scale', 'ml_cords_scale', 'dv_cords'],
             exclude_col=None,
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=False
+            truncate_session=False
         )
 
-        super().__init__(opt, sheet_page='visual_parq', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', aggregator=collector)
 
 
 # ========== #
@@ -65,7 +64,7 @@ class VisStatAggOptions(AbstractParser, StatisticOptions):
                 raise ValueError(f'unknown header: {self.header}')
 
         if self.update:
-            stat.update_spreadsheet(self.variable)
+            stat.run_sync(self.variable)
 
 
 if __name__ == '__main__':

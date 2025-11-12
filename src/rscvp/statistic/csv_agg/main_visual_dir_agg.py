@@ -4,28 +4,27 @@ import polars as pl
 from argclz import AbstractParser, try_int_type, as_argument
 from neuralib.plot import plot_figure
 from rscvp.statistic._var import VIS_DIR_HEADERS
-from rscvp.statistic.csv_agg.collector import CSVCollector
-from rscvp.statistic.csv_agg.core import LocalSpreadsheetSync
+from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_io import get_headers_from_code
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.visual.main_polar import plot_osi_dsi_all, BaseVisPolarOptions
 from rscvp.visual.util import get_polar_sftf_order, PrefSFTFParas
 
 
-class VZDirStat(LocalSpreadsheetSync):
+class VZDirStat(ParquetSheetSync):
     """Visual direction/orientation statistic"""
 
     # should be same order as SFTF_IDX in main_polar.py
     SFTF = get_polar_sftf_order()
 
     def __init__(self, opt: StatisticOptions, sftf: list[str] = None):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             'pa',
             stat_col=get_headers_from_code('pa'),
             fields=dict(rec_region=str, plane_index=try_int_type)
         )
 
-        super().__init__(opt, sheet_page='visual_parq', collector=collector)
+        super().__init__(opt, sheet_page='visual_parq', aggregator=collector)
 
         # sort based on tf order, transform due to different orders as D,OSI_{x}
         self.sftf = sftf or self.SFTF
@@ -72,7 +71,7 @@ class VisDirStatAggOption(AbstractParser, StatisticOptions, BaseVisPolarOptions)
         vzdir = VZDirStat(self)
 
         if self.update:
-            vzdir.update_spreadsheet(self.variable)
+            vzdir.run_sync(self.variable)
 
         self.plot_osi_dsi_regions(vzdir, 'aRSC')
         self.plot_osi_dsi_regions(vzdir, 'pRSC')

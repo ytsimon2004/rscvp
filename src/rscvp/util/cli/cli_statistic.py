@@ -26,7 +26,7 @@ class StatisticOptions(SelectionOptions):
 
     # ----Aggregate---- #
 
-    truncate_session_agg: bool = argument(
+    truncate_session: bool = argument(
         '--trunc-session',
         group=GROUP_STAT,
         help='whether truncate the session for aggregate the csv'
@@ -49,7 +49,7 @@ class StatisticOptions(SelectionOptions):
 
     @property
     def variable(self) -> str:
-        if self.session is not None and not self.truncate_session_agg:
+        if self.session is not None and not self.truncate_session:
             parts = self.session.split(',')
             if len(set(parts)) > 1:
                 raise RuntimeError('different session not supported')

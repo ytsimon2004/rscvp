@@ -1,55 +1,54 @@
 from argclz import try_int_type, AbstractParser, as_argument
 from rscvp.statistic._var import GENERIC_HEADERS
-from rscvp.statistic.csv_agg.collector import CSVCollector
-from rscvp.statistic.csv_agg.core import LocalSpreadsheetSync
+from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 
 
-class DFFStat(LocalSpreadsheetSync):
+class DFFStat(ParquetSheetSync):
     """DF/F amplitude"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='ds',
             stat_col=['perc95_dff', 'max_dff'],
             exclude_col=['mean_dff', 'median_dff'],
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
+            truncate_session=opt.truncate_session
         )
 
-        super().__init__(opt, collector=collector, sheet_page='generic_parq')
+        super().__init__(opt, aggregator=collector, sheet_page='generic_parq')
 
 
-class SpeedStat(LocalSpreadsheetSync):
+class SpeedStat(ParquetSheetSync):
     """speed score"""
 
     def __init__(self, opt: StatisticOptions):
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='sc',
             stat_col=['speed_score'],
             exclude_col=None,
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
+            truncate_session=opt.truncate_session
         )
 
-        super().__init__(opt, collector=collector, sheet_page=opt.sheet_name)
+        super().__init__(opt, aggregator=collector, sheet_page=opt.sheet_name)
 
 
-class SpeedRunStat(LocalSpreadsheetSync):
+class SpeedRunStat(ParquetSheetSync):
     """speed score in run epoch"""
 
     def __init__(self, opt: StatisticOptions):
         opt.running_epoch = True
 
-        collector = CSVCollector(
+        collector = NeuronDataAggregator(
             code='sc',
             stat_col=['speed_score_run'],
             exclude_col=None,
             fields=dict(rec_region=str, plane_index=try_int_type),
-            truncate_session_agg=opt.truncate_session_agg
+            truncate_session=opt.truncate_session
         )
 
-        super().__init__(opt, collector=collector, sheet_page=opt.sheet_name)
+        super().__init__(opt, aggregator=collector, sheet_page=opt.sheet_name)
 
 
 class GenericStatAgg(AbstractParser, StatisticOptions):
@@ -71,7 +70,7 @@ class GenericStatAgg(AbstractParser, StatisticOptions):
                 raise ValueError(f'unknown header: {self.header}')
 
         if self.update:
-            stat.update_spreadsheet(self.variable)
+            stat.run_sync(self.variable)
 
 
 if __name__ == '__main__':

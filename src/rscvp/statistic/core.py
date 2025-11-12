@@ -1,7 +1,7 @@
 import abc
 import sqlite3
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -16,7 +16,7 @@ from neuralib.plot import plot_figure
 from neuralib.typing import DataFrame, PathLike, ArrayLike, is_numeric_arraylike
 from neuralib.util.utils import joinn
 from neuralib.util.utils import uglob
-from neuralib.util.verbose import fprint
+from neuralib.util.verbose import fprint, printdf
 from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.util.cli.cli_stattest import StatisticTestOptions, StatResults
 from rscvp.util.database import (
@@ -40,25 +40,30 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
     Folder Structure ::
 
         [STAT_DIR] /
+            ├── [SPREADSHEET_NAME].parquet  (0)
+            │
             └── [SPREADSHEET_NAME] /
-                    └── [HEADER]_[GROUP_HEADER]_[TEST_TYPE] /
+                    └── [HEADER]_[GROUP_HEADER]_[TEST_TYPE] / [SESSION]?
                         ├── collect_dataset/
-                        │       └── collected_dataset_*.pkl  (1)
+                        │       └── collected_dataset_{HEADER}.pkl  (1)
                         │
                         ├── extracted_data/
-                        │       └── extracted_data_*.parquet  (2)
+                        │       └── extracted_data_{HEADER}.parquet  (2)
                         │
                         ├── statistic_figure/
-                        │        └── figures.pdf  (3)
+                        │       └── {HEADER}_{GROUP_HEADER}.pdf  (3)
                         │
                         └── statistic_result/
-                            └── perc95_dff_region.json/csv (4)
+                                └── {HEADER}_{GROUP_HEADER}.{json|csv} (4)
 
 
-    (1) pkl file for :class:`CollectDataSet` saving
-    (2) extracted data with selected header(s) in parquet
-    (3) figures output
-    (4) statistic output json/csv
+    (0) Local parquet synced with Google Spreadsheet (population-level data)
+    (1) Pickled :class:`CollectDataSet` with grouped statistical data
+    (2) Extracted neuron-level data with selected headers
+    (3) Statistical visualization figures (PDF format)
+    (4) Statistical test results (JSON for structured data, CSV for pairwise tests)
+
+    Note: [SESSION]? subdirectory is created only when session parameter is specified
 
     """
 
@@ -112,10 +117,12 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
 
         self.plot()
 
+    # noinspection PyUnboundLocalVariable
     def load_table(self, primary_key: str | tuple[str, ...] = 'Data',
                    to_pandas: bool = False,
                    concat_plane: bool = True,
-                   join_regions: bool = True) -> None:
+                   join_regions: bool = True,
+                   verbose: bool = True) -> None:
         """
         Load table from source
 
@@ -128,6 +135,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
         :param to_pandas: polars to pandas dataframe
         :param concat_plane: in ETL dataset, only filter ``optic`` with ``all``(i.e., db pipeline)
         :param join_regions: find region table to join with
+        :param verbose
         :return:
         """
         if self.group_header == 'session':
@@ -160,13 +168,15 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
             case _:
                 raise ValueError(f'Unknown load source: {self.load_source}')
 
-        #
         if concat_plane:
             df = self._filter_concat_optics(df)
 
-        #
         if to_pandas:
             df = df.to_pandas()
+
+        if verbose:
+            print(f'# ----- Load table from source: {self.load_source} ----- #')
+            printdf(df)
 
         self.df = df
 
@@ -204,6 +214,10 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
     @property
     def directory(self) -> Path:
         d = self.statistic_dir / self.sheet_name / f'{self.header}_{self.group_header}_{self.test_type}'
+
+        if self.session is not None:
+            d = d / self.session
+
         if not d.exists():
             d.mkdir(exist_ok=True, parents=True)
         return d
@@ -229,16 +243,20 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
         return self.extracted_data / f'extracted_data_{self.header}.parquet'
 
     @property
-    def output_figure(self) -> Optional[Path]:
+    def output_figure(self) -> Path | None:
         if self.debug_mode:
-            return
+            return None
         return (self.statistic_figure / f'{self.header}_{self.group_header}').with_suffix('.pdf')
 
-    def get_output_figure_type(self, *ext) -> Path:
+    def get_output_figure_type(self, *ext) -> Path | None:
         """specific fig types"""
         output = self.output_figure
+        if output is None:
+            return None
+
         prefix = output.stem + f"_{joinn('-', *ext)}"
         suffix = output.suffix
+
         return output.with_name(prefix + suffix)
 
     @property
