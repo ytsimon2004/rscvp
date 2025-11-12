@@ -32,19 +32,6 @@ python -m rscvp.statistic.parq.main_value_gsp \
   --stat-test ttest
 
 
-# ----- speed_score ----- #
-
-spatial_agg csv_agg.main_spatial_agg \
-  -H speed_score \
-  --trunc-session \
-  -s light
-
-spatial_agg csv_agg.main_spatial_agg \
-  -H speed_score_run \
-  --trunc-session \
-  -s light
-
-
 # ----- tcc ----- #
 
 spatial_agg csv_agg.main_spatial_agg \
@@ -79,7 +66,7 @@ spatial_agg csv_agg.main_spatial_agg \
   -s light
 
 python -m rscvp.statistic.parq.main_value_gsp \
-  -H liability \
+  -H trial_reliability \
   --page spatial_parq \
   --stat-test ttest
 

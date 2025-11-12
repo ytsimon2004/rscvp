@@ -51,7 +51,7 @@ class VZSFTFAggOption(AbstractParser, StatisticOptions):
                 self.plot_dot_dff(vzsftf.df)
             case s if s.startswith('sftf_amp_'):
                 if self.update:
-                    vzsftf.run_sync(self.variable)
+                    vzsftf.update_sync(self.variable)
 
     def plot_dot_dff(self, df: pl.DataFrame):
         """

@@ -16,7 +16,7 @@ from neuralib.plot import plot_figure
 from neuralib.typing import DataFrame, PathLike, ArrayLike, is_numeric_arraylike
 from neuralib.util.utils import joinn
 from neuralib.util.utils import uglob
-from neuralib.util.verbose import fprint, printdf
+from neuralib.util.verbose import fprint
 from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.util.cli.cli_stattest import StatisticTestOptions, StatResults
 from rscvp.util.database import (
@@ -176,7 +176,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
 
         if verbose:
             print(f'# ----- Load table from source: {self.load_source} ----- #')
-            printdf(df)
+            print(df)
 
         self.df = df
 
@@ -248,7 +248,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
             return None
         return (self.statistic_figure / f'{self.header}_{self.group_header}').with_suffix('.pdf')
 
-    def get_output_figure_type(self, *ext) -> Path | None:
+    def output_figure_prefix(self, *ext) -> Path | None:
         """specific fig types"""
         output = self.output_figure
         if output is None:
@@ -425,20 +425,21 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
     def plot_pairwise_mean(self, with_bar: bool = True) -> None:
         h = self.variable
 
-        info = get_statistic_key_info().drop('region')
-        df = self.df.join(info, on='Data')
+        info_table = get_statistic_key_info().drop('region')
+        df = self.df.join(info_table, on='Data')
         df = (
             df.select('Data', 'region', 'pair_wise_group', h)
             .sort('pair_wise_group', 'region')
             .with_columns(pl.col(h).list.len().alias('n_neurons'))
             .with_columns(pl.col(h).list.mean())
-            .atler.with_mouseline(col='Data')
+            .alter.with_mouseline(col='Data')
+            .drop_nulls()
         )
 
         value_a = df.filter(pl.col('region') == 'aRSC')[h].to_list()
         value_b = df.filter(pl.col('region') == 'pRSC')[h].to_list()
 
-        with plot_figure(None, figsize=(3, 8)) as ax:
+        with plot_figure(self.output_figure_prefix('pairwise'), figsize=(3, 8)) as ax:
             self.plot_connect_datapoints(ax, value_a, value_b, df=df, with_bar=with_bar)
 
     def plot_connect_datapoints(self, ax: Axes,

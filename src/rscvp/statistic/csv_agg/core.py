@@ -5,7 +5,7 @@ import numpy as np
 import polars as pl
 from polars.polars import SchemaFieldNotFoundError
 
-from neuralib.util.verbose import fprint, print_save, printdf
+from neuralib.util.verbose import fprint, print_save
 from rscvp.util.cli import CodeAlias, HEADER, CELLULAR_IO, CommonOptions
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.util_gspread import RSCGoogleWorkSheet, filter_tdhash, GSPREAD_SHEET_PAGE
@@ -239,7 +239,6 @@ class ParquetSheetSync:
             verb = 'UPDATE'
 
         df.write_parquet(parquet_path)  # TODO check logic
-        printdf(df)
         print_save(parquet_path, verb)
 
     def load_parquet(self, filepath: Path | None = None,
@@ -259,10 +258,10 @@ class ParquetSheetSync:
     # Aggregate / Update #
     # ================== #
 
-    def run_sync(self, header: str,
-                 force_parquet: bool = False,
-                 as_local: bool = True,
-                 dtype: pl.DataType = pl.List(pl.Float64)) -> None:
+    def update_sync(self, header: str,
+                    force_parquet: bool = False,
+                    as_local: bool = True,
+                    dtype: pl.DataType = pl.List(pl.Float64)) -> None:
         """
         **NOTE that if ``filter_concat_df()`` was implemented by children, ``get_pars()`` will used filtered df instead**
 

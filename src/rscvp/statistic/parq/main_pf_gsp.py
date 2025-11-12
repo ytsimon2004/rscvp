@@ -183,7 +183,10 @@ class PFStatGSP(StatPipeline):
         ax.set(ylabel='fraction', xlabel='n_pf')
         ax.tick_params(axis='x', labelrotation=45)
 
-        plt.show()
+        if self.debug_mode:
+            plt.show()
+        else:
+            plt.savefig(self.output_figure)
 
     @staticmethod
     def _print_npf_info(df: pl.DataFrame) -> None:

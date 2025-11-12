@@ -56,12 +56,11 @@ class RSCGoogleWorkSheet(GoogleWorkSheet):
         df = filter_tdhash(self.to_polars(), self.FIRST_COLUMN_NAME)
         return df[self.FIRST_COLUMN_NAME].to_list()
 
-    def mark_cell(self,
-                  primary_list: list[str],
+    def mark_cell(self, primary_list: list[str],
                   header: str,
                   mark_as: str | None = None):
         """
-        Mark google spreadsheet as `PICKLED` after updating(merging) the pickle file
+        Mark google spreadsheet as `PARQUET` after updating(merging) the pickle file
 
         :param primary_list: list of `primary key` for updating
         :param header: variable
@@ -71,7 +70,7 @@ class RSCGoogleWorkSheet(GoogleWorkSheet):
 
         if mark_as is None:
             from datetime import datetime
-            mark_as = f"PARQUET_{datetime.today().strftime('%y%m%d')}"
+            mark_as = f"parq_{datetime.today().strftime('%y%m%d')}"
 
         values = [mark_as] * len(primary_list)
         self.update_cell(primary_list, header, values)

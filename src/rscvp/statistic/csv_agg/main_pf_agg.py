@@ -35,7 +35,7 @@ class PFStatAggOptions(AbstractParser, StatisticOptions):
         pfs = PFStat(self)
         if self.update:
             dtype = pl.List(pl.Int8) if 'n_pf' in self.variable else pl.List(pl.Utf8)
-            pfs.run_sync(self.variable, dtype=dtype)
+            pfs.update_sync(self.variable, dtype=dtype)
 
 
 if __name__ == '__main__':

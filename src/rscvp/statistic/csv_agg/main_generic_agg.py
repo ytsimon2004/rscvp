@@ -70,7 +70,7 @@ class GenericStatAgg(AbstractParser, StatisticOptions):
                 raise ValueError(f'unknown header: {self.header}')
 
         if self.update:
-            stat.run_sync(self.variable)
+            stat.update_sync(self.variable)
 
 
 if __name__ == '__main__':

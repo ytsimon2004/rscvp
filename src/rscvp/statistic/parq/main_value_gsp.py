@@ -48,7 +48,7 @@ class ValStatGSP(StatPipeline, Dispatch):
 
     def plot(self):
         dat = self.get_collect_data()
-        output_file = self.get_output_figure_type(self.plot_type)
+        output_file = self.output_figure_prefix(self.plot_type)
 
         if self.plot_type == 'diag':
             self.plot_diag_histplot(dat, output_file)

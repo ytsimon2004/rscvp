@@ -71,7 +71,7 @@ class VisDirStatAggOption(AbstractParser, StatisticOptions, BaseVisPolarOptions)
         vzdir = VZDirStat(self)
 
         if self.update:
-            vzdir.run_sync(self.variable)
+            vzdir.update_sync(self.variable)
 
         self.plot_osi_dsi_regions(vzdir, 'aRSC')
         self.plot_osi_dsi_regions(vzdir, 'pRSC')
