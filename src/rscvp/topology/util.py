@@ -49,7 +49,7 @@ class RSCObjectiveFOV(FieldOfView):
 def _to_fov(df: pl.DataFrame,
             exp_date: str | None = None,
             animal_id: str | None = None,
-            use_db: bool = False) -> list[RSCObjectiveFOV]:
+            use_db: bool = False) -> list[RSCObjectiveFOV] | RSCObjectiveFOV:
     """load all recording FOV"""
     region = df['region'].to_list()
     rot = df['objective_rotation'].to_list()
@@ -84,5 +84,7 @@ def _to_fov(df: pl.DataFrame,
         .to_numpy()
     )
 
-    return [RSCObjectiveFOV(np.vstack([*p]), rotation_ml=rot[i], region_name=region[i])
-            for i, p in enumerate(points)]
+    ret = [RSCObjectiveFOV(np.vstack([*p]), rotation_ml=rot[i], region_name=region[i])
+           for i, p in enumerate(points)]
+
+    return ret[0] if len(ret) == 1 else ret

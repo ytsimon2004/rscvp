@@ -34,7 +34,7 @@ anterior_persistence main_trial_avg_position \
   --session light \
   --used_session light \
   -T spks \
-  --page apcls_blank \
+  --page fov_table \
   --cv
 
 posterior_persistence main_trial_avg_position \
@@ -42,6 +42,6 @@ posterior_persistence main_trial_avg_position \
   --session light \
   --used_session light \
   -T spks \
-  --page apcls_blank \
+  --page fov_table \
   --cv
 

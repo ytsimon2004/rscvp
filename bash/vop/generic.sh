@@ -66,8 +66,8 @@ run_python signal ds \
 
 run_python topology fov
 
-run_python topology loc \
-  --page apcls_tac
+run_python topology cord \
+  --page fov_table
 
 
 # ====================== #
@@ -78,16 +78,16 @@ run_python topology ct
 
 run_python topology ctopo \
   --us light \
-  --page apcls_tac
+  --page fov_table
 
 run_python topology vtopo \
   --us light \
-  --page apcls_tac
+  --page fov_table
 
 run_python topology stopo \
   --session light \
   --us light \
-  --page apcls_tac
+  --page fov_table
 
 
 # ============== #

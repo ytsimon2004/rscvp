@@ -102,7 +102,7 @@ class CommonOptions:
     )
 
     reuse_output: bool = argument(
-        '-R', '--re',
+        '--reuse-output',
         group=GROUP_IO,
         help='reuse the latest file for storage. If True, store the new item in '
              'latest version directory, otherwise create a new version suffix'

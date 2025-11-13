@@ -66,13 +66,13 @@ run_python signal ds \
 
 run_python topology fov
 
-run_python topology loc \
-  --page ap_ldl
+run_python topology cord \
+  --page fov_table
 
 run_python topology stopo \
   --session light_bas \
   --us light_bas \
-  --page ap_ldl
+  --page fov_table
 
 
 # ============ #

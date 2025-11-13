@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 from rscvp.statistic.persistence_agg.main_topo_celltype import TopoCellTypePersistenceAgg
 from rscvp.topology.main_cls import ClsTopoOptions
+from rscvp.topology.main_cords import RoiLocOptions
 from rscvp.topology.main_fov import FOVOptions
-from rscvp.topology.main_rois_loc import RoiLocOptions
 from rscvp.topology.main_spatial_topo import SpatialTopoPlotOptions
 from rscvp.topology.main_visual_topo import VisTopoPlotOptions
 from .util import check_attr
