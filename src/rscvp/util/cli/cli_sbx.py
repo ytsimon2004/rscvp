@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import ClassVar
 
 from argclz import argument
@@ -43,7 +44,7 @@ class SBXOptions(CommonOptions):
 
         return (fx + fy) / 2
 
-    @property
+    @cached_property
     def scanbox_distance(self) -> tuple[float, float]:
         """(X, Y) in um shown in the scanbox system"""
         try:
