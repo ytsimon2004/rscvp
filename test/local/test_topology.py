@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from rscvp.statistic.persistence_agg.main_topo_celltype import TopoCellTypePersistenceAgg
 from rscvp.topology.main_cls import ClsTopoOptions
-from rscvp.topology.main_cords import RoiLocOptions
+from rscvp.topology.main_cords import RoiCordOptions
 from rscvp.topology.main_fov import FOVOptions
 from rscvp.topology.main_spatial_topo import SpatialTopoPlotOptions
 from rscvp.topology.main_visual_topo import VisTopoPlotOptions
@@ -40,14 +40,14 @@ class TestTopologyModule(unittest.TestCase):
         Opt().main([])
 
     def test_roi_location(self):
-        class Opt(RoiLocOptions):
+        class Opt(RoiCordOptions):
             exp_date = '210315'
             animal_id = 'YW006'
             plane_index = 0
             gspread_page = 'apcls_tac'
             debug_mode = True
 
-        check_attr(Opt, RoiLocOptions)
+        check_attr(Opt, RoiCordOptions)
         Opt().main([])
 
     @patch('matplotlib.pyplot.show')

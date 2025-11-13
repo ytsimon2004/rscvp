@@ -1,4 +1,4 @@
-from typing import final
+from typing import final, get_args
 
 import attrs
 import numpy as np
@@ -6,6 +6,7 @@ import polars as pl
 from typing_extensions import Self
 
 from neuralib.imaging.registration import FieldOfView
+from rscvp.util.util_gspread import USAGE_TYPE
 
 __all__ = ['RSCObjectiveFOV']
 
@@ -19,18 +20,23 @@ class RSCObjectiveFOV(FieldOfView):
     @classmethod
     def load_from_gspread(cls, exp_date: str | None = None,
                           animal_id: str | None = None,
-                          usage: str = 'base') -> Self | list[Self]:
+                          usage: USAGE_TYPE | None = None) -> Self | list[Self]:
         """Load fov coordinates from google spreadsheet"""
         from rscvp.statistic.cli_gspread import GSPExtractor
 
-        df = GSPExtractor('fov_table').load_from_gspread().filter(pl.col('usage') == usage)
+        df = GSPExtractor('fov_table').load_from_gspread()
+
+        if usage is not None:
+            if usage not in get_args(USAGE_TYPE):
+                raise ValueError(f'unknown usage type: {usage}')
+            df = df.filter(pl.col('usage') == usage)
 
         return _to_fov(df, exp_date, animal_id, use_db=False)
 
     @classmethod
     def load_from_database(cls, exp_date: str | None = None,
                            animal_id: str | None = None,
-                           usage: str = 'base'):
+                           usage: USAGE_TYPE | None = None):
         """Load fov coordinates from local project sqlite database"""
         import sqlite3
         from rscvp.util.database import RSCDatabase
@@ -42,6 +48,11 @@ class RSCObjectiveFOV(FieldOfView):
             query='SELECT * FROM "FieldOfViewDB"',
             connection=conn
         ).filter(pl.col('usage') == usage)
+
+        if usage is not None:
+            if usage not in get_args(USAGE_TYPE):
+                raise ValueError(f'unknown usage type: {usage}')
+            df = df.filter(pl.col('usage') == usage)
 
         return _to_fov(df, exp_date, animal_id, use_db=True)
 

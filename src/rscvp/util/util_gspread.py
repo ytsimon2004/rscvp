@@ -11,6 +11,7 @@ from rscvp.util.io import IOConfig
 
 __all__ = [
     'GSPREAD_SHEET_PAGE',
+    'USAGE_TYPE',
     'RSCGoogleWorkSheet',
     'GoogleSpreadSheet',
     #
@@ -27,6 +28,8 @@ GSPREAD_SHEET_PAGE = Literal[
     'BaseClassDB', 'DarkClassDB', 'BlankClassDB', 'VRClassDB',
     'BayesDecodeDB', 'VisualSFTFDirDB'
 ]
+
+USAGE_TYPE = Literal['base', 'blank', 'dark', 'vr']
 
 
 class RSCGoogleWorkSheet(GoogleWorkSheet):

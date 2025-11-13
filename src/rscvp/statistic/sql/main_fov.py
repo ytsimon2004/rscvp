@@ -3,6 +3,7 @@ from neuralib.plot import plot_figure
 from neuralib.util.verbose import publish_annotation
 from rscvp.topology.util import RSCObjectiveFOV
 from rscvp.util.cli import CommonOptions, SBXOptions, StatisticOptions
+from rscvp.util.util_gspread import USAGE_TYPE
 from rscvp.util.util_ibl import IBLAtlasPlotWrapper
 
 __all__ = ['FieldOfViewOptions']
@@ -19,11 +20,13 @@ class FieldOfViewOptions(AbstractParser, SBXOptions):
     ibl_res: int = argument('--res', default=10, choices=(10, 25, 50), help='resolution of IBL atlas dorsal map')
     database: bool = argument('--db', help='load from rscvp database, otherwise from gspread')
 
+    exp_usage: USAGE_TYPE = 'base'
+
     def run(self):
         if self.database:
-            fovs = RSCObjectiveFOV.load_from_database(self.exp_date, self.animal_id)
+            fovs = RSCObjectiveFOV.load_from_database(self.exp_date, self.animal_id, usage=self.exp_usage)
         else:
-            fovs = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id)
+            fovs = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, usage=self.exp_usage)
 
         with plot_figure(None) as ax:
             ibl = IBLAtlasPlotWrapper(res_um=self.ibl_res)

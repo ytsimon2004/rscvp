@@ -22,6 +22,8 @@ __all__ = [
     'CellTypeCordCacheBuilder'
 ]
 
+from rscvp.util.util_gspread import USAGE_TYPE
+
 
 @persistence.persistence_class
 class CellTypeCordCache:
@@ -198,7 +200,8 @@ def plot_topo_cell_type(ax: Axes,
                         classification_type: Literal['visual', 'spatial'],
                         all_mask: np.ndarray,
                         cell_type_mask: np.ndarray,
-                        set_square: bool = False):
+                        set_square: bool = False,
+                        usage: USAGE_TYPE | None = None):
     """
     plot the topographical distribution of cell types in s2p cell's segmentations
 
@@ -211,8 +214,9 @@ def plot_topo_cell_type(ax: Axes,
     :param all_mask: all cell mask (i.e., after preselection)
     :param cell_type_mask: cell type classification mask
     :param set_square
+    :param usage
     """
-    fov_bregma = RSCObjectiveFOV.load_from_gspread(exp_date, animal_id).to_um()
+    fov_bregma = RSCObjectiveFOV.load_from_gspread(exp_date, animal_id, usage=usage).to_um()
 
     plot_registered_fov(ax, s2p, all_mask,
                         uni_color='Greys',

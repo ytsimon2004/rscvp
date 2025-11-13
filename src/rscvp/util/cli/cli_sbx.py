@@ -5,7 +5,6 @@ from neuralib.imaging.scanbox.core import SBXInfo
 from neuralib.imaging.suite2p import Suite2PResult
 from neuralib.util.utils import uglob
 from neuralib.util.verbose import fprint
-from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from .cli_core import CommonOptions
 
 __all__ = ['SBXOptions']
@@ -26,7 +25,6 @@ class SBXOptions(CommonOptions):
     zoom: float = argument('--obj-zoom', group=GROUP_SBX, default=1.7, help='zoom setting during acquisition')
 
     # -----mapping----- #
-    gspread_page: GSPREAD_SHEET_PAGE = argument('--page', group=GROUP_MAPPING, help='gspread page for load fov info')
     brain_mapping: bool = argument('--brain-mapping', group=GROUP_MAPPING, help='Do brain mapping scaling')
 
     def load_sbx(self) -> SBXInfo:
@@ -38,7 +36,7 @@ class SBXOptions(CommonOptions):
         """From theoretical XY(um) to actual brain atlas coordinate (brain size variation from individual animal)"""
         from rscvp.topology.util import RSCObjectiveFOV
 
-        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id).to_um()
+        fov = RSCObjectiveFOV.load_from_gspread(self.exp_date, self.animal_id, usage=self.exp_usage).to_um()
         d = self.scanbox_distance
         fx = fov.ml_distance / d[0]
         fy = fov.ap_distance / d[1]

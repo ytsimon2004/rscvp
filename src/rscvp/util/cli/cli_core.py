@@ -19,6 +19,8 @@ __all__ = [
     'cast_opt'
 ]
 
+from ..util_gspread import USAGE_TYPE
+
 DAQ_TYPE = Literal['2P', '1P', 'no_cam']
 """experiment type for data acquisition"""
 
@@ -81,6 +83,13 @@ class CommonOptions:
         group=GROUP_PRIMARY,
         default=None,
         help='region name for the imaging',
+    )
+
+    exp_usage: USAGE_TYPE | None = argument(
+        '--exp-usage',
+        group=GROUP_PRIMARY,
+        default=None,
+        help='experiment usage type, mainly use for gspread query',
     )
 
     # ----- DATA IO ----- #
