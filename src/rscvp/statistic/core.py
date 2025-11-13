@@ -297,8 +297,7 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
 
         return self._collect_data
 
-    def _get_collect_data(self,
-                          group_header: GROUP_HEADER_TYPE | None = None,
+    def _get_collect_data(self, group_header: GROUP_HEADER_TYPE | None = None,
                           col: str | None = None,
                           key_prefix: str | None = None,
                           verbose: bool = True) -> CollectDataSet:

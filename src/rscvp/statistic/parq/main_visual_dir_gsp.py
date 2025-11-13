@@ -15,11 +15,11 @@ from rscvp.util.util_stat import CollectDataSet
 from rscvp.visual.main_polar import BaseVisPolarOptions
 from rscvp.visual.util_plot import dir_hist
 
-__all__ = ['VZDirStatGSP']
+__all__ = ['VisualDirParQ']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.5F-G,I-J', as_doc=True)
-class VZDirStatGSP(StatPipeline, BaseVisPolarOptions):
+class VisualDirParQ(StatPipeline, BaseVisPolarOptions):
     DESCRIPTION = 'direction / orientation selectivity in individual cells across animals'
 
     header: str = as_argument(StatisticOptions.header).with_options(choices=VIS_DIR_HEADERS)
@@ -107,4 +107,4 @@ class VZDirStatGSP(StatPipeline, BaseVisPolarOptions):
 
 
 if __name__ == '__main__':
-    VZDirStatGSP().main()
+    VisualDirParQ().main()

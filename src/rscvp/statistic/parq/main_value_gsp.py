@@ -12,11 +12,11 @@ from rscvp.statistic.core import StatPipeline
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.util_stat import DataSetType, CollectDataSet
 
-__all__ = ['ValStatGSP']
+__all__ = ['ValueParQ']
 
 
 @publish_annotation('main', project='rscvp', figure=['fig.2D-2F', 'fig.S3D'], as_doc=True)
-class ValStatGSP(StatPipeline, Dispatch):
+class ValueParQ(StatPipeline, Dispatch):
     DESCRIPTION = 'see the values from individual neurons across animal'
 
     plot_type: Literal[
@@ -39,7 +39,7 @@ class ValStatGSP(StatPipeline, Dispatch):
     ttest_parametric_infer = True
 
     def run(self):
-        self.load_table(to_pandas=False if self.animal_based_comp else True)
+        self.load_table()
 
         if self.animal_based_comp:
             self.plot_pairwise_mean()
@@ -111,4 +111,4 @@ class ValStatGSP(StatPipeline, Dispatch):
 
 
 if __name__ == '__main__':
-    ValStatGSP().main()
+    ValueParQ().main()

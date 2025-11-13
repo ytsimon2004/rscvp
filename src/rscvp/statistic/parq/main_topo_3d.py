@@ -11,7 +11,7 @@ from neuralib.atlas.brainrender.core import CAMERA_ANGLE_TYPE
 from neuralib.atlas.util import allen_to_brainrender_coord
 from rscvp.statistic.core import StatPipeline
 
-__all__ = ['TopoMetricVolumeOptions']
+__all__ = ['Topo3DParQ']
 
 LAYER_COLORS = {
     'RSPd1': 'lightblue',
@@ -29,7 +29,7 @@ SUBREGION_COLORS = {
 }
 
 
-class TopoMetricVolumeOptions(StatPipeline):
+class Topo3DParQ(StatPipeline):
     DESCRIPTION = 'Topological volumetric view of value average for the batch dataset'
 
     plot_type: Literal['top', 'front', 'side', '3d'] = argument(
@@ -207,4 +207,4 @@ class TopoMetricVolumeOptions(StatPipeline):
 
 
 if __name__ == '__main__':
-    TopoMetricVolumeOptions().main()
+    Topo3DParQ().main()

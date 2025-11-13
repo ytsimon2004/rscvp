@@ -11,11 +11,11 @@ from rscvp.statistic.core import StatPipeline
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.util_stat import CollectDataSet
 
-__all__ = ['VisStatGSP']
+__all__ = ['VisualParQ']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.4B', as_doc=True)
-class VisStatGSP(StatPipeline):
+class VisualParQ(StatPipeline):
     DESCRIPTION = 'Compare the individual neurons visual responses in aRSC versus pRSC'
 
     nbins: int = argument(
@@ -108,4 +108,4 @@ class VisStatGSP(StatPipeline):
 
 
 if __name__ == '__main__':
-    VisStatGSP().main()
+    VisualParQ().main()

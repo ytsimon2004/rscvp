@@ -7,11 +7,11 @@ from rscvp.statistic.core import StatPipeline
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.util.util_plot import REGION_COLORS_PHY
 
-__all__ = ['GenericGSP']
+__all__ = ['GenericParQ']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.3D & fig.4C', as_doc=True)
-class GenericGSP(StatPipeline):
+class GenericParQ(StatPipeline):
     DESCRIPTION = 'Plot the generic header. i.e., session independent, without cell masking'
 
     header: Literal['perc95_dff', 'max_dff'] = as_argument(StatisticOptions.header).with_options(...)
@@ -51,4 +51,4 @@ class GenericGSP(StatPipeline):
 
 
 if __name__ == '__main__':
-    GenericGSP().main()
+    GenericParQ().main()

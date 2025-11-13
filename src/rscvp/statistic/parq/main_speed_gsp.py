@@ -11,7 +11,7 @@ from rscvp.util.cli import StatisticOptions
 
 
 @publish_annotation('appendix', project='rscvp', as_doc=True, caption='rev')
-class SpeedStatGSP(StatPipeline):
+class SpeedParQ(StatPipeline):
     DESCRIPTION = 'Speed score histogram (note the negative value is meaningful, not use mean-based statistics)'
 
     header = as_argument(StatisticOptions.header).with_options(
@@ -77,4 +77,4 @@ class SpeedStatGSP(StatPipeline):
 
 
 if __name__ == '__main__':
-    SpeedStatGSP().main()
+    SpeedParQ().main()

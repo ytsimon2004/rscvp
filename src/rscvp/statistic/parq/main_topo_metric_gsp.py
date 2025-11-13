@@ -11,11 +11,11 @@ from rscvp.statistic.core import StatPipeline
 from rscvp.topology.util_plot import plot_topo_variable, plot_topo_histogram
 from rscvp.visual.main_polar import BaseVisPolarOptions
 
-__all__ = ['TopoMetricOptions']
+__all__ = ['TopoMetricParQ']
 
 
 @publish_annotation('main', project='rscvp', figure=['fig.2C', 'fig.4D left', 'fig.5K', 'fig.S2F'], as_doc=True)
-class TopoMetricOptions(StatPipeline, BaseVisPolarOptions):
+class TopoMetricParQ(StatPipeline, BaseVisPolarOptions):
     DESCRIPTION = 'topological value average for the batch dataset'
 
     scaled: bool = argument('--scaled', help='If use scaled coordinates')
@@ -186,4 +186,4 @@ class TopoMetricOptions(StatPipeline, BaseVisPolarOptions):
 
 
 if __name__ == '__main__':
-    TopoMetricOptions().main()
+    TopoMetricParQ().main()

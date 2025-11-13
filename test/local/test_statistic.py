@@ -12,8 +12,8 @@ from rscvp.statistic.csv_agg.main_visual_dir_agg import VisDirStatAggOption
 from rscvp.statistic.csv_agg.main_visual_sftf_agg import VZSFTFAggOption
 from rscvp.statistic.main_normality import NormTestOption
 from rscvp.statistic.main_para_mtx import ParaCorrMatOptions
-from rscvp.statistic.parq.main_generic_gsp import GenericGSP
-from rscvp.statistic.parq.main_pf_gsp import PFStatGSP
+from rscvp.statistic.parq.main_generic_gsp import GenericParQ
+from rscvp.statistic.parq.main_pf_gsp import PlaceFieldParQ
 from rscvp.statistic.sql.main_base_cls import BaseClassStat
 from rscvp.statistic.sql.main_cell_type import CellTypeStat
 from rscvp.statistic.sql.main_decode_err import MedianDecodeErrorStat
@@ -75,7 +75,7 @@ class TestStatisticPipeline(unittest.TestCase):
 
     @patch('matplotlib.pyplot.show')
     def test_parq_generic(self, *args):
-        class Opt(GenericGSP):
+        class Opt(GenericParQ):
             exp_date = '210315,210409'
             animal_id = 'YW006,YW006'
             plane_index = '0,0'
@@ -168,7 +168,7 @@ class TestStatisticPipeline(unittest.TestCase):
         opt.main([])
 
     def test_pf_width_parq(self):
-        class Opt(PFStatGSP):
+        class Opt(PlaceFieldParQ):
             exp_date = '210315,210409'
             animal_id = 'YW006,YW006'
             rec_region = 'aRSC,pRSC'

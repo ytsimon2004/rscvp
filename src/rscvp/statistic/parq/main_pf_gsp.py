@@ -16,11 +16,11 @@ from rscvp.statistic.core import StatPipeline
 from rscvp.util.util_plot import REGION_COLORS_HIST
 from rscvp.util.util_stat import DataSetType, CollectDataSet
 
-__all__ = ['PFStatGSP']
+__all__ = ['PlaceFieldParQ']
 
 
 @publish_annotation('main', project='rscvp', figure='fig.2G', as_doc=True)
-class PFStatGSP(StatPipeline):
+class PlaceFieldParQ(StatPipeline):
     DESCRIPTION = 'place-field statistic across animals'
 
     header: str = as_argument(StatPipeline.header).with_options(choices=PF_HEADERS)
@@ -36,7 +36,6 @@ class PFStatGSP(StatPipeline):
     def run(self):
         self.post_parsing()
 
-        # TODO check both cases
         if self.animal_based_comp:
             self.load_table(to_pandas=False)
             self.plot_pairwise_mean()
@@ -252,4 +251,4 @@ class PFStatGSP(StatPipeline):
 
 
 if __name__ == '__main__':
-    PFStatGSP().main()
+    PlaceFieldParQ().main()
