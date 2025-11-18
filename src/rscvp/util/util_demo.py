@@ -41,14 +41,14 @@ def mkdir_demo_dataset(token: str,
         case 'zenodo':
             data_url = f"https://zenodo.org/records/17466243/files/rscvp_dataset.zip?token={token}"
         case 'figshare':
-            data_url = f'https://figshare.com/ndownloader/files/{token}'
+            data_url = f"https://figshare.com/ndownloader/files/59669591?token={token}"
 
     zip_path = Path(RSCVP_CACHE_DIRECTORY) / "rscvp_dataset.zip"
 
     if aria2:
         try:
             import subprocess
-            print('Using aria2c for fast download data from zenodo ...')
+            print(f'Using aria2c for fast download data from {source} ...')
             # Use fewer connections for figshare to avoid 502 errors
             connections = "2" if source == 'figshare' else "16"
             result = subprocess.run(
