@@ -10,8 +10,43 @@ from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.visual.main_polar import plot_osi_dsi_all, BaseVisPolarOptions
 from rscvp.visual.util import get_polar_sftf_order, PrefSFTFParas
 
+__all__ = ['VisDirAggOption']
 
-class VZDirStat(ParquetSheetSync):
+
+class VisDirAggOption(AbstractParser, StatisticOptions, BaseVisPolarOptions):
+    DESCRIPTION = 'OSI DSI preferred in aRSC and pRSC'
+
+    header = as_argument(StatisticOptions.header).with_options(choices=VIS_DIR_HEADERS)
+
+    pre_selection = True
+    vc_selection = 0.3
+
+    def run(self):
+        vzdir = VisDirStat(self)
+
+        if self.update:
+            vzdir.update_sync(self.variable)
+
+        self.plot_osi_dsi_regions(vzdir, 'aRSC')
+        self.plot_osi_dsi_regions(vzdir, 'pRSC')
+
+    def plot_osi_dsi_regions(self, vzdir: 'VisDirStat', region: str):
+        """plot the osi, dsi plot for certain region (could be batch dataset)"""
+
+        mask = vzdir.df['region'] == region
+        vp = vzdir.process().with_mask(mask)
+
+        dire = vp.pref_dir[(vp.pref_dsi >= self.selective_thres)]
+        ori = vp.pref_ori[(vp.pref_osi >= self.selective_thres)]
+
+        output_file = vzdir.opt.statistic_dir / 'visual_dir' / region
+        output_file.parent.mkdir(exist_ok=True, parents=True)
+
+        with plot_figure(output_file, 2, 3, figsize=(12, 8)) as ax:
+            plot_osi_dsi_all(ax, vp.pref_dsi, vp.pref_osi, dire, ori, self.selective_thres)
+
+
+class VisDirStat(ParquetSheetSync):
     """Visual direction/orientation statistic"""
 
     # should be same order as SFTF_IDX in main_polar.py
@@ -59,38 +94,5 @@ class VZDirStat(ParquetSheetSync):
         return pl.DataFrame(ret)
 
 
-class VisDirStatAggOption(AbstractParser, StatisticOptions, BaseVisPolarOptions):
-    DESCRIPTION = 'OSI DSI preferred in aRSC and pRSC'
-
-    header = as_argument(StatisticOptions.header).with_options(choices=VIS_DIR_HEADERS)
-
-    pre_selection = True
-    vc_selection = 0.3
-
-    def run(self):
-        vzdir = VZDirStat(self)
-
-        if self.update:
-            vzdir.update_sync(self.variable)
-
-        self.plot_osi_dsi_regions(vzdir, 'aRSC')
-        self.plot_osi_dsi_regions(vzdir, 'pRSC')
-
-    def plot_osi_dsi_regions(self, vzdir: VZDirStat, region: str):
-        """plot the osi, dsi plot for certain region (could be batch dataset)"""
-
-        mask = vzdir.df['region'] == region
-        vp = vzdir.process().with_mask(mask)
-
-        dire = vp.pref_dir[(vp.pref_dsi >= self.selective_thres)]
-        ori = vp.pref_ori[(vp.pref_osi >= self.selective_thres)]
-
-        output_file = vzdir.opt.statistic_dir / 'visual_dir' / region
-        output_file.parent.mkdir(exist_ok=True, parents=True)
-
-        with plot_figure(output_file, 2, 3, figsize=(12, 8)) as ax:
-            plot_osi_dsi_all(ax, vp.pref_dsi, vp.pref_osi, dire, ori, self.selective_thres)
-
-
 if __name__ == '__main__':
-    VisDirStatAggOption().main()
+    VisDirAggOption().main()

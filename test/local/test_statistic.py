@@ -5,11 +5,11 @@ from datetime import datetime
 from typing import ClassVar
 from unittest.mock import patch
 
-from rscvp.statistic.csv_agg.main_pf_agg import PFStatAggOptions
-from rscvp.statistic.csv_agg.main_spatial_agg import SpatialStatAggOptions
-from rscvp.statistic.csv_agg.main_visual_agg import VisStatAggOptions
-from rscvp.statistic.csv_agg.main_visual_dir_agg import VisDirStatAggOption
-from rscvp.statistic.csv_agg.main_visual_sftf_agg import VZSFTFAggOption
+from rscvp.statistic.csv_agg.main_pf_agg import PFAggOptions
+from rscvp.statistic.csv_agg.main_spatial_agg import SpatialAggOptions
+from rscvp.statistic.csv_agg.main_visual_agg import VisAggOptions
+from rscvp.statistic.csv_agg.main_visual_dir_agg import VisDirAggOption
+from rscvp.statistic.csv_agg.main_visual_sftf_agg import VisSFTFAggOptions
 from rscvp.statistic.main_normality import NormTestOption
 from rscvp.statistic.main_para_mtx import ParaCorrMatOptions
 from rscvp.statistic.parq.main_generic_gsp import GenericParQ
@@ -88,7 +88,7 @@ class TestStatisticPipeline(unittest.TestCase):
         Opt().main([])
 
     def test_non_session_agg(self):
-        class Opt(SpatialStatAggOptions):
+        class Opt(SpatialAggOptions):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             plane_index = '0,0'
@@ -101,7 +101,7 @@ class TestStatisticPipeline(unittest.TestCase):
         opt.main([])
 
     def test_visual_header_agg(self):
-        class Opt(VisStatAggOptions):
+        class Opt(VisAggOptions):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             plane_index = '0,0'
@@ -113,7 +113,7 @@ class TestStatisticPipeline(unittest.TestCase):
         opt.main([])
 
     def test_visual_sftf_agg(self):
-        class Opt(VZSFTFAggOption):
+        class Opt(VisSFTFAggOptions):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             plane_index = '0,0'
@@ -125,7 +125,7 @@ class TestStatisticPipeline(unittest.TestCase):
         opt.main([])
 
     def test_visual_sftf_fraction(self):
-        class Opt(VZSFTFAggOption):
+        class Opt(VisSFTFAggOptions):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             plane_index = '0,0'
@@ -137,7 +137,7 @@ class TestStatisticPipeline(unittest.TestCase):
         opt.main([])
 
     def test_visual_dir_agg(self):
-        class Opt(VisDirStatAggOption):
+        class Opt(VisDirAggOption):
             exp_date = '210315,210401'
             animal_id = 'YW006,YW006'
             rec_region = 'aRSC,pRSC'  # pseudo
@@ -153,7 +153,7 @@ class TestStatisticPipeline(unittest.TestCase):
         pass
 
     def test_pf_width_agg(self):
-        class Opt(PFStatAggOptions):
+        class Opt(PFAggOptions):
             exp_date = '210315,210409'
             animal_id = 'YW006,YW006'
             rec_region = 'aRSC,pRSC'  # pseudo

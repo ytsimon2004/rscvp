@@ -5,6 +5,38 @@ from rscvp.statistic._var import SPATIAL_HEADERS
 from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 
+__all__ = ['SpatialAggOptions']
+
+
+class SpatialAggOptions(AbstractParser, StatisticOptions):
+    DESCRIPTION = 'spatial related variables statistic, ' \
+                  'accept for session statistic (ldl protocol)'
+
+    header = as_argument(StatisticOptions.header).with_options(choices=SPATIAL_HEADERS)
+    sheet_name: Literal['spatial_parq', 'dark_parq']
+
+    pre_selection = True
+    pc_selection = 'slb'
+
+    def run(self):
+
+        match self.header:
+            case 'si':
+                stat = SIStat(self)
+            case 'trial_cc':
+                stat = TCCStat(self)
+            case 'ev_trial_avg':
+                stat = EVStat(self)
+            case 'trial_reliability':
+                stat = TrStat(self)
+            case 'ap_cords' | 'ml_cords' | 'ap_cords_scale' | 'ml_cords_scale' | 'dv_cords':
+                stat = CordSpatialStat(self)
+            case _:
+                raise ValueError(f'unknown header: {self.header}')
+
+        if self.update:
+            stat.update_sync(self.variable)
+
 
 class SIStat(ParquetSheetSync):
     """spatial information"""
@@ -84,35 +116,6 @@ class CordSpatialStat(ParquetSheetSync):
 
 # ====== #
 
-class SpatialStatAggOptions(AbstractParser, StatisticOptions):
-    DESCRIPTION = 'spatial related variables statistic, ' \
-                  'accept for session statistic (ldl protocol)'
-
-    header = as_argument(StatisticOptions.header).with_options(choices=SPATIAL_HEADERS)
-    sheet_name: Literal['spatial_parq', 'dark_parq']
-
-    pre_selection = True
-    pc_selection = 'slb'
-
-    def run(self):
-
-        match self.header:
-            case 'si':
-                stat = SIStat(self)
-            case 'trial_cc':
-                stat = TCCStat(self)
-            case 'ev_trial_avg':
-                stat = EVStat(self)
-            case 'trial_reliability':
-                stat = TrStat(self)
-            case 'ap_cords' | 'ml_cords' | 'ap_cords_scale' | 'ml_cords_scale' | 'dv_cords':
-                stat = CordSpatialStat(self)
-            case _:
-                raise ValueError(f'unknown header: {self.header}')
-
-        if self.update:
-            stat.update_sync(self.variable)
-
 
 if __name__ == '__main__':
-    SpatialStatAggOptions().main()
+    SpatialAggOptions().main()

@@ -30,13 +30,13 @@ def physiology_workflow():
         with Cluster("Session Analysis"):
             csv_out = StoredData("metrics.csv")
             cache_out = StoredData("persistence.pkl")
-            db_session = Sql("SQLite DB")
+            db_session = Sql("write SQLite DB")
             cellular_modules = Python("selection/visual\nspatial/topology\n/model")
 
         with Cluster("Batch Statistics"):
             parquet_out = StoredData("csv aggregate (.parquet)")
             cache_agg = StoredData("persistence aggregate (.pkl)")
-            db_batch = Sql("SQLite DB")
+            db_batch = Sql("read SQLite DB")
             statistic_modules = Python("statistic\n")
 
         # Physiology

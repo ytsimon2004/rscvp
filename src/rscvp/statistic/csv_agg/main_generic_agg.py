@@ -3,6 +3,30 @@ from rscvp.statistic._var import GENERIC_HEADERS
 from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 
+__all__ = ['GenericAggOptions']
+
+
+class GenericAggOptions(AbstractParser, StatisticOptions):
+    DESCRIPTION = 'Generic variables statistic aggregation'
+
+    header = as_argument(StatisticOptions.header).with_options(choices=GENERIC_HEADERS)
+
+    pre_selection = True
+
+    def run(self):
+        match self.header:
+            case 'speed_score':
+                stat = SpeedStat(self)
+            case 'speed_score_run':
+                stat = SpeedRunStat(self)
+            case 'perc95_dff' | 'max_dff':
+                stat = DFFStat(self)
+            case _:
+                raise ValueError(f'unknown header: {self.header}')
+
+        if self.update:
+            stat.update_sync(self.variable)
+
 
 class DFFStat(ParquetSheetSync):
     """DF/F amplitude"""
@@ -51,27 +75,5 @@ class SpeedRunStat(ParquetSheetSync):
         super().__init__(opt, aggregator=collector, sheet_page=opt.sheet_name)
 
 
-class GenericStatAgg(AbstractParser, StatisticOptions):
-    DESCRIPTION = 'Generic variables statistic aggregation'
-
-    header = as_argument(StatisticOptions.header).with_options(choices=GENERIC_HEADERS)
-
-    pre_selection = True
-
-    def run(self):
-        match self.header:
-            case 'speed_score':
-                stat = SpeedStat(self)
-            case 'speed_score_run':
-                stat = SpeedRunStat(self)
-            case 'perc95_dff' | 'max_dff':
-                stat = DFFStat(self)
-            case _:
-                raise ValueError(f'unknown header: {self.header}')
-
-        if self.update:
-            stat.update_sync(self.variable)
-
-
 if __name__ == '__main__':
-    GenericStatAgg().main()
+    GenericAggOptions().main()

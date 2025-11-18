@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.statistic.parq.main_value_gsp" />
-    <option name="PARAMETERS" value="-H trial_cc --plot diag --stat-test pairwise_ttest --page ap_ldl --group-var session" />
+    <option name="PARAMETERS" value="-H trial_cc --plot diag --stat-test pairwise_ttest --page dark_parq --group-var session --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

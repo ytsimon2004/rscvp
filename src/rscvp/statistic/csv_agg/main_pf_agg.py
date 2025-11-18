@@ -5,7 +5,22 @@ from rscvp.statistic._var import PF_HEADERS
 from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 
-__all__ = ['PFStatAggOptions']
+__all__ = ['PFAggOptions']
+
+
+class PFAggOptions(AbstractParser, StatisticOptions):
+    DESCRIPTION = 'place field properties comparison'
+
+    header = as_argument(StatisticOptions.header).with_options(choices=PF_HEADERS)
+
+    pc_selection = 'slb'
+    pre_selection = True
+
+    def run(self):
+        pfs = PFStat(self)
+        if self.update:
+            dtype = pl.List(pl.Int8) if 'n_pf' in self.variable else pl.List(pl.Utf8)
+            pfs.update_sync(self.variable, dtype=dtype)
 
 
 class PFStat(ParquetSheetSync):
@@ -23,20 +38,5 @@ class PFStat(ParquetSheetSync):
         super().__init__(opt, sheet_page=opt.sheet_name, aggregator=aggregator)
 
 
-class PFStatAggOptions(AbstractParser, StatisticOptions):
-    DESCRIPTION = 'place field properties comparison'
-
-    header = as_argument(StatisticOptions.header).with_options(choices=PF_HEADERS)
-
-    pc_selection = 'slb'
-    pre_selection = True
-
-    def run(self):
-        pfs = PFStat(self)
-        if self.update:
-            dtype = pl.List(pl.Int8) if 'n_pf' in self.variable else pl.List(pl.Utf8)
-            pfs.update_sync(self.variable, dtype=dtype)
-
-
 if __name__ == '__main__':
-    PFStatAggOptions().main()
+    PFAggOptions().main()

@@ -1,7 +1,7 @@
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from typing import Type
+from typing import Type, Literal
 
 from argclz import AbstractParser
 from neuralib.util.tqdm import download_with_tqdm
@@ -9,15 +9,18 @@ from neuralib.util.utils import ensure_dir
 from rscvp.util.io import RSCVP_CACHE_DIRECTORY
 
 __all__ = [
-    'mkdir_test_dataset',
+    'DEMO_DATA_SOURCE',
+    'mkdir_demo_dataset',
     'clean_cache_dataset',
     'run_demo'
 ]
 
 CACHED_DEMO_DATASET = ensure_dir(RSCVP_CACHE_DIRECTORY) / 'rscvp_dataset'
+DEMO_DATA_SOURCE = Literal['zenodo', 'figshare']
 
 
-def mkdir_test_dataset(token: str,
+def mkdir_demo_dataset(token: str,
+                       source: DEMO_DATA_SOURCE = 'figshare',
                        force_download: bool = False,
                        aria2: bool = True) -> Path:
     """
@@ -25,6 +28,7 @@ def mkdir_test_dataset(token: str,
 
 
     :param token: Authentication token to access the dataset.
+    :param source: Source of the dataset
     :param force_download: Boolean flag indicating whether to forcibly download
         the dataset even if it already exists in the cache. Defaults to False.
     :param aria2: Boolean flag indicating whether to use `aria2` for downloading the dataset. Defaults to True.
@@ -33,28 +37,38 @@ def mkdir_test_dataset(token: str,
     if CACHED_DEMO_DATASET.exists() and not force_download:
         return CACHED_DEMO_DATASET
 
-    data_url = f"https://zenodo.org/records/17466243/files/rscvp_dataset.zip?token={token}"
+    match source:
+        case 'zenodo':
+            data_url = f"https://zenodo.org/records/17466243/files/rscvp_dataset.zip?token={token}"
+        case 'figshare':
+            data_url = f'https://figshare.com/ndownloader/files/{token}'
+
     zip_path = Path(RSCVP_CACHE_DIRECTORY) / "rscvp_dataset.zip"
 
     if aria2:
         try:
             import subprocess
             print('Using aria2c for fast download data from zenodo ...')
-            subprocess.run(
+            # Use fewer connections for figshare to avoid 502 errors
+            connections = "2" if source == 'figshare' else "16"
+            result = subprocess.run(
                 [
-                    "aria2c", "-x", "16", "-s", "16", "-k", "1M",
+                    "aria2c", "-x", connections, "-s", connections, "-k", "1M",
                     "-o", str(zip_path.name),
                     "-d", str(RSCVP_CACHE_DIRECTORY),
                     data_url
                 ],
-                check=True
+                check=False  # Don't raise exception on error, check manually
             )
-        except BaseException:
-            print('aria2c not found, falling back to Python downloader...')
+            if result.returncode != 0:
+                print(f'aria2c failed with code {result.returncode}, falling back to Python downloader...')
+                aria2 = False
+        except (FileNotFoundError, Exception) as e:
+            print(f'aria2c error: {e}, falling back to Python downloader...')
             aria2 = False
 
     if not aria2:
-        print("Downloading data from zenodo ...")
+        print(f"Downloading data from {source} ...")
         zip_stream: BytesIO = download_with_tqdm(data_url)
         with open(zip_path, "wb") as f:
             f.write(zip_stream.getbuffer())
@@ -76,7 +90,9 @@ def clean_cache_dataset():
 
 
 def run_demo(cls: Type[AbstractParser],
-             token: str, *,
+             token: str,
+             source: DEMO_DATA_SOURCE = 'figshare',
+             *,
              force_download: bool = False,
              clean_cached: bool = False):
     """
@@ -84,10 +100,11 @@ def run_demo(cls: Type[AbstractParser],
 
     :param cls: Running class, must be subclass of AbstractParser
     :param token: token for downloading dataset from zenodo
+    :param source: source of dataset, default is figshare
     :param force_download: force re-download dataset from zenodo
     :param clean_cached: clean cached dataset after running demo
     """
-    mkdir_test_dataset(token=token, force_download=force_download)
+    mkdir_demo_dataset(token=token, source=source, force_download=force_download)
     cls().main([])
 
     if clean_cached:

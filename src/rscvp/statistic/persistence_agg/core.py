@@ -141,6 +141,6 @@ class AbstractPersistenceAgg(AbstractParser, CommonOptions, Generic[C], metaclas
 
 def data_region_dict(page: GSPREAD_SHEET_PAGE) -> dict[str, Region]:
     from rscvp.statistic.cli_gspread import GSPExtractor
-    df = GSPExtractor(page, ['Data', 'region']).load_from_gspread(verbose=False)
+    df = GSPExtractor(page, ['Data', 'region']).load_from_gspread()
 
     return {d: r for d, r in df.iter_rows()}

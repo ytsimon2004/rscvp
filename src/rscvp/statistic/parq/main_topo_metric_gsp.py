@@ -57,7 +57,7 @@ class TopoMetricParQ(StatPipeline, BaseVisPolarOptions):
         self.plot()
 
     @property
-    def gspread_field(self) -> str:
+    def field(self) -> str:
         """Handle case in ldl gspread with header(field): [HEADER]_[SESSION]"""
         if self.session is None:
             return self.header
@@ -65,7 +65,7 @@ class TopoMetricParQ(StatPipeline, BaseVisPolarOptions):
             return f'{self.header}_{self.session}'
 
     def post_processing(self, remove_neg: bool = True):
-        field = self.gspread_field
+        field = self.field
 
         if 'pf_peak' in field or 'pf_width' in field:
             ap, ml = self._place_field_handler()
@@ -154,12 +154,12 @@ class TopoMetricParQ(StatPipeline, BaseVisPolarOptions):
         ap_centers = (ap_edges[:-1] + ap_edges[1:]) / 2
 
         with plot_figure(None) as ax:
-            plot_topo_histogram(ax, cords, val, self.gspread_field, ibl_res=self.ibl_res)
+            plot_topo_histogram(ax, cords, val, self.field, ibl_res=self.ibl_res)
 
             if self.restrict_rsc:
                 ax.set(xlim=(-1500, 50), ylim=(-4200, -500))
 
-            helper = AxesExtendHelper(ax, y_position='left')
+            helper = AxesExtendHelper(ax, y_position='left', y_gap=0.4)
             helper.xbar(ml_centers, h_ml_mean, width=bin_size, color='gray', edgecolor='none', alpha=0.7)
             helper.ybar(ap_centers, h_ap_mean, height=bin_size, color='gray', edgecolor='none', alpha=0.7)
 
@@ -176,7 +176,7 @@ class TopoMetricParQ(StatPipeline, BaseVisPolarOptions):
                 kwargs.setdefault('vmin', np.percentile(val, vmin))
                 kwargs.setdefault('vmax', np.percentile(val, vmax))
 
-            plot_topo_variable(ax, cords, val, self.gspread_field,
+            plot_topo_variable(ax, cords, val, self.field,
                                scatter_size=5,
                                with_top_view=True,
                                zorder=-1, **kwargs)

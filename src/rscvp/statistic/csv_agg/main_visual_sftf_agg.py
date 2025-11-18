@@ -14,23 +14,10 @@ from rscvp.statistic.csv_agg.core import ParquetSheetSync, NeuronDataAggregator
 from rscvp.util.cli.cli_statistic import StatisticOptions
 from rscvp.visual.util import SFTF_ARRANGEMENT, get_sftf_mesh_order
 
-__all__ = ['VZSFTFAggOption']
+__all__ = ['VisSFTFAggOptions']
 
 
-class VZSFTFStat(ParquetSheetSync):
-    """visual SFTF preference properties statistic"""
-
-    def __init__(self, opt: StatisticOptions):
-        collector = NeuronDataAggregator(
-            code='st',
-            stat_col=SFTF_ARRANGEMENT,
-            fields=dict(rec_region=str, plane_index=try_int_type)
-        )
-
-        super().__init__(opt, sheet_page='visual_parq', aggregator=collector)
-
-
-class VZSFTFAggOption(AbstractParser, StatisticOptions):
+class VisSFTFAggOptions(AbstractParser, StatisticOptions):
     DESCRIPTION = 'compare the visual spatiotemporal preference properties in apRSC'
 
     SFTF = get_sftf_mesh_order()
@@ -43,7 +30,7 @@ class VZSFTFAggOption(AbstractParser, StatisticOptions):
     vc_selection = 0.3
 
     def run(self):
-        vzsftf = VZSFTFStat(self)
+        vzsftf = VisSFTFStat(self)
         match self.header:
             case 'fraction':
                 self.plot_dot_fraction(vzsftf.df)
@@ -141,5 +128,18 @@ class VZSFTFAggOption(AbstractParser, StatisticOptions):
             ax[1].set(title='pRSC', xlabel=f'TF (Hz)', ylabel=f'SF (cyc/deg)')
 
 
+class VisSFTFStat(ParquetSheetSync):
+    """visual SFTF preference properties statistic"""
+
+    def __init__(self, opt: StatisticOptions):
+        collector = NeuronDataAggregator(
+            code='st',
+            stat_col=SFTF_ARRANGEMENT,
+            fields=dict(rec_region=str, plane_index=try_int_type)
+        )
+
+        super().__init__(opt, sheet_page='visual_parq', aggregator=collector)
+
+
 if __name__ == '__main__':
-    VZSFTFAggOption().main()
+    VisSFTFAggOptions().main()

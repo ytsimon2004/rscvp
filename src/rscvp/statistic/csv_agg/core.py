@@ -302,6 +302,7 @@ class ParquetSheetSync:
         :param dtype: expected list of dtype for casting of aggregated data
         :return: Updated dataframe
         """
+        # TODO some case it fail?
         for primary in primary_list:
             pars = self.get_pars(primary, header)
 

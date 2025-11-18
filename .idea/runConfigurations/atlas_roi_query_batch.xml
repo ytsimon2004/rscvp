@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="rscvp.atlas.main_roi_query_batch" />
-    <option name="PARAMETERS" value="-A YW043,YW051,YW063,YW064 --area RHP --debug" />
+    <option name="PARAMETERS" value="-A YW043,YW051,YW063,YW064 --area VIS --debug" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />

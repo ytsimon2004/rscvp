@@ -201,7 +201,6 @@ class TestSpatialBatchModule(unittest.TestCase):
             session = 'light'
             used_session = 'light'
             debug_mode = True
-            region_validate_page = 'spatial_parq'
 
         check_attr(Opt, PositionBinPersistenceAgg)
         Opt().main([])
