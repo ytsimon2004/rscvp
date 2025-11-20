@@ -1,19 +1,14 @@
 import os
 import sys
 
-# Get the directory of the current conf.py file
-conf_dir = os.path.dirname(__file__)
+sys.path.insert(0, os.path.abspath('../../src'))
+import traceback
 
-# Define the path to the directory containing your 'rscvp' package folder ('src')
-# This assumes the project root is one level up from 'docs/'
-project_root = os.path.abspath(os.path.join(conf_dir, '..'))
-src_path = os.path.join(project_root, 'src')
-
-# Insert the 'src' directory into sys.path to make 'rscvp' importable
-sys.path.insert(0, src_path)
-
-# Verify the path is being added (optional, but good for debugging)
-print(f"Adding {src_path} to sys.path")
+try:
+    from rscvp.statistic.csv_agg.core import NeuronDataAggregator
+except Exception as e:
+    print("####### Import NeuronDataAggregator failed:", e)
+    traceback.print_exc()
 
 
 project = 'rscvp'

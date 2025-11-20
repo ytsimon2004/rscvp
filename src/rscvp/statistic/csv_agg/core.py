@@ -3,7 +3,7 @@ from typing import Literal, Any
 
 import numpy as np
 import polars as pl
-from polars.polars import SchemaFieldNotFoundError
+from polars.exceptions import SchemaFieldNotFoundError
 
 from neuralib.util.verbose import fprint, print_save
 from rscvp.util.cli import CodeAlias, HEADER, CELLULAR_IO, CommonOptions
