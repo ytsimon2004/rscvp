@@ -1,21 +1,19 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../../src'))
-import traceback
+# Get the directory of the current conf.py file
+conf_dir = os.path.dirname(__file__)
 
-try:
-    import rscvp.util.cli
-except Exception as e:
-    print("####### Import of rscvp.util.cli failed:", e)
-    traceback.print_exc()
+# Define the path to the directory containing your 'rscvp' package folder ('src')
+# This assumes the project root is one level up from 'docs/'
+project_root = os.path.abspath(os.path.join(conf_dir, '..'))
+src_path = os.path.join(project_root, 'src')
 
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+# Insert the 'src' directory into sys.path to make 'rscvp' importable
+sys.path.insert(0, src_path)
+
+# Verify the path is being added (optional, but good for debugging)
+print(f"Adding {src_path} to sys.path")
 
 
 project = 'rscvp'
