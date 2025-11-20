@@ -11,7 +11,6 @@ rscvp.statistic
     rscvp.statistic.cli_gspread
     rscvp.statistic.core
     rscvp.statistic.csv_agg
-    rscvp.statistic.main_2p_fov
     rscvp.statistic.main_normality
     rscvp.statistic.main_para_mtx
     rscvp.statistic.main_ses_overview

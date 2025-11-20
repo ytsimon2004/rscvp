@@ -7,6 +7,7 @@ rscvp.util.util_demo
    :toctree: _autosummary
    :nosignatures:
 
-   mkdir_test_dataset
+   DEMO_DATA_SOURCE
+   mkdir_demo_dataset
    clean_cache_dataset
    run_demo

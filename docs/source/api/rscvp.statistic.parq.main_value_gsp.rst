@@ -7,4 +7,4 @@ rscvp.statistic.parq.main_value_gsp
    :toctree: _autosummary
    :nosignatures:
 
-   ValStatGSP
+   ValueParQ

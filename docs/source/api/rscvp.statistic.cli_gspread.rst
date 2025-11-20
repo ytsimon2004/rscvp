@@ -8,5 +8,3 @@ rscvp.statistic.cli_gspread
    :nosignatures:
 
    GSPExtractor
-   CliGspreadLUT
-   CliGspreadGenerator

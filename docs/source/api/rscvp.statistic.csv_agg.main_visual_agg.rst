@@ -7,4 +7,4 @@ rscvp.statistic.csv_agg.main_visual_agg
    :toctree: _autosummary
    :nosignatures:
 
-   VisStatAggOptions
+   VisAggOptions

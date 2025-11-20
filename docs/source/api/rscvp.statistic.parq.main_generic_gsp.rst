@@ -7,4 +7,4 @@ rscvp.statistic.parq.main_generic_gsp
    :toctree: _autosummary
    :nosignatures:
 
-   GenericGSP
+   GenericParQ

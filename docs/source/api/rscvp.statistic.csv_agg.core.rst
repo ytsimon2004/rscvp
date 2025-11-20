@@ -7,4 +7,5 @@ rscvp.statistic.csv_agg.core
    :toctree: _autosummary
    :nosignatures:
 
-   LocalSpreadsheetSync
+   NeuronDataAggregator
+   ParquetSheetSync

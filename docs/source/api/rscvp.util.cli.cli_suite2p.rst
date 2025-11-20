@@ -11,3 +11,4 @@ rscvp.util.cli.cli_suite2p
    get_neuron_list
    NeuronID
    NORMALIZE_TYPE
+   suite2p_alignment_fov

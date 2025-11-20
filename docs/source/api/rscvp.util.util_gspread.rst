@@ -8,8 +8,8 @@ rscvp.util.util_gspread
    :nosignatures:
 
    GSPREAD_SHEET_PAGE
+   USAGE_TYPE
    RSCGoogleWorkSheet
    GoogleSpreadSheet
-   get_statistic_key_info
-   truncate_before_todo_hash
+   filter_tdhash
    skip_comment_primary_key

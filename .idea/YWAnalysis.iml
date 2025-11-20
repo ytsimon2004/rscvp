@@ -11,7 +11,6 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/archive" />
-      <excludeFolder url="file://$MODULE_DIR$/notebook" />
       <excludeFolder url="file://$MODULE_DIR$/viewer/statics/2p" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />

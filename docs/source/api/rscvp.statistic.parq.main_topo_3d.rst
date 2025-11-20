@@ -7,4 +7,4 @@ rscvp.statistic.parq.main_topo_3d
    :toctree: _autosummary
    :nosignatures:
 
-   TopoMetricVolumeOptions
+   Topo3DParQ

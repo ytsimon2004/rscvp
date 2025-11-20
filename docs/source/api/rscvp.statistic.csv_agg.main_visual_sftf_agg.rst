@@ -7,4 +7,4 @@ rscvp.statistic.csv_agg.main_visual_sftf_agg
    :toctree: _autosummary
    :nosignatures:
 
-   VZSFTFAggOption
+   VisSFTFAggOptions

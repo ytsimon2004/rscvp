@@ -7,4 +7,4 @@ rscvp.statistic.csv_agg.main_pf_agg
    :toctree: _autosummary
    :nosignatures:
 
-   PFStatAggOptions
+   PFAggOptions

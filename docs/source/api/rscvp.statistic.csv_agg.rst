@@ -8,8 +8,6 @@ rscvp.statistic.csv_agg
     :maxdepth: 1
     :caption: Modules:
 
-    rscvp.statistic.csv_agg.auto_cli
-    rscvp.statistic.csv_agg.collector
     rscvp.statistic.csv_agg.core
     rscvp.statistic.csv_agg.main_generic_agg
     rscvp.statistic.csv_agg.main_pf_agg

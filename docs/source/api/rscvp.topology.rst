@@ -10,8 +10,9 @@ rscvp.topology
 
     rscvp.topology.cache_ctype_cord
     rscvp.topology.main_cls
+    rscvp.topology.main_cords
     rscvp.topology.main_fov
-    rscvp.topology.main_rois_loc
+    rscvp.topology.main_fov_db
     rscvp.topology.main_spatial_topo
     rscvp.topology.main_visual_topo
     rscvp.topology.util

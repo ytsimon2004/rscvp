@@ -7,4 +7,4 @@ rscvp.statistic.parq.main_pf_gsp
    :toctree: _autosummary
    :nosignatures:
 
-   PFStatGSP
+   PlaceFieldParQ

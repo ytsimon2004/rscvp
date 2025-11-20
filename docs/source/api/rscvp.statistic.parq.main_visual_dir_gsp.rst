@@ -7,4 +7,4 @@ rscvp.statistic.parq.main_visual_dir_gsp
    :toctree: _autosummary
    :nosignatures:
 
-   VZDirStatGSP
+   VisualDirParQ

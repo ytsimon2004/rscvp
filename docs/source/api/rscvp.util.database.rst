@@ -8,12 +8,14 @@ rscvp.util.database
    :nosignatures:
 
    DB_TYPE
-   DataBaseType
+   ResultDB
    PhysiologyDB
-   GenericDB
-   DarknessGenericDB
-   BlankBeltGenericDB
-   VRGenericDB
+   FieldOfViewDB
+   BaseClassDB
+   DarkClassDB
+   BlankClassDB
+   VRClassDB
    BayesDecodeDB
    VisualSFTFDirDB
    RSCDatabase
+   download_database

@@ -7,4 +7,4 @@ rscvp.statistic.parq.main_topo_metric_gsp
    :toctree: _autosummary
    :nosignatures:
 
-   TopoMetricOptions
+   TopoMetricParQ

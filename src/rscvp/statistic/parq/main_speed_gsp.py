@@ -9,6 +9,8 @@ from rscvp.statistic.cli_gspread import GSPExtractor
 from rscvp.statistic.core import StatPipeline
 from rscvp.util.cli import StatisticOptions
 
+__all__ = ['SpeedParQ']
+
 
 @publish_annotation('appendix', project='rscvp', as_doc=True, caption='rev')
 class SpeedParQ(StatPipeline):

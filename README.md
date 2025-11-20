@@ -49,13 +49,13 @@
 
 ### Physiology Dataset
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/19CfLB2izsMFZvaanJwkDSIzG8LZNhoAh#scrollTo=VIPD4N6zjWh-)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1HX13mWIPFcTctTZbPsXYmQsD_4D9iJpf?usp=sharing)
 
 ### Histology Dataset
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Xf8Ukc0PwpyllUyZtD6zhQgzJT40XmQo#scrollTo=_N-nXAvsbVxN)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Xf8Ukc0PwpyllUyZtD6zhQgzJT40XmQo?usp=sharing)
 
-## Annotation for published figures in the source code
+## Code available
 
 - Checkout class/function with `@publish_annotation('main' | 'sup',project='rscvp', figure=[FIGURE_NUMBER])` decorator
 
@@ -98,9 +98,9 @@ class FigureClass:
 - Processed table-like data
 - Token request needed (not published yet)
 
-### Zenodo
+### Zenodo / figshare
 
-- Contain example raw data + processed aggregated parquet data
+- Contain example raw data + processed aggregated dataframe
 - Token request needed (not published yet)
 
 ## Contact

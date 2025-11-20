@@ -7,4 +7,4 @@ rscvp.statistic.parq.main_visual_gsp
    :toctree: _autosummary
    :nosignatures:
 
-   VisStatGSP
+   VisualParQ
