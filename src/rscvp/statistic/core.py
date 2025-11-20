@@ -23,7 +23,7 @@ from rscvp.util.database import (
     DB_TYPE,
     RSCDatabase
 )
-from rscvp.util.util_gspread import get_statistic_key_info, GSPREAD_SHEET_PAGE
+from rscvp.util.util_gspread import GSPREAD_SHEET_PAGE
 from rscvp.util.util_plot import REGION_COLORS_HIST, SESSION_COLORS
 from rscvp.util.util_stat import GROUP_HEADER_TYPE, CollectDataSet, get_stat_group_vars
 
@@ -424,10 +424,10 @@ class StatPipeline(AbstractParser, StatisticTestOptions, metaclass=abc.ABCMeta):
     def plot_pairwise_mean(self, with_bar: bool = True) -> None:
         h = self.variable
 
-        info_table = get_statistic_key_info().drop('region')
-        df = self.df.join(info_table, on='Data')
         df = (
-            df.select('Data', 'region', 'pair_wise_group', h)
+            self.df
+            .alter.join_pairwise(source='db' if self.db_table is not None else 'gspread', db_type=self.db_table)
+            .select('Data', 'region', 'pair_wise_group', h)
             .sort('pair_wise_group', 'region')
             .with_columns(pl.col(h).list.len().alias('n_neurons'))
             .with_columns(pl.col(h).list.mean())

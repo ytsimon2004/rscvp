@@ -15,7 +15,6 @@ __all__ = [
     'RSCGoogleWorkSheet',
     'GoogleSpreadSheet',
     #
-    'get_statistic_key_info',
     'filter_tdhash',
     'skip_comment_primary_key',
 ]
@@ -77,15 +76,6 @@ class RSCGoogleWorkSheet(GoogleWorkSheet):
 
         values = [mark_as] * len(primary_list)
         self.update_cell(primary_list, header, values)
-
-
-# ============== #
-
-def get_statistic_key_info(page: GSPREAD_SHEET_PAGE = 'fov_table') -> pl.DataFrame:
-    df = RSCGoogleWorkSheet.of_work_page(page, primary_key='Data').to_polars()
-    df = filter_tdhash(df, 'Data')
-    df = skip_comment_primary_key(df, 'Data')
-    return df.select('Data', 'region', 'pair_wise_group')
 
 
 def filter_tdhash(df: DataFrame,

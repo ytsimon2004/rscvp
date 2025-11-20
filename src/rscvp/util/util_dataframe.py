@@ -5,6 +5,8 @@ import polars as pl
 __all__ = ['to_numeric',
            'check_null']
 
+from rscvp.util.database import DB_TYPE
+
 
 def to_numeric(s: pl.Series) -> pl.Series:
     try:
@@ -51,3 +53,35 @@ class AlterFrame:
             .otherwise(pl.lit('other'))
             .alias('mouseline')
         )
+
+    def join_pairwise(self, source: Literal['gspread', 'db'],
+                      db_type: DB_TYPE | None = None) -> pl.DataFrame:
+        if source == 'gspread':
+            from rscvp.util.util_gspread import RSCGoogleWorkSheet, filter_tdhash, skip_comment_primary_key
+
+            df = RSCGoogleWorkSheet.of_work_page('fov_table', primary_key='Data').to_polars()
+            df = filter_tdhash(df, 'Data')
+            df = skip_comment_primary_key(df, 'Data')
+            df = df.select('Data', 'pair_wise_group')
+
+        elif source == 'db':
+            import sqlite3
+            from rscvp.util.database import RSCDatabase
+
+            if db_type is None:
+                raise RuntimeError('db_type must be specified')
+
+            file = RSCDatabase().database_file
+            df = (
+                pl.read_database(
+                    query=f'SELECT * FROM "{db_type}"',
+                    connection=(sqlite3.connect(file))
+                )
+                .with_columns((pl.col('date') + '_' + pl.col('animal')).alias('Data'))
+                .select('Data', 'pair_wise_group')
+            )
+
+        else:
+            raise ValueError(f'Unknown source: {source}')
+
+        return self._df.join(df, on='Data')
