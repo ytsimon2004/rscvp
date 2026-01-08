@@ -20,7 +20,7 @@ dependencies = [
     "argclz>=1.0.0",
     "sqlclz>=0.0.1",
     "iblatlas>=0.9.0",
-    "neura-library[atlas,imaging]",
+    "neura-library[atlas,imaging]<=0.6.0",
     "scikit-learn>=1.7.0",
     "stimpyp>=0.3.1",
 ]

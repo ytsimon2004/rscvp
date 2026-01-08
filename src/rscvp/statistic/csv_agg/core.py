@@ -1,9 +1,9 @@
 from pathlib import Path
-from typing import Literal, Any
 
 import numpy as np
 import polars as pl
 from polars.exceptions import SchemaFieldNotFoundError
+from typing import Literal, Any
 
 from neuralib.util.verbose import fprint, print_save
 from rscvp.util.cli import CodeAlias, HEADER, CELLULAR_IO, CommonOptions
@@ -238,7 +238,7 @@ class ParquetSheetSync:
         else:
             verb = 'UPDATE'
 
-        df.write_parquet(parquet_path)  # TODO check logic
+        df.write_parquet(parquet_path)
         print_save(parquet_path, verb)
 
     def load_parquet(self, filepath: Path | None = None,
