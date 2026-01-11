@@ -1,15 +1,14 @@
-from typing import Optional
-
 import numpy as np
 from matplotlib.axes import Axes
+from typing import Optional
+
+from argclz import AbstractParser, argument, int_tuple_type
+from neuralib.plot import plot_figure
+from neuralib.plot.colormap import insert_colorbar
+from neuralib.suite2p import get_neuron_signal
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_stimpy import StimpyOptions
 from rscvp.util.cli.cli_suite2p import Suite2pOptions, get_neuron_list
-
-from argclz import AbstractParser, argument, int_tuple_type
-from neuralib.imaging.suite2p import get_neuron_signal
-from neuralib.plot import plot_figure
-from neuralib.plot.colormap import insert_colorbar
 
 __all__ = ['NeuropilCorrOption',
            'plot_dff_heat']

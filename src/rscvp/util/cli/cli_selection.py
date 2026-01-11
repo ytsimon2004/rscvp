@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import random
 from pathlib import Path
-from typing import Literal, ClassVar
 
 import attrs
 import numpy as np
 import polars as pl
+import random
+from typing import Literal, ClassVar
 
 from argclz import argument, try_int_type
 from neuralib.util.verbose import fprint
@@ -487,7 +487,7 @@ def _find_single_plane_cell_prob(plane_index: int,
     :param col:
     :return:
     """
-    from neuralib.imaging.suite2p import Suite2PResult
+    from neuralib.suite2p import Suite2PResult
 
     s2p = Suite2PResult.load((root / f'plane{plane_index}'), 0.5)
 

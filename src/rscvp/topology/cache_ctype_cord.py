@@ -1,16 +1,16 @@
-from functools import cached_property
 from pathlib import Path
-from typing import Literal
 
 import numpy as np
+from functools import cached_property
 from matplotlib.axes import Axes
+from typing import Literal
 
 from argclz import AbstractParser, as_argument, argument
-from neuralib.imaging.registration import CellularCoordinates
-from neuralib.imaging.suite2p import Suite2PResult
 from neuralib.persistence import persistence
 from neuralib.plot import plot_figure
 from neuralib.plot.tools import AxesExtendHelper
+from neuralib.registration import CellularCoordinates
+from neuralib.suite2p import Suite2PResult
 from rscvp.topology.util import RSCObjectiveFOV
 from rscvp.topology.util_plot import plot_registered_fov
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions

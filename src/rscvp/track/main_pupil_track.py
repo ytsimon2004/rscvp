@@ -1,16 +1,15 @@
-from typing import Literal
-
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import Normalize
+from typing import Literal
 
 from argclz import AbstractParser, argument
 from argclz.dispatch import Dispatch, dispatch
+from neuralib.facemap import FaceMapResult
+from neuralib.facemap.plot import plot_cmap_time_series
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
 from neuralib.plot.plot import grid_subplots
-from neuralib.tracking.facemap import FaceMapResult
-from neuralib.tracking.facemap.plot import plot_cmap_time_series
 from neuralib.util.interp import interp1d_nan
 from rscvp.util.cli import TreadmillOptions
 from rscvp.util.cli.cli_camera import CameraOptions

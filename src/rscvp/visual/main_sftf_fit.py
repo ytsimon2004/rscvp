@@ -1,20 +1,20 @@
+from pathlib import Path
+
 import collections
 import functools
-import warnings
-from pathlib import Path
-from typing import Union, NamedTuple, Optional, Literal, Iterable, overload
-
 import numpy as np
 import scipy.optimize
 import scipy.stats
+import warnings
 from matplotlib.axes import Axes
 from scipy.interpolate import interp1d
 from tqdm import tqdm
+from typing import Union, NamedTuple, Optional, Literal, Iterable, overload
 
 from argclz import AbstractParser, argument, int_tuple_type
-from neuralib.imaging.suite2p import get_neuron_signal, Suite2PResult, sync_s2p_rigevent
 from neuralib.persistence import *
 from neuralib.plot import plot_figure
+from neuralib.suite2p import get_neuron_signal, Suite2PResult, sync_s2p_rigevent
 from neuralib.util.verbose import fprint
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_persistence import PersistenceRSPOptions

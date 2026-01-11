@@ -1,11 +1,10 @@
+import numpy as np
 from typing import Literal
 
-import numpy as np
-from rscvp.util.cli import StimpyOptions, Suite2pOptions
-
 from argclz import AbstractParser, argument, int_tuple_type, union_type
-from neuralib.imaging.suite2p import dff_signal, Suite2PResult, sync_s2p_rigevent
 from neuralib.plot import plot_figure
+from neuralib.suite2p import dff_signal, Suite2PResult, sync_s2p_rigevent
+from rscvp.util.cli import StimpyOptions, Suite2pOptions
 
 
 class RawTraceOptions(AbstractParser, StimpyOptions, Suite2pOptions):

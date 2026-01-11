@@ -1,11 +1,10 @@
-from typing import final, get_args
-
 import attrs
 import numpy as np
 import polars as pl
+from typing import final, get_args
 from typing_extensions import Self
 
-from neuralib.imaging.registration import FieldOfView
+from neuralib.registration import FieldOfView
 from rscvp.util.util_gspread import USAGE_TYPE
 
 __all__ = ['RSCObjectiveFOV']

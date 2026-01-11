@@ -1,12 +1,11 @@
-from datetime import datetime
 from pathlib import Path
-from typing import ClassVar, Final, Literal
 
 import numpy as np
+from datetime import datetime
+from typing import ClassVar, Final, Literal
 
 from argclz import argument, int_tuple_type, str_tuple_type
-from neuralib.tracking import read_facemap
-from neuralib.tracking.facemap import FaceMapResult, KeyPoint
+from neuralib.facemap import read_facemap, FaceMapResult, KeyPoint
 from neuralib.util.interp import interp_timestamp
 from neuralib.util.utils import ensure_dir, uglob
 from rscvp.util.pixviz import PixVizResult

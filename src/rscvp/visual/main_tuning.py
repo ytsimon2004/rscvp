@@ -1,11 +1,10 @@
+import numpy as np
 from typing import TypeVar
 
-import numpy as np
-
 from argclz import AbstractParser
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent, Suite2PResult
 from neuralib.persistence.cli_persistence import get_options_and_cache, PersistenceOptions
 from neuralib.plot import plot_figure
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent, Suite2PResult
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import DataOutput, PersistenceRSPOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list

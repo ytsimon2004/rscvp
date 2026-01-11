@@ -1,14 +1,13 @@
-from typing import cast
-
 import attrs
 import numpy as np
 from memory_profiler import profile
 from scipy.interpolate import interp1d
+from typing import cast
 
 from argclz import AbstractParser
-from neuralib.imaging.widefield import compute_singular_vector
 from neuralib.locomotion import CircularPosition
 from neuralib.persistence import persistence
+from neuralib.widefield import compute_singular_vector
 from rscvp.util.cli import PersistenceRSPOptions, WFieldOptions, TreadmillOptions
 from rscvp.util.wfield import WfieldResult
 from stimpyp import STIMPY_SOURCE_VERSION, RiglogData, PyVlog

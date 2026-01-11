@@ -3,7 +3,7 @@ from os import PathLike
 import numpy as np
 
 from argclz import AbstractParser
-from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
+from neuralib.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.utils import ensure_dir
 from neuralib.util.verbose import publish_annotation, print_save
 from rscvp.util.cli import SelectionOptions

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/YWAnalysis.iml" filepath="$PROJECT_DIR$/.idea/YWAnalysis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../wfanalysis/.idea/wfanalysis.iml" filepath="$PROJECT_DIR$/../wfanalysis/.idea/wfanalysis.iml" />
     </modules>
   </component>
 </project>

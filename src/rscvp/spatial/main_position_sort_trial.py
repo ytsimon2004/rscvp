@@ -2,9 +2,9 @@ import numpy as np
 from scipy.ndimage import gaussian_filter1d
 
 from argclz import AbstractParser, argument, as_argument
-from neuralib.imaging.suite2p import normalize_signal, get_neuron_signal, sync_s2p_rigevent
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
+from neuralib.suite2p import normalize_signal, get_neuron_signal, sync_s2p_rigevent
 from rscvp.spatial.main_cache_sortidx import ApplySortIdxCache
 from rscvp.util.cli import Suite2pOptions
 from rscvp.util.cli.cli_output import DataOutput

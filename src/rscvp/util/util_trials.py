@@ -1,11 +1,10 @@
-from typing import Literal, get_args
-
 import attrs
 import numpy as np
 from attr import field
+from typing import Literal, get_args
 from typing_extensions import Self
 
-from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
+from neuralib.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
 from rscvp.util.cli.cli_suite2p import NeuronID, get_neuron_list
 from stimpyp import Session, SessionInfo, RiglogData, RigEvent
 

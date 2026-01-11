@@ -3,10 +3,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from argclz import AbstractParser, as_argument, argument
-from neuralib.imaging.suite2p import Suite2PResult
-from neuralib.imaging.suite2p.plot import get_soma_pixel
 from neuralib.imglib.color import grey2rgb
 from neuralib.imglib.transform import affine_transform
+from neuralib.suite2p import Suite2PResult, get_soma_pixel
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli.cli_suite2p import Suite2pOptions
 

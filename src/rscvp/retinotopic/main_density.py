@@ -4,11 +4,11 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
 from argclz import AbstractParser, argument
-from neuralib.imaging.widefield import SequenceFFT
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_cyclic_colorbar
 from neuralib.util.unstable import unstable
+from neuralib.widefield import SequenceFFT
 from rscvp.retinotopic.cache_retinotopic import RetinotopicCacheBuilder
 from rscvp.util.cli import WFieldOptions
 

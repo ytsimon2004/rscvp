@@ -6,6 +6,18 @@
       <sourceFolder url="file://$MODULE_DIR$/../argclz/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../argclz/.venv" />
     </content>
+    <content url="file://$MODULE_DIR$/../neuralib2">
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-atlas" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-atlas/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-imaging" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-imaging/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-metric" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-metric/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-parser" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-parser/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-utils" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../neuralib2/packages/neuralib-utils/src" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
@@ -19,18 +31,7 @@
       <excludeFolder url="file://$MODULE_DIR$/res/env" />
       <excludeFolder url="file://$MODULE_DIR$/src/rscvp.egg-info" />
     </content>
-    <content url="file://$MODULE_DIR$/../rscvp-port/neuralib">
-      <sourceFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/test" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/.venv" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/build" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/dist" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/doc/build" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/src/neura_library.egg-info" />
-      <excludeFolder url="file://$MODULE_DIR$/../rscvp-port/neuralib/doc/source/api/_autosummary" />
-    </content>
     <content url="file://$MODULE_DIR$/../sqlclz">
-      <sourceFolder url="file://$MODULE_DIR$/../sqlclz/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../sqlclz/.venv" />
     </content>
     <content url="file://$MODULE_DIR$/../stimpyp">
@@ -41,13 +42,17 @@
       <excludeFolder url="file://$MODULE_DIR$/../stimpyp/doc/source/notebooks/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/../stimpyp/src/stimpyp.egg-info" />
     </content>
-    <orderEntry type="jdk" jdkName="uv (rscvp)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="uv (rscvp) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="wfanalysis" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
   </component>
   <component name="ReSTService">
     <option name="TXT_IS_RST" value="true" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="py.test" />
   </component>
 </module>

@@ -3,7 +3,7 @@ import polars as pl
 from polars.exceptions import SchemaError
 
 from argclz import AbstractParser
-from neuralib.imaging.suite2p import Suite2PResult
+from neuralib.suite2p import Suite2PResult
 from neuralib.util.verbose import fprint, print_save
 from rscvp.util.cli.cli_io import CELLULAR_IO
 from rscvp.util.cli.cli_output import DataOutput

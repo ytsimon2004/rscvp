@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import NamedTuple
-
 import numpy as np
 import scipy
+from functools import cached_property
 from scipy.interpolate import interp1d
+from typing import NamedTuple
 
 from argclz import argument, AbstractParser, int_tuple_type, union_type, as_argument
-from neuralib.imaging.suite2p import get_neuron_signal, SIGNAL_TYPE, Suite2PResult, sync_s2p_rigevent
+from neuralib.decoding.position import place_bayes
 from neuralib.locomotion import running_mask1d, CircularPosition
-from neuralib.model.bayes_decoding import place_bayes
 from neuralib.persistence import *
 from neuralib.persistence.cli_persistence import get_options_and_cache
+from neuralib.suite2p import get_neuron_signal, SIGNAL_TYPE, Suite2PResult, sync_s2p_rigevent
 from neuralib.util.verbose import fprint
 from rscvp.model.bayes_decoding.util import calc_wrap_distance
 from rscvp.spatial.main_cache_occ import ApplyPosBinCache, AbstractPosBinActOptions

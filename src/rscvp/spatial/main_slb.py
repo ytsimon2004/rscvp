@@ -1,9 +1,8 @@
-from functools import cached_property
-
 import numpy as np
 import polars as pl
 import scipy.ndimage
 import scipy.stats
+from functools import cached_property
 from joblib import Parallel, delayed
 from matplotlib.axes import Axes
 from scipy.ndimage import gaussian_filter1d
@@ -11,9 +10,9 @@ from tqdm import tqdm
 
 import stimpyp
 from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
+from neuralib.suite2p import SIGNAL_TYPE
 from neuralib.util.tqdm import tqdm_joblib
 from neuralib.util.verbose import publish_annotation
 from rscvp.spatial.main_cache_occ import ApplyPosBinCache

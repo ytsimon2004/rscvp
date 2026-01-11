@@ -1,11 +1,10 @@
+import numpy as np
 from typing import Final, Literal
 
-import numpy as np
-
 from argclz import argument
-from neuralib.imaging.registration import CellularCoordinates
 from neuralib.plot import plot_figure
 from neuralib.plot.tools import AxesExtendHelper
+from neuralib.registration import CellularCoordinates
 from neuralib.util.verbose import fprint, publish_annotation
 from rscvp.statistic.core import StatPipeline
 from rscvp.topology.util_plot import plot_topo_variable, plot_topo_histogram

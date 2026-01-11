@@ -1,12 +1,11 @@
-from typing import Iterable
-
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from typing import Iterable
 
 from argclz import int_tuple_type, AbstractParser, argument
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent, Suite2PResult
 from neuralib.plot import plot_figure
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent, Suite2PResult
 from neuralib.typing import AxesArray
 from rscvp.util.cli import DataOutput, Suite2pOptions, TreadmillOptions, get_neuron_list
 from rscvp.util.util_trials import TrialSignal

@@ -8,18 +8,17 @@
 cue cells are not further tested for LNP model?
 """
 
-from typing import cast
-
 import numpy as np
 from matplotlib.axes import Axes
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import find_peaks
 from tqdm import tqdm
+from typing import cast
 
 from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.typing import ArrayLike, array2str
 from neuralib.util.unstable import unstable
 from rscvp.selection.utils import image_time_per_trial

@@ -1,14 +1,13 @@
-from typing import Optional
-
 import attrs
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.stats import zscore
+from typing import Optional
 
 from argclz import AbstractParser
-from neuralib.imaging.suite2p import SIGNAL_TYPE, Suite2PResult, get_neuron_signal, sync_s2p_rigevent, get_s2p_coords
 from neuralib.locomotion import CircularPosition
 from neuralib.persistence import persistence
+from neuralib.suite2p import SIGNAL_TYPE, Suite2PResult, get_neuron_signal, sync_s2p_rigevent, get_s2p_coords
 from rscvp.util.cli import RasterMapOptions, SBXOptions, SelectionOptions, CameraOptions, PersistenceRSPOptions, \
     TreadmillOptions
 from rscvp.util.util_camera import truncate_video_to_pulse

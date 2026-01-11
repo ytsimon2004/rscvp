@@ -1,16 +1,15 @@
 import collections
-from typing import NamedTuple
-
 import numpy as np
 from matplotlib.axes import Axes
 from scipy.signal import butter, lfilter
 from scipy.stats import pearsonr
+from typing import NamedTuple
 
 from argclz import AbstractParser
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
 from neuralib.plot.tools import AnchoredScaleBar
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_plot import PlotOptions

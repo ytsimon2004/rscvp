@@ -1,6 +1,3 @@
-from typing import NamedTuple
-from typing import Union
-
 import attrs
 import numpy as np
 from matplotlib.axes import Axes
@@ -8,12 +5,14 @@ from scipy.interpolate import interp1d
 from scipy.stats import pearsonr
 from sklearn.linear_model import PoissonRegressor
 from tqdm import tqdm
+from typing import NamedTuple
+from typing import Union
 from typing_extensions import Self
 
 from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_merge
+from neuralib.suite2p import Suite2PResult, get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.unstable import unstable
 from rscvp.util.cli import BEHAVIOR_COVARIANT, get_neuron_list
 from rscvp.util.cli import GLMOptions, SelectionOptions, DataOutput, NeuronID

@@ -1,14 +1,13 @@
-from typing import Literal
-
 import numpy as np
 import polars as pl
 from tqdm import tqdm
+from typing import Literal
 
 from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import dotplot
 from neuralib.plot import plot_figure
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.verbose import fprint, publish_annotation
 from rscvp.util.cli import DataOutput, SelectionOptions, SQLDatabaseOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID

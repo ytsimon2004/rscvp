@@ -2,16 +2,16 @@ import numpy as np
 import rastermap.utils
 from matplotlib.axes import Axes
 from rastermap import Rastermap
-from rscvp.model.rastermap.rastermap_wfield_cache import RasterInputWfield, RasterMapWfieldCacheBuilder
-from rscvp.util.cli import DataOutput, RasterMapOptions, WFieldOptions
 from scipy.stats import zscore
 
 from argclz import AbstractParser
-from neuralib.model.rastermap import RasterMapResult, RasterOptions
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import plot_figure, ax_merge
+from neuralib.rastermap import RasterMapResult, RasterOptions
 from neuralib.util.utils import uglob
 from neuralib.util.verbose import fprint
+from rscvp.model.rastermap.rastermap_wfield_cache import RasterInputWfield, RasterMapWfieldCacheBuilder
+from rscvp.util.cli import DataOutput, RasterMapOptions, WFieldOptions
 
 DEFAULT_WFIELD_RASTER_OPT: RasterOptions = {
     'n_clusters': 100,

@@ -1,15 +1,14 @@
-from typing import Literal, cast, get_args
-
 import numpy as np
 import polars as pl
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from typing import Literal, cast, get_args
 
 from argclz import argument, AbstractParser
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import get_customized_cmap
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.typing import AxesArray, PathLike
 from neuralib.util.utils import keys_with_value
 from neuralib.util.verbose import publish_annotation

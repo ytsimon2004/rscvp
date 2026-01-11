@@ -1,16 +1,15 @@
 import itertools
-from typing import NamedTuple
-
 import numpy as np
 from matplotlib.axes import Axes
 from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
+from typing import NamedTuple
 from typing_extensions import Self
 
 from argclz import AbstractParser, argument, int_tuple_type
-from neuralib.imaging.suite2p import SIGNAL_TYPE
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure, ax_merge
+from neuralib.suite2p import SIGNAL_TYPE
 from neuralib.util.verbose import fprint, publish_annotation
 from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli import DataOutput, PlotOptions, SelectionOptions, get_neuron_list, NeuronID

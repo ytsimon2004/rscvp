@@ -2,8 +2,8 @@ from functools import cached_property
 from typing import ClassVar
 
 from argclz import argument
-from neuralib.imaging.scanbox.core import SBXInfo
-from neuralib.imaging.suite2p import Suite2PResult
+from neuralib.scanbox.core import SBXInfo
+from neuralib.suite2p import Suite2PResult
 from neuralib.util.utils import uglob
 from neuralib.util.verbose import fprint
 from .cli_core import CommonOptions

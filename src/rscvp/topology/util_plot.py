@@ -1,18 +1,15 @@
 import abc
-from typing import Literal, Iterable
-
 import matplotlib.colors as mcolors
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.image import AxesImage
+from typing import Literal, Iterable
 
 from argclz import argument, AbstractParser, as_argument
-from neuralib.imaging.registration import CellularCoordinates
-from neuralib.imaging.suite2p import Suite2PResult, get_s2p_coords
-from neuralib.imaging.suite2p.plot import get_soma_pixel
-from neuralib.plot import plot_figure
+from neuralib.plot import plot_figure, scatter_binx_plot
 from neuralib.plot.colormap import insert_colorbar, insert_cyclic_colorbar
-from neuralib.plot.plot import scatter_binx_plot
+from neuralib.registration import CellularCoordinates
+from neuralib.suite2p import Suite2PResult, get_s2p_coords, get_soma_pixel
 from neuralib.typing import AxesArray, ArrayLike
 from rscvp.util.cli import PlotOptions, SBXOptions, SelectionOptions
 from rscvp.util.util_ibl import IBLAtlasPlotWrapper

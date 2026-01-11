@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from argclz import AbstractParser, as_argument
-from neuralib.imaging.suite2p.plot import plot_soma_center
 from neuralib.imglib.color import grey2rgb
 from neuralib.imglib.norm import get_percentile_value
 from neuralib.plot import plot_figure
+from neuralib.suite2p.plot import plot_soma_center
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_selection import SelectionOptions
 from .util_plot import plot_registered_fov

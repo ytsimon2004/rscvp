@@ -1,10 +1,11 @@
+from pathlib import Path
+
 import subprocess
 import sys
-from pathlib import Path
 from typing import ClassVar, Optional
 
 from argclz import argument, int_tuple_type
-from neuralib.model.rastermap import RasterMapResult
+from neuralib.rastermap import RasterMapResult
 from neuralib.util.verbose import fprint
 from .cli_core import CommonOptions
 

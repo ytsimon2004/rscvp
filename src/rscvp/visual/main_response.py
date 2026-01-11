@@ -5,12 +5,12 @@ from tqdm import tqdm
 from typing_extensions import Self
 
 from argclz import AbstractParser, argument, float_tuple_type
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.persistence import persistence, ETLConcatable, validate_concat_etl_persistence
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import plot_figure
 from neuralib.plot.colormap import insert_colorbar
 from neuralib.plot.psth import peri_onset_1d
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import get_neuron_list, Suite2pOptions, PersistenceRSPOptions, StimpyOptions
 from rscvp.util.typing import SIGNAL_TYPE

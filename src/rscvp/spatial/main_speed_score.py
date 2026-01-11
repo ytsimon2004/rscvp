@@ -1,15 +1,14 @@
-from typing import Literal, NamedTuple
-
 import numpy as np
 import polars as pl
 from matplotlib.axes import Axes
 from tqdm import trange
+from typing import Literal, NamedTuple
 
 from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import get_neuron_signal, SIGNAL_TYPE, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.locomotion import CircularPosition, running_mask1d
 from neuralib.plot import plot_figure
+from neuralib.suite2p import get_neuron_signal, SIGNAL_TYPE, sync_s2p_rigevent
 from neuralib.util.verbose import publish_annotation
 from rscvp.spatial.main_cache_occ import ApplyPosBinCache
 from rscvp.util.cli import DataOutput

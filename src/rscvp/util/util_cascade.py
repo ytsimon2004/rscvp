@@ -1,7 +1,7 @@
 import numpy as np
 
-from neuralib.imaging.spikes import CASCADE_MODEL_TYPE, cascade_predict
-from neuralib.imaging.suite2p import get_neuron_signal, Suite2PResult
+from neuralib.spikes import CASCADE_MODEL_TYPE, cascade_predict
+from neuralib.suite2p import get_neuron_signal, Suite2PResult
 from neuralib.util.verbose import print_save, print_load
 
 __all__ = [

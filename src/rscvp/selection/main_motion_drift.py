@@ -1,9 +1,8 @@
+from argclz import AbstractParser, argument
+from neuralib.plot import plot_figure
+from neuralib.suite2p import Suite2PResult
 from rscvp.selection.utils import moving_average
 from rscvp.util.cli import DataOutput, StimpyOptions, Suite2pOptions
-
-from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import Suite2PResult
-from neuralib.plot import plot_figure
 
 __all__ = ['MotionDriftOptions']
 

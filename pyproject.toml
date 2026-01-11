@@ -1,7 +1,7 @@
 [project]
 name = "rscvp"
 version = "0.0.1"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 description = "Analysis for retrosplenial cortex project"
 authors = [{ name = "Yu-Ting Wei", email = "ytsimon2004@gmail.com" }]
 license = { file = "LICENSE" }
@@ -20,9 +20,12 @@ dependencies = [
     "argclz>=1.0.0",
     "sqlclz>=0.0.1",
     "iblatlas>=0.9.0",
-    "neura-library[atlas,imaging]<=0.6.0",
     "scikit-learn>=1.7.0",
     "stimpyp>=0.3.1",
+    "neuralib-atlas",
+    "neuralib-imaging",
+    "neuralib-metric",
+    "neuralib-parser",
 ]
 
 
@@ -42,9 +45,7 @@ doc = [
     "sphinx-rtd-theme",
     "sphinx-prompt",
     "sphinx_copybutton",
-    #
     "rscvp[opt]",
-    "neura-library[all]",
 ]
 
 all = ["rscvp[opt]"]

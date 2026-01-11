@@ -44,7 +44,6 @@ class TestTopologyModule(unittest.TestCase):
             exp_date = '210315'
             animal_id = 'YW006'
             plane_index = 0
-            gspread_page = 'apcls_tac'
             debug_mode = True
 
         check_attr(Opt, RoiCordOptions)
@@ -57,7 +56,6 @@ class TestTopologyModule(unittest.TestCase):
             animal_id = 'YW006'
             plane_index = 0
             session = 'light'
-            gspread_page = 'apcls_tac'
             used_session = 'light'
             debug_mode = True
 
@@ -70,7 +68,6 @@ class TestTopologyModule(unittest.TestCase):
             exp_date = '210315'
             animal_id = 'YW006'
             plane_index = 0
-            gspread_page = 'apcls_tac'
             used_session = 'light'
             debug_mode = True
 

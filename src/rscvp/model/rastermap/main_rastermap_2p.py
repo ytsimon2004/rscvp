@@ -1,17 +1,16 @@
-from functools import cached_property
-from typing import Literal, TYPE_CHECKING
-
 import attrs
 import numpy as np
 import rastermap.utils
+from functools import cached_property
 from matplotlib.axes import Axes
 from rastermap import Rastermap
 from scipy.interpolate import interp1d
+from typing import Literal, TYPE_CHECKING
 
 from argclz import AbstractParser, argument
-from neuralib.model.rastermap import RasterMapResult, RasterOptions
 from neuralib.persistence.cli_persistence import get_options_and_cache
 from neuralib.plot import plot_figure, ax_merge
+from neuralib.rastermap import RasterMapResult, RasterOptions
 from neuralib.util.gpu import check_mps_available
 from neuralib.util.unstable import unstable
 from neuralib.util.verbose import fprint

@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import Literal, ClassVar
 
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from typing import Literal, ClassVar
 
 from argclz import argument, try_int_type
-from neuralib.imaging.suite2p import SIGNAL_TYPE, Suite2PResult
+from neuralib.suite2p import SIGNAL_TYPE, Suite2PResult
 from neuralib.typing import PathLike
 from .cli_core import CommonOptions
 
@@ -159,7 +159,7 @@ def suite2p_alignment_fov(ops_file: PathLike, bright_field_file: PathLike) -> No
     :param ops_file: Path to Suite2P ops file
     :param bright_field_file: Path to bright field image
     """
-    from neuralib.imaging.suite2p import Suite2pGUIOptions
+    from neuralib.suite2p import Suite2pGUIOptions
     from neuralib.imglib.norm import enhance_blood_vessels
 
     ops: Suite2pGUIOptions = np.load(ops_file, allow_pickle=True).tolist()

@@ -1,13 +1,12 @@
-from typing import Literal
-
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
+from typing import Literal
 
 from argclz import AbstractParser, argument
-from neuralib.imaging.suite2p import dff_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
+from neuralib.suite2p import dff_signal, sync_s2p_rigevent
 from neuralib.typing import AxesArray
 from neuralib.typing.func import flatten_arraylike
 from neuralib.util.verbose import publish_annotation

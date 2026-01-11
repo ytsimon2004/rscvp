@@ -1,20 +1,19 @@
-from typing import NamedTuple, Callable
-
 import numpy as np
 import polars as pl
 import scipy
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter1d
 from tqdm import trange
+from typing import NamedTuple, Callable
 
-from neuralib.imaging.suite2p import (
+from neuralib.locomotion import running_mask1d
+from neuralib.suite2p import (
     Suite2PResult,
     get_neuron_signal,
     normalize_signal,
     sync_s2p_rigevent,
     CALCIUM_TYPE
 )
-from neuralib.locomotion import running_mask1d
 from rscvp.util.cli import SelectionOptions
 from rscvp.util.cli.cli_shuffle import SHUFFLE_METHOD, PositionShuffleOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID, NORMALIZE_TYPE

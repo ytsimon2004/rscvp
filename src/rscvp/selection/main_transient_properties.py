@@ -4,9 +4,9 @@ from scipy.signal import find_peaks
 from tqdm import tqdm
 
 from argclz import AbstractParser
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.io import csv_header
 from neuralib.plot import plot_figure
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent
 from neuralib.util.verbose import publish_annotation
 from rscvp.util.cli import DataOutput, StimpyOptions, Suite2pOptions, get_neuron_list
 from rscvp.util.util_trials import TrialSelection

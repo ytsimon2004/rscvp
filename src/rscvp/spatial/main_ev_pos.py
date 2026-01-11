@@ -3,8 +3,8 @@ from sklearn.metrics import mean_squared_error
 from tqdm import tqdm
 
 from argclz import AbstractParser
-from neuralib.imaging.suite2p import get_neuron_signal, sync_s2p_rigevent, SIGNAL_TYPE
 from neuralib.io import csv_header
+from neuralib.suite2p import get_neuron_signal, sync_s2p_rigevent, SIGNAL_TYPE
 from rscvp.util.cli.cli_output import DataOutput
 from rscvp.util.cli.cli_selection import SelectionOptions
 from rscvp.util.cli.cli_suite2p import get_neuron_list, NeuronID

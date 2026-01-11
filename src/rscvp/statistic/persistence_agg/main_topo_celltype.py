@@ -1,5 +1,4 @@
 import collections
-
 import numpy as np
 
 from argclz import try_int_type, argument
@@ -31,7 +30,7 @@ class TopoCellTypePersistenceAgg(AbstractPersistenceAgg, CellTypeSelectionOption
     def get_regions_cache(self) -> dict[Region, list[CellTypeCordCache]]:
         ret = collections.defaultdict(list)
 
-        dy = data_region_dict('apcls_tac')
+        dy = data_region_dict('fov_table')
         for _ in self.foreach_dataset(**self.field):
             name = f'{self.exp_date}_{self.animal_id}'
             region = dy[name]
