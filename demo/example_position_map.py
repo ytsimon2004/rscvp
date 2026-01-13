@@ -1,9 +1,6 @@
 from rscvp.spatial.main_slb import PositionLowerBoundOptions
 from rscvp.util.util_demo import run_demo
 
-# contact author since paper is not published yet
-TOKEN = ...
-
 
 class ExampleRun(PositionLowerBoundOptions):
     exp_date = '210315'
@@ -20,4 +17,4 @@ class ExampleRun(PositionLowerBoundOptions):
 
 
 if __name__ == '__main__':
-    run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+    run_demo(ExampleRun, clean_cached=False)

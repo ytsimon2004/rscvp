@@ -1,9 +1,6 @@
 from rscvp.util.util_demo import run_demo
 from rscvp.visual.main_tuning import VisualTuningOptions
 
-# contact author since paper is not published yet
-TOKEN = ...
-
 
 class ExampleRun(VisualTuningOptions):
     exp_date = '210315'
@@ -17,4 +14,4 @@ class ExampleRun(VisualTuningOptions):
 
 
 if __name__ == '__main__':
-    run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+    run_demo(ExampleRun, clean_cached=False)

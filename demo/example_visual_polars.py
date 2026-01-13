@@ -1,8 +1,6 @@
 from rscvp.util.util_demo import run_demo
 from rscvp.visual.main_polar import VisualPolarOptions
 
-# contact author since paper is not published yet
-TOKEN = '...'
 
 
 class ExampleRun(VisualPolarOptions):
@@ -16,4 +14,4 @@ class ExampleRun(VisualPolarOptions):
 
 
 if __name__ == '__main__':
-    run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+    run_demo(ExampleRun, clean_cached=False)

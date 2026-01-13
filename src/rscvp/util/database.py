@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import os
+import polars as pl
 import re
 import shutil
-from pathlib import Path
+import sqlclz
 from typing import NamedTuple, Annotated, Type, Literal, overload
 
-import polars as pl
-
-import sqlclz
 from neuralib.tools.gspread import upload_dataframe_to_spreadsheet, SpreadSheetName
 from neuralib.util.verbose import fprint, print_save
 from rscvp.util.io import IOConfig
@@ -28,7 +28,7 @@ __all__ = [
     'VisualSFTFDirDB',
     #
     'RSCDatabase',
-    'download_database'
+    'copy_database'
 ]
 
 DB_TYPE = Literal[
@@ -441,16 +441,21 @@ class RSCDatabase(sqlclz.Database):
         print(df)
 
 
-def download_database(token: str) -> None:
-    from neuralib.io.dataset import google_drive_file
+def copy_database(file: str | None = None):
+    """
+    Copy database to local directory.
+    :param file: .db path, if None, download from google drive.
+    """
 
     dst = RSCDatabase().database_file
 
     if dst.exists():
         print(f'Database already exists at {dst}')
-        return None
+    elif file is not None:
+        shutil.copy(file, dst)
+        print_save(dst)
     else:
-        with google_drive_file(token, quiet=True) as file:
+        from neuralib.io.dataset import google_drive_file
+        with google_drive_file('aYxXmphpPh7Obe4KM2kjwrqMcMPyzm4a', quiet=True) as file:  # TODO
             shutil.copy(file, dst)
             print_save(dst)
-            return None

@@ -3,9 +3,6 @@ from rscvp.atlas.main_roi_atlas import RoiAtlasOptions
 from rscvp.util.io import RSCVP_CACHE_DIRECTORY
 from rscvp.util.util_demo import run_demo
 
-# contact author since paper is not published yet
-TOKEN = ...
-
 
 class ExampleRun(RoiAtlasOptions):
     SOURCE_ROOT = ensure_dir(RSCVP_CACHE_DIRECTORY) / 'rscvp_dataset' / 'analysis' / 'hist'
@@ -14,4 +11,4 @@ class ExampleRun(RoiAtlasOptions):
 
 
 if __name__ == '__main__':
-    run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+    run_demo(ExampleRun, clean_cached=False)

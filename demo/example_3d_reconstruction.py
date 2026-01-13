@@ -5,9 +5,6 @@ from rscvp.util.cli import RSCRoiClassifierDataFrame
 from rscvp.util.io import RSCVP_CACHE_DIRECTORY
 from rscvp.util.util_demo import run_demo
 
-# contact author since paper is not published yet
-TOKEN = ...
-
 
 class ExampleRun(RoiRenderCLI):
     regions = ("VISal", "VISam", "VISl", "VISli", "VISp", "VISpl", "VISpm", "VISpor")
@@ -31,4 +28,4 @@ class ExampleRun(RoiRenderCLI):
 
 
 if __name__ == '__main__':
-    run_demo(ExampleRun, token=TOKEN, clean_cached=False)
+    run_demo(ExampleRun, clean_cached=False)

@@ -4,9 +4,6 @@ from rscvp.selection.main_trial_reliability import TrialReliabilityOptions
 from rscvp.util.util_demo import run_demo
 from rscvp.visual.main_reliability import VisualReliabilityOptions
 
-# contact author since paper is not published yet
-TOKEN = ...
-
 
 class ExampleNeuropil(NeuropilErrOptions):
     exp_date = '210315'
@@ -54,9 +51,9 @@ class ExampleDecoding(DecodeAnalysisOptions):
 
 if __name__ == '__main__':
     # run preselection of neuron pipeline
-    run_demo(ExampleNeuropil, token=TOKEN, clean_cached=False)
-    run_demo(ExampleTrialReliability, token=TOKEN, clean_cached=False)
-    run_demo(ExampleVisualReliability, token=TOKEN, clean_cached=False)
+    run_demo(ExampleNeuropil, clean_cached=False)
+    run_demo(ExampleTrialReliability, clean_cached=False)
+    run_demo(ExampleVisualReliability, clean_cached=False)
 
     # decoding pipeline
-    run_demo(ExampleDecoding, token=TOKEN, clean_cached=False)
+    run_demo(ExampleDecoding, clean_cached=False)
