@@ -1,19 +1,6 @@
 Demo Run
 ========
 
-Token Request
--------------------------
-
-Since the paper is not yet published, the example dataset is provided via a private link.
-Please contact the author, Yu-Ting Wei (ytsimon2004@gmail.com), to request an access token.
-
-- Replace ``TOKEN = ...`` in the example scripts or colab notebook
-
-.. code-block:: python
-
-    TOKEN = "your_token_here"
-    #        ^^^^^^^^^^^^^^^ Replace with your token string (e.g., "mY1NSIsImRhdGEiOnt")
-
 
 Run on Local Module Path
 -------------------------

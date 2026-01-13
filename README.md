@@ -1,12 +1,29 @@
 # rscvp
 
-[![Documentation Status](https://readthedocs.org/projects/rscvp/badge/?version=latest)](https://rscvp.readthedocs.io/en/latest/)
+**Anterior and posterior retrosplenial cortex form complementary visuospatial circuits in the mouse**
 
-- Pipeline for RSC visuo-spatial project (rscvp) analysis
-- Data are acquired using internal customized package [Stimpy](https://bitbucket.org/activision/stimpy/src/master)
-- Core analysis largely depending on the customized
-  package [neuralib](https://neuralib.readthedocs.io/en/latest/index.html) and cli
-  pipeline [argclz](https://argp.readthedocs.io/en/latest/)
+Yu-Ting Wei et al., 2026. *Nature Communications*
+
+[![Documentation Status](https://readthedocs.org/projects/rscvp/badge/?version=latest)](https://rscvp.readthedocs.io/en/latest/)
+[![DOI](https://zenodo.org/badge/979371317.svg)](https://doi.org/10.5281/zenodo.18234117)
+
+## Overview
+
+This repository contains the complete analysis pipeline for the RSC (Retrosplenial Cortex) visuo-spatial project,
+including:
+
+- **Two-photon calcium imaging analysis** - Neural activity recordings during visual and spatial tasks
+- **Anatomical tracing analysis** - Retrograde tracing and CCF registration pipeline
+- **Behavioral analysis** - Virtual reality and head-fixed treadmill paradigms
+- **Statistical modeling** - Bayesian decoding, tuning curve analysis, and reliability metrics
+
+### Dependencies
+
+This pipeline builds on:
+
+- [argclz](https://argp.readthedocs.io/en/latest/) - CLI pipeline framework
+- [neuralib](https://neuralib.readthedocs.io/en/latest/index.html) - Core analysis utilities
+- [Stimpy](https://bitbucket.org/activision/stimpy/src/master) - Visual stimulus presentation (internal)
 
 ------------------------------
 
@@ -29,20 +46,20 @@
     .venv\Scripts\activate           # Windows
 
     # Install package in development mode
-    uv pip install -e .
+    uv pip install -e .[all]
 ```
 
 - conda
 
 ```bash
     # Create conda environment with Python 3.10
-    conda create -n rscvp python=3.10 -y
+    conda create -n rscvp python=3.11 -y
 
     # Activate environment
     conda activate rscvp
 
     # Install package in development mode
-    pip install -e .
+    pip install -e .[all]
 ```
 
 ## Run Example in Google Colab
@@ -55,29 +72,6 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Xf8Ukc0PwpyllUyZtD6zhQgzJT40XmQo?usp=sharing)
 
-## Code available
-
-- Checkout class/function with `@publish_annotation('main' | 'sup',project='rscvp', figure=[FIGURE_NUMBER])` decorator
-
-```python
-from neuralib.util.verbose import publish_annotation
-
-
-@publish_annotation('main', project='rscvp', figure=['fig.1A-1D', 'fig.2A-2F'], as_doc=True)
-class FigureClass:
-
-  @publish_annotation('main', project='rscvp', figure='fig.1B', as_doc=True)
-  def run_figure1(self):
-    ...
-
-  @publish_annotation('main', project='rscvp', figure='fig.2C', as_doc=True)
-  def run_figure2(self):
-    ...
-
-  def _prepare_data(self):
-    pass
-
-```
 
 ## Analysis Workflow
 
@@ -89,25 +83,52 @@ class FigureClass:
 
 ![histology_data_analysis_workflow.png](docs/source/_static/histology_data_analysis_workflow.png)
 
-## Data availability
+## Code availability
 
-- From
-  Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17639283.svg)](https://doi.org/10.5281/zenodo.17639283)
-- From
-  figshare [![DOI](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.31052872-blue?logo=figshare&logoColor=white)](https://figshare.com/s/88802ef91b1f519f9075)
+- Code for reproduce the paper figure are wei2026-v* git tagged
+- The archived code are accessible
+  via [![DOI](https://zenodo.org/badge/979371317.svg)](https://doi.org/10.5281/zenodo.18234117)
 
-### SQLite database
+## Data Availability
+
+All datasets are publicly available on Zenodo and Figshare with DOIs:
+
+### Example Dataset (Demo & Colab)
+
+[![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.17639283.svg)](https://doi.org/10.5281/zenodo.17639283)
+[![Figshare](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.31052872-blue?logo=figshare&logoColor=white)](https://figshare.com/s/88802ef91b1f519f9075)
+
+Contains:
+
+- Example two-photon imaging data (suite2p extracted)
+- Example behavioral data
+- Anatomical tracing results (CCF-registered)
+- Processed aggregated dataframes
+- Pre-computed analysis caches
+- SQL Database for session information
+
+**Note:** The dataset is automatically downloaded when running demo scripts or Colab notebooks.
+
+### SQLite Database
 
 ![rscvp_sql_schema.png](docs/source/_static/rscvp_sql_schema.png)
 
-- Processed table-like data
-- Token request needed (not published yet)
+## Citation
 
-### Zenodo / figshare
+If you use this code or data in your research, please cite:
 
-- Contain example raw data + processed aggregated dataframe
-- Token request needed (not published yet)
+```bibtex
+@article{wei2026rsc,
+  title={Anterior and posterior retrosplenial cortex form complementary visuospatial circuits in the mouse},
+  author={Wei, Yu-Ting and others},
+  journal={Nature Communications},
+  year={2026},
+  doi={10.5281/zenodo.18234117}
+}
+```
 
 ## Contact
 
-Yu-Ting Wei (ytsimon2004@gmail.com)
+**Yu-Ting Wei**
+Email: ytsimon2004@gmail.com
+GitHub: [@ytsimon2004](https://github.com/ytsimon2004)
