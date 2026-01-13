@@ -91,6 +91,11 @@ class FigureClass:
 
 ## Data availability
 
+- From
+  Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17639283.svg)](https://doi.org/10.5281/zenodo.17639283)
+- From
+  figshare [![DOI](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.31052872-blue?logo=figshare&logoColor=white)](https://figshare.com/s/88802ef91b1f519f9075)
+
 ### SQLite database
 
 ![rscvp_sql_schema.png](docs/source/_static/rscvp_sql_schema.png)

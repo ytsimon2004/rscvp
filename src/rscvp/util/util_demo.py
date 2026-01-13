@@ -51,12 +51,15 @@ def mkdir_demo_dataset(source: DEMO_DATA_SOURCE = 'zenodo',
     if aria2:
         try:
             import subprocess
-            print(f'Using aria2c for fast download data from {source} ...')
+            print(f'Using aria2c for fast download data from {source}, takes few minutes ...')
             # fewer connections for figshare to avoid 502 errors
             connections = "2" if source == 'figshare' else "16"
 
             aria2c_cmd = [
-                "aria2c", "-x", connections, "-s", connections, "-k", "1M",
+                "aria2c",
+                "-x", connections,
+                "-s", connections,
+                "-k", "1M",
                 "-o", str(zip_path.name),
                 "-d", str(RSCVP_CACHE_DIRECTORY),
             ]
@@ -70,7 +73,7 @@ def mkdir_demo_dataset(source: DEMO_DATA_SOURCE = 'zenodo',
 
             result = subprocess.run(
                 aria2c_cmd,
-                check=False  # Don't raise exception on error, check manually
+                check=False,  # check manually
             )
             if result.returncode != 0:
                 print(f'aria2c failed with code {result.returncode}, falling back to Python downloader...')
